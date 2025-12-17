@@ -176,7 +176,7 @@
             </div>
         </div>
         
-        <div id="sponsorAds" class="sponsor-ads animate-on-scroll" style="--delay: 0.4s;"></div>
+        <div id="sponsorNotification" class="sponsor-notification"></div>
 
         <div class="space-y-3">
             <div class="bg-white border border-gray-200 transition-all duration-300 rounded-none animate-on-scroll hover:border-red-500 hover:shadow-lg hover:transform hover:-translate-y-1">
@@ -301,20 +301,31 @@
                 fetch('/sponsor-config.json').then(res => res.json()).catch(() => ({ enabled: true })),
                 fetch('/sponsor.json').then(res => res.json()).catch(() => [])
             ]).then(([config, data]) => {
-                const sponsorAds = document.getElementById('sponsorAds');
+                const sponsorNotification = document.getElementById('sponsorNotification');
                 if (config.enabled && data && data.length > 0) {
-                    let adsHtml = '<h4 class="text-sm font-bold text-gray-900 mb-3">Sponsors</h4><div class="grid grid-cols-1 md:grid-cols-2 gap-4">';
-                    data.forEach(sponsor => {
-                        adsHtml += `<a href="${sponsor.url || '#'}" target="_blank" class="block hover:opacity-80 transition-opacity">
-                            <img src="${sponsor.image}" alt="${sponsor.name || 'Sponsor'}" class="w-full h-auto rounded">
-                        </a>`;
-                    });
-                    adsHtml += '</div>';
-                    sponsorAds.innerHTML = adsHtml;
+                    const randomSponsor = data[Math.floor(Math.random() * data.length)];
+                    const notificationHtml = `
+                        <button class="sponsor-notification-close" onclick="closeSponsorNotification()">×</button>
+                        <a href="${randomSponsor.url || '#'}" target="_blank" onclick="closeSponsorNotification()">
+                            <img src="${randomSponsor.image}" alt="${randomSponsor.name || 'Sponsor'}">
+                        </a>
+                    `;
+                    sponsorNotification.innerHTML = notificationHtml;
+                    setTimeout(() => {
+                        sponsorNotification.classList.add('show');
+                    }, 1000);
                 } else {
-                    sponsorAds.style.display = 'none';
+                    sponsorNotification.style.display = 'none';
                 }
             });
+            
+            function closeSponsorNotification() {
+                const notification = document.getElementById('sponsorNotification');
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                }, 400);
+            }
             
             const spotlight = document.getElementById('mouse-spotlight');
             if (spotlight) {

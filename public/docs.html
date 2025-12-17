@@ -70,17 +70,49 @@
         .feedback-btn i {
             font-size: 16px;
         }
-        .sponsor-ads {
-            background: #f9fafb;
+        .sponsor-notification {
+            position: fixed;
+            bottom: 24px;
+            left: 24px;
+            z-index: 1001;
+            background: white;
             border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 16px;
-            margin: 16px 0;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            max-width: 400px;
+            padding: 0;
+            overflow: hidden;
+            transform: translateX(-120%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .sponsor-ads img {
-            max-width: 100%;
+        .sponsor-notification.show {
+            transform: translateX(0);
+        }
+        .sponsor-notification img {
+            width: 100%;
             height: auto;
-            border-radius: 4px;
+            display: block;
+        }
+        .sponsor-notification-close {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all 0.2s ease;
+        }
+        .sponsor-notification-close:hover {
+            background: rgba(0, 0, 0, 0.7);
+            transform: scale(1.1);
         }
         @keyframes spin {
             to { transform: rotate(360deg); }
@@ -173,7 +205,7 @@
           </div>
         </div>
         
-        <div id="sponsorAds" class="sponsor-ads mb-6"></div>
+        <div id="sponsorNotification" class="sponsor-notification"></div>
         
         <div class="flex items-center justify-between mb-6">
             <div class="flex-1 relative">
@@ -207,8 +239,9 @@
           </p>
         </div>
     </main>
-    <button onclick="openFeedback()" class="feedback-btn">
-        <i class="fas fa-comment mr-2"></i>Feedback
+    <button onclick="openFeedback()" class="feedback-btn" aria-label="Send Feedback">
+        <i class="fas fa-comment"></i>
+        <span>Feedback</span>
     </button>
     <script>
       async function loadApiData() {
@@ -615,7 +648,7 @@
       });
       
       function openFeedback() {
-          window.open('https://github.com/yemobyte/YeMo-APIs/issues/new', '_blank');
+        window.open('https://github.com/yemobyte/YeMo-APIs/issues/new', '_blank');
       }
     </script>
 </body>
