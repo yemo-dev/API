@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=1200, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="A lightweight, auto-loading REST API built with Express.js that automatically registers endpoints from the file system.">
     <meta name="keywords" content="API, REST API, YeMo API, API Documentation, Developer Tools">
     <meta name="author" content="YeMo">
@@ -34,8 +34,7 @@
         }
         
         body {
-            min-width: 1200px;
-            overflow-x: auto;
+            overflow-x: hidden;
         }
         
         .glass {
@@ -116,7 +115,7 @@
     
     <div id="mouse-spotlight"></div>
     
-    <main class="max-w-2xl mx-auto px-8 py-16 pb-32" style="min-width: 672px;">
+    <main class="max-w-2xl mx-auto px-4 sm:px-6 md:px-8 py-8 sm:py-12 md:py-16 pb-16 sm:pb-24 md:pb-32">
         <div class="text-left mb-8">
             <p class="text-gray-600 text-xs mb-4 animate-on-load" style="animation-delay: 0.1s;">Hi Developer! Welcome To</p>
             <h2 class="flex flex-wrap items-center gap-1 text-3xl text-gray-900 font-bold mb-1.5 animate-on-load" style="animation-delay: 0.2s;">
@@ -132,7 +131,7 @@
         </div>
 
         <div class="bg-gray-50 border border-gray-200 p-4 my-3 animate-on-scroll">
-            <div class="grid grid-cols-3 gap-4">
+            <div class="grid grid-cols-3 gap-2 sm:gap-4">
                 <div class="text-center">
                     <div class="text-lg font-bold text-gray-900" id="totalEndpoints">0</div>
                     <div class="text-xs text-gray-600">Endpoints</div>
