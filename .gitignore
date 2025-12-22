@@ -1,10 +1,24 @@
-node_modules/
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+bin/
+
+# Logs
 logs/
-data/
-package-lock.json
-.env
-files/
 *.log
-.DS_Store
-.vscode/
-.idea/
+
+# Data
+data/
+banned-ips.json
+
+# Files
+files/
+
+# Vendor
+vendor/
+
+# Environment
+.env
