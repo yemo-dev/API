@@ -37,19 +37,29 @@ func New() *Server {
 func (s *Server) Init() {
 	utils.Logger.Info("Starting server initialization...")
 
-	// Resolve public directory
+	// Resolve public directory logic
+	// Strategy:
+	// 1. Try relative path "public" from CWD.
+	// 2. If valid, use absolute path of it.
+	// 3. Fallback to just "public" (relative) if resolution fails.
+
 	cwd, err := os.Getwd()
 	if err != nil {
-		utils.Logger.Error(fmt.Sprintf("Failed to get current working directory: %v", err))
+		utils.Logger.Error(fmt.Sprintf("Failed to get CWD: %v", err))
 		cwd = "."
 	}
-	s.publicDir = filepath.Join(cwd, "public")
 
-	// Check if public dir exists, if not, try to find it?
-	if _, err := os.Stat(s.publicDir); os.IsNotExist(err) {
-		utils.Logger.Warn(fmt.Sprintf("Public directory not found at %s", s.publicDir))
+	relativePublic := "public"
+	absPublic := filepath.Join(cwd, relativePublic)
+
+	// Check existence
+	if stat, err := os.Stat(absPublic); err == nil && stat.IsDir() {
+		s.publicDir = absPublic
+		// utils.Logger.Info(fmt.Sprintf("Found public directory at: %s", s.publicDir))
 	} else {
-		// utils.Logger.Info(fmt.Sprintf("Serving static files from %s", s.publicDir))
+		utils.Logger.Warn(fmt.Sprintf("Public directory not found at: %s (CWD: %s)", absPublic, cwd))
+		// Try fallback to just relative "public" in case of some weird path issue
+		s.publicDir = relativePublic
 	}
 
 	// Middleware Order: Logger -> Recovery -> RateLimiter
@@ -82,6 +92,7 @@ func (s *Server) Init() {
 	s.router.HandleFunc("/openapi.json", s.serveOpenAPI)
 
 	// Legal
+	// For FileServer, if s.publicDir is absolute, fine. If relative, fine.
 	legalDir := filepath.Join(s.publicDir, "legal")
 	s.router.PathPrefix("/legal/").Handler(http.StripPrefix("/legal/", http.FileServer(http.Dir(legalDir))))
 
