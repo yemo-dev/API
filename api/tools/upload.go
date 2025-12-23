@@ -28,8 +28,6 @@ func (e *UploadEndpoint) ParamsSchema() map[string]interface{} {
 }
 
 func (e *UploadEndpoint) Run(w http.ResponseWriter, r *http.Request) {
-	// Parse multipart form
-	// Max size 50MB safety.
 	r.ParseMultipartForm(50 << 20)
 
 	file, header, err := r.FormFile("file")
@@ -39,7 +37,6 @@ func (e *UploadEndpoint) Run(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	// Generate random name
 	bytes := make([]byte, 16)
 	rand.Read(bytes)
 	randomName := hex.EncodeToString(bytes) + filepath.Ext(header.Filename)
@@ -57,7 +54,6 @@ func (e *UploadEndpoint) Run(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Copy
 	if _, err := io.Copy(dst, file); err != nil {
 		dst.Close()
 		response.Error(w, 500, "Failed to write file")
@@ -65,7 +61,6 @@ func (e *UploadEndpoint) Run(w http.ResponseWriter, r *http.Request) {
 	}
 	dst.Close()
 
-	// Auto delete after 5 minutes
 	go func() {
 		time.Sleep(5 * time.Minute)
 		os.Remove(filePath)

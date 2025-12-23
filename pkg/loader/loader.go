@@ -27,7 +27,6 @@ type Endpoint interface {
 var Registry = make(map[string]Endpoint)
 
 // Register adds an endpoint to the registry.
-// It uses runtime.Caller to determine the file path and generate the route.
 func Register(e Endpoint) {
 	_, file, _, ok := runtime.Caller(1)
 	if !ok {
@@ -35,18 +34,9 @@ func Register(e Endpoint) {
 		return
 	}
 
-	// Calculate route from file path
-	// Assuming structure: .../api/category/name.go -> /api/category/name
-	// We look for "api/" in the path.
-
-	// Normalize separators
 	file = filepath.ToSlash(file)
 	idx := strings.Index(file, "/api/")
 	if idx == -1 {
-		// Fallback or error?
-		// Maybe it is in api root?
-		// Try to find where "api" starts.
-		// If not found, maybe just use the name? No, route structure is key.
 		utils.Logger.Warn(fmt.Sprintf("Endpoint registered from outside api/ folder: %s", file))
 		return
 	}
@@ -76,7 +66,7 @@ func LoadRoutes(r *mux.Router) []map[string]interface{} {
 			"description":  endpoint.Description(),
 			"category":     endpoint.Category(),
 			"route":        route,
-			"url":          route, // BaseURL will be added in openapi handler
+			"url":          route,
 			"methods":      methods,
 			"params":       endpoint.Params(),
 			"paramsSchema": endpoint.ParamsSchema(),

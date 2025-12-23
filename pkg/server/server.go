@@ -37,12 +37,6 @@ func New() *Server {
 func (s *Server) Init() {
 	utils.Logger.Info("Starting server initialization...")
 
-	// Resolve public directory logic
-	// Strategy:
-	// 1. Try relative path "public" from CWD.
-	// 2. If valid, use absolute path of it.
-	// 3. Fallback to just "public" (relative) if resolution fails.
-
 	cwd, err := os.Getwd()
 	if err != nil {
 		utils.Logger.Error(fmt.Sprintf("Failed to get CWD: %v", err))
@@ -52,21 +46,16 @@ func (s *Server) Init() {
 	relativePublic := "public"
 	absPublic := filepath.Join(cwd, relativePublic)
 
-	// Check existence
 	if stat, err := os.Stat(absPublic); err == nil && stat.IsDir() {
 		s.publicDir = absPublic
-		// utils.Logger.Info(fmt.Sprintf("Found public directory at: %s", s.publicDir))
 	} else {
 		utils.Logger.Warn(fmt.Sprintf("Public directory not found at: %s (CWD: %s)", absPublic, cwd))
-		// Try fallback to just relative "public" in case of some weird path issue
 		s.publicDir = relativePublic
 	}
 
-	// Middleware Order: Logger -> Recovery -> RateLimiter
 	s.router.Use(middleware.LoggerMiddleware)
 	s.router.Use(middleware.RecoveryMiddleware)
 
-	// Rate Limiter
 	rlConfig := middleware.RateLimiterConfig{
 		MaxRequests: 25,
 		Window:      10 * time.Second,
@@ -76,27 +65,21 @@ func (s *Server) Init() {
 	rl := middleware.NewRateLimiter(rlConfig)
 	s.router.Use(rl.Middleware)
 
-	// Admin unban endpoint
 	s.router.HandleFunc("/admin/unban", s.handleAdminUnban).Methods("POST")
 
 	utils.Logger.Info("Loading API endpoints...")
 	s.docs = loader.LoadRoutes(s.router)
 
-	// Files endpoint (serving uploaded files)
 	fileHandler := http.StripPrefix("/files/", http.FileServer(http.Dir("files")))
 	s.router.PathPrefix("/files/").Handler(fileHandler).Methods("GET")
 
-	// Static files
 	s.router.HandleFunc("/", s.serveIndex)
 	s.router.HandleFunc("/docs", s.serveDocs)
 	s.router.HandleFunc("/openapi.json", s.serveOpenAPI)
 
-	// Legal
-	// For FileServer, if s.publicDir is absolute, fine. If relative, fine.
 	legalDir := filepath.Join(s.publicDir, "legal")
 	s.router.PathPrefix("/legal/").Handler(http.StripPrefix("/legal/", http.FileServer(http.Dir(legalDir))))
 
-	// Catch all for 404
 	s.router.NotFoundHandler = http.HandlerFunc(s.handleNotFound)
 }
 
@@ -112,12 +95,10 @@ func (s *Server) Start() {
 		Handler: s.router,
 	}
 
-	// Logs
 	utils.Logger.Ready("Local: http://localhost:" + port)
 	s.logNetwork(port)
 	utils.Logger.Ready("Ready for connections")
 
-	// Start server in goroutine
 	go func() {
 		if err := s.http.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			utils.Logger.Error(fmt.Sprintf("Listen: %s", err))
@@ -125,7 +106,6 @@ func (s *Server) Start() {
 		}
 	}()
 
-	// Graceful shutdown
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	<-c
@@ -215,7 +195,6 @@ func (s *Server) serveOpenAPI(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handleNotFound(w http.ResponseWriter, r *http.Request) {
-	// Check Accept header
 	accept := r.Header.Get("Accept")
 	if strings.Contains(accept, "text/html") {
 		w.WriteHeader(404)

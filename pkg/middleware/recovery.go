@@ -16,7 +16,6 @@ func RecoveryMiddleware(next http.Handler) http.Handler {
 			if err := recover(); err != nil {
 				utils.Logger.Error(fmt.Sprintf("Panic recovered: %v\n%s", err, debug.Stack()))
 
-				// Check Accept header
 				accept := r.Header.Get("Accept")
 				if strings.Contains(accept, "text/html") {
 					w.WriteHeader(500)

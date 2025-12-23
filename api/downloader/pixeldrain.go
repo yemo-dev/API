@@ -3,7 +3,6 @@ package downloader
 import (
 	"net/http"
 	"net/url"
-
 	"yemo-api/pkg/loader"
 	"yemo-api/pkg/response"
 
@@ -30,13 +29,11 @@ func (e *PixelDrainEndpoint) Run(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Simple validation
 	if _, err := url.ParseRequestURI(targetURL); err != nil {
 		response.Error(w, 400, "Invalid URL")
 		return
 	}
 
-	// Fetch page
 	resp, err := http.Get(targetURL)
 	if err != nil {
 		response.Error(w, 500, "Failed to fetch URL: " + err.Error())
@@ -49,14 +46,12 @@ func (e *PixelDrainEndpoint) Run(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Parse HTML
 	doc, err := goquery.NewDocumentFromReader(resp.Body)
 	if err != nil {
 		response.Error(w, 500, "Failed to parse HTML")
 		return
 	}
 
-	// Example scraping logic
 	title := doc.Find("title").Text()
 
 	data := map[string]interface{}{

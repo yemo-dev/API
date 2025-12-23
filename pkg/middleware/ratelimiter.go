@@ -13,11 +13,9 @@ import (
 	"yemo-api/pkg/response"
 )
 
-// RateLimiterConfig holds configuration for the rate limiter
 type RateLimiterConfig struct {
 	MaxRequests int
 	Window      time.Duration
-	BanDuration time.Duration
 	DataDir     string
 	LogDir      string
 }
@@ -35,7 +33,7 @@ type clientRate struct {
 
 type RateLimiter struct {
 	config       RateLimiterConfig
-	clients      sync.Map // map[string]*clientRate
+	clients      sync.Map
 	banned       map[string]banInfo
 	bannedMutex  sync.RWMutex
 	bannedFile   string
@@ -186,7 +184,6 @@ func (rl *RateLimiter) Middleware(next http.Handler) http.Handler {
 
 		client.timestamps = append(client.timestamps, now)
 
-		// Filter old
 		var recent []int64
 		for _, t := range client.timestamps {
 			if now-t <= windowMs {
@@ -199,7 +196,6 @@ func (rl *RateLimiter) Middleware(next http.Handler) http.Handler {
 		client.mu.Unlock()
 
 		go func() {
-			// Async log
 			strCount := fmt.Sprintf("%d", count)
 			rl.appendLog("[REQ] " + time.Now().UTC().Format(time.RFC3339) + " " + ip + " " + r.Method + " " + r.URL.Path + " count=" + strCount)
 		}()
@@ -223,7 +219,6 @@ func getIP(r *http.Request) string {
 	if forwarded != "" {
 		return forwarded
 	}
-	// RemoteAddr contains port, strip it
 	host, _, err := net.SplitHostPort(r.RemoteAddr)
 	if err == nil {
 		return host

@@ -21,7 +21,6 @@ import (
 	"yemo-api/pkg/response"
 )
 
-// PlayEndpoint implements the endpoint interface
 type PlayEndpoint struct{}
 
 func (e *PlayEndpoint) Name() string { return "Play & Download YouTube Video/Audio" }
@@ -36,8 +35,6 @@ func (e *PlayEndpoint) ParamsSchema() map[string]interface{} {
 		"query": map[string]interface{}{"type": "string", "required": true, "minLength": 1},
 	}
 }
-
-// -- SaveTube Logic --
 
 type saveTube struct {
 	Base string
@@ -75,10 +72,7 @@ func stRequest(method, endpoint string, data map[string]string) (map[string]inte
 		body = bytes.NewBuffer(jsonData)
 	}
 
-	// For GET, we might append params?
-	// The JS code: `params: method === 'get' ? data : undefined`
 	if method == "GET" && data != nil && len(data) > 0 {
-		// append query params
 		u, _ := url.Parse(targetURL)
 		q := u.Query()
 		for k, v := range data {
@@ -154,7 +148,6 @@ func stDecrypt(enc string) (map[string]interface{}, error) {
 	decrypted := make([]byte, len(content))
 	mode.CryptBlocks(decrypted, content)
 
-	// Unpad (PKCS7)
 	padding := int(decrypted[len(decrypted)-1])
 	if padding > len(decrypted) || padding == 0 {
 		return nil, errors.New("invalid padding")
@@ -163,15 +156,12 @@ func stDecrypt(enc string) (map[string]interface{}, error) {
 
 	var result map[string]interface{}
 	if err := json.Unmarshal(decrypted, &result); err != nil {
-		// Sometimes it returns a string that is JSON? Or direct JSON?
-		// JS: JSON.parse(decrypted.toString())
 		return nil, err
 	}
 	return result, nil
 }
 
 func extractVideoID(link string) string {
-	// Simple regex
 	patterns := []string{
 		`youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})`,
 		`youtu\.be\/([a-zA-Z0-9_-]{11})`,
@@ -188,7 +178,6 @@ func extractVideoID(link string) string {
 	return ""
 }
 
-// ytmp3.mobi Logic
 func ytmp3Mobi(youtubeURL string) (string, error) {
 	videoID := extractVideoID(youtubeURL)
 	if videoID == "" {
@@ -215,7 +204,6 @@ func ytmp3Mobi(youtubeURL string) (string, error) {
 
 	randStr := fmt.Sprintf("%f", rand.Float64())
 
-	// Init
 	initURL := "https://d.ymcdn.org/api/v1/init?p=y&23=1llum1n471&_=" + randStr
 	initRes, err := fetchJSON(initURL)
 	if err != nil {
@@ -227,7 +215,6 @@ func ytmp3Mobi(youtubeURL string) (string, error) {
 		return "", errors.New("failed to get convertURL")
 	}
 
-	// Trigger conversion
 	params := url.Values{}
 	params.Set("v", videoID)
 	params.Set("f", "mp4")
@@ -249,7 +236,6 @@ func ytmp3Mobi(youtubeURL string) (string, error) {
 		return "", errors.New("failed to get progressURL")
 	}
 
-	// Poll
 	for i := 0; i < 10; i++ {
 		progRes, err := fetchJSON(progressURL)
 		if err != nil {
@@ -261,7 +247,6 @@ func ytmp3Mobi(youtubeURL string) (string, error) {
 			if dl, ok := progRes["downloadURL"].(string); ok {
 				return dl, nil
 			}
-			// Should be in result
 			return "", errors.New("progress complete but no url")
 		}
 		if msg, ok := progRes["error"].(string); ok && msg != "" {
@@ -285,7 +270,6 @@ func stDownload(link, format string) (map[string]interface{}, error) {
 		return nil, err
 	}
 
-	// Info
 	infoURL := fmt.Sprintf("https://%s%s", cdn, st.Info)
 	infoRes, err := stRequest("POST", infoURL, map[string]string{"url": "https://www.youtube.com/watch?v=" + id})
 	if err != nil {
@@ -351,14 +335,11 @@ func stDownload(link, format string) (map[string]interface{}, error) {
 	}, nil
 }
 
-// Simple YouTube Search (Scraping)
 func searchYouTube(query string) (string, string, error) {
-	// If query is URL, just return it.
 	if _, err := url.ParseRequestURI(query); err == nil && strings.Contains(query, "youtu") {
 		return query, "", nil
 	}
 
-	// Fetch search page
 	client := &http.Client{}
 	req, _ := http.NewRequest("GET", "https://www.youtube.com/results?search_query="+url.QueryEscape(query), nil)
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
@@ -387,14 +368,12 @@ func (e *PlayEndpoint) Run(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Search or use URL
 	videoURL, _, err := searchYouTube(query)
 	if err != nil {
 		response.Error(w, 404, "Video not found for the given query.")
 		return
 	}
 
-	// Parallel download info fetching
 	type resChan struct {
 		format string
 		res    map[string]interface{}
@@ -432,7 +411,6 @@ func (e *PlayEndpoint) Run(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Merge metadata from successful one
 	meta := mp4Result
 	if meta == nil {
 		meta = mp3Result
@@ -457,7 +435,6 @@ func (e *PlayEndpoint) Run(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response.JSON(w, 200, map[string]interface{}{
-		"success": true,
 		"creator": "GIMI❤️",
 		"data":    data,
 	})

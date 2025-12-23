@@ -27,12 +27,6 @@ func LoggerMiddleware(next http.Handler) http.Handler {
 		defer func() {
 			duration := time.Since(start)
 
-			// If panic happens, status might not be set or might be default 200 if WriteHeader wasn't called.
-			// However, if Recovery middleware runs *after* Logger (wrapped inside Logger), Recovery will handle the response.
-			// But wrapper won't capture the status written by Recovery unless Recovery writes to *this* wrapper.
-			// If Recovery middleware is inside this one, it will write to wrapper.
-
-			// Log format: GET /api/users [200] (45ms)
 			methodColor := color.New(color.FgCyan).SprintFunc()
 			statusColor := color.New(color.FgGreen).SprintFunc()
 			if wrapper.statusCode >= 400 {

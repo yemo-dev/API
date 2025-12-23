@@ -1,24 +1,11 @@
-# Binaries
-*.exe
-*.exe~
-*.dll
-*.so
-*.dylib
-bin/
-
-# Logs
+node_modules/
 logs/
-*.log
-
-# Data
 data/
-banned-ips.json
-
-# Files
-files/
-
-# Vendor
-vendor/
-
-# Environment
+package-lock.json
 .env
+files/
+*.log
+.DS_Store
+.vscode/
+.idea/
+legacy_src
