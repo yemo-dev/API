@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"strings"
 	"syscall"
 	"time"
@@ -21,9 +22,10 @@ import (
 )
 
 type Server struct {
-	router *mux.Router
-	http   *http.Server
-	docs   []map[string]interface{}
+	router    *mux.Router
+	http      *http.Server
+	docs      []map[string]interface{}
+	publicDir string
 }
 
 func New() *Server {
@@ -35,9 +37,22 @@ func New() *Server {
 func (s *Server) Init() {
 	utils.Logger.Info("Starting server initialization...")
 
+	// Resolve public directory
+	cwd, err := os.Getwd()
+	if err != nil {
+		utils.Logger.Error(fmt.Sprintf("Failed to get current working directory: %v", err))
+		cwd = "."
+	}
+	s.publicDir = filepath.Join(cwd, "public")
+
+	// Check if public dir exists, if not, try to find it?
+	if _, err := os.Stat(s.publicDir); os.IsNotExist(err) {
+		utils.Logger.Warn(fmt.Sprintf("Public directory not found at %s", s.publicDir))
+	} else {
+		// utils.Logger.Info(fmt.Sprintf("Serving static files from %s", s.publicDir))
+	}
+
 	// Middleware Order: Logger -> Recovery -> RateLimiter
-	// Logger wraps everything to time it.
-	// Recovery wraps logic to catch panics.
 	s.router.Use(middleware.LoggerMiddleware)
 	s.router.Use(middleware.RecoveryMiddleware)
 
@@ -58,7 +73,6 @@ func (s *Server) Init() {
 	s.docs = loader.LoadRoutes(s.router)
 
 	// Files endpoint (serving uploaded files)
-	// JS: `GET /files/:filename`
 	fileHandler := http.StripPrefix("/files/", http.FileServer(http.Dir("files")))
 	s.router.PathPrefix("/files/").Handler(fileHandler).Methods("GET")
 
@@ -68,7 +82,8 @@ func (s *Server) Init() {
 	s.router.HandleFunc("/openapi.json", s.serveOpenAPI)
 
 	// Legal
-	s.router.PathPrefix("/legal/").Handler(http.StripPrefix("/legal/", http.FileServer(http.Dir("public/legal"))))
+	legalDir := filepath.Join(s.publicDir, "legal")
+	s.router.PathPrefix("/legal/").Handler(http.StripPrefix("/legal/", http.FileServer(http.Dir(legalDir))))
 
 	// Catch all for 404
 	s.router.NotFoundHandler = http.HandlerFunc(s.handleNotFound)
@@ -140,11 +155,13 @@ func (s *Server) logNetwork(port string) {
 }
 
 func (s *Server) serveIndex(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "public/index.html")
+	path := filepath.Join(s.publicDir, "index.html")
+	http.ServeFile(w, r, path)
 }
 
 func (s *Server) serveDocs(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "public/docs.html")
+	path := filepath.Join(s.publicDir, "docs.html")
+	http.ServeFile(w, r, path)
 }
 
 func (s *Server) serveOpenAPI(w http.ResponseWriter, r *http.Request) {
@@ -154,10 +171,6 @@ func (s *Server) serveOpenAPI(w http.ResponseWriter, r *http.Request) {
 	}
 	baseURL := fmt.Sprintf("%s://%s", scheme, r.Host)
 
-	// Inject baseURL into docs?
-	// The prompt format:
-	// { "baseURL": ..., "endpoints": [...] }
-
 	resp := map[string]interface{}{
 		"title":       "YeMo API's.",
 		"description": "Welcome to the API documentation...",
@@ -165,10 +178,8 @@ func (s *Server) serveOpenAPI(w http.ResponseWriter, r *http.Request) {
 		"endpoints":   s.docs,
 	}
 
-	// Add url with base to each endpoint if needed
 	finalDocs := make([]map[string]interface{}, len(s.docs))
 	for i, doc := range s.docs {
-		// Clone map
 		newDoc := make(map[string]interface{})
 		for k, v := range doc {
 			newDoc[k] = v
@@ -179,7 +190,7 @@ func (s *Server) serveOpenAPI(w http.ResponseWriter, r *http.Request) {
 
 		query := ""
 		if len(params) > 0 {
-			query = "?param=YOUR_" + strings.ToUpper(params[0]) // Simplistic example
+			query = "?param=YOUR_" + strings.ToUpper(params[0])
 		}
 
 		newDoc["url"] = fmt.Sprintf("%s%s%s", baseURL, route, query)
@@ -197,7 +208,8 @@ func (s *Server) handleNotFound(w http.ResponseWriter, r *http.Request) {
 	accept := r.Header.Get("Accept")
 	if strings.Contains(accept, "text/html") {
 		w.WriteHeader(404)
-		http.ServeFile(w, r, "public/404.html")
+		path := filepath.Join(s.publicDir, "404.html")
+		http.ServeFile(w, r, path)
 		return
 	}
 	response.Error(w, 404, "Endpoint not found")
@@ -220,7 +232,6 @@ func (s *Server) handleAdminUnban(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Parse body for IP
 	var req struct {
 		IP string `json:"ip"`
 		AdminKey string `json:"adminKey"`
