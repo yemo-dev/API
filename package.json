@@ -2,6 +2,7 @@
     "name": "API",
     "version": "1.0.0",
     "description": "About Simple and easy to use API. ⭐️ Star to support our work!",
+    "license": "MIT",
     "repository": {
         "type": "git",
         "url": "https://github.com/yemo-dev/API.git"
