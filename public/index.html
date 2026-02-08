@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YeMo | NEO-SWAGGER PREM</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;700;900&family=JetBrains+Mono:wght@800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #F0F0F0;
+            --black: #000000;
+            --white: #FFFFFF;
+            --yellow: #FFEE00;
+            --cyan: #00E0FF;
+            --magenta: #FF00FF;
+            --green: #00FF66;
+            --border: 5px solid #000;
+            --shadow: 10px 10px 0px #000;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--black);
+            font-family: 'Space Grotesk', sans-serif;
+            padding: 1rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            width: 100%;
+            flex: 1;
+        }
+
+        .top-bar {
+            background: var(--black);
+            color: #fff;
+            padding: 1.5rem 2rem;
+            border: var(--border);
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            font-weight: 900;
+            letter-spacing: -2px;
+        }
+
+        .info-box {
+            background: var(--white);
+            border: var(--border);
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .info-box h1 {
+            font-size: clamp(2rem, 6vw, 3.5rem);
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            line-height: 1;
+        }
+
+        .info-box p {
+            font-size: clamp(0.95rem, 2vw, 1.1rem);
+            font-weight: 400;
+            color: #333;
+            margin-bottom: 1.5rem;
+        }
+
+        .header-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .badge {
+            background: var(--black);
+            color: var(--yellow);
+            padding: 5px 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            font-weight: 800;
+            border: 3px solid var(--black);
+        }
+
+        .docs-link {
+            background: var(--magenta);
+            color: #fff;
+            text-decoration: none;
+            padding: 8px 15px;
+            font-weight: 900;
+            font-size: 1rem;
+            border: 4px solid var(--black);
+            box-shadow: 4px 4px 0 var(--black);
+            transition: 0.1s;
+            text-transform: uppercase;
+        }
+
+        .docs-link:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0 var(--black);
+            background: var(--cyan);
+            color: #000;
+        }
+
+        .servers-box {
+            background: var(--yellow);
+            border: var(--border);
+            padding: 1.5rem;
+            box-shadow: 6px 6px 0 var(--black);
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .servers-box label {
+            font-weight: 900;
+            text-transform: uppercase;
+            font-size: 1rem;
+        }
+
+        .servers-box select {
+            background: var(--white);
+            border: 3px solid var(--black);
+            padding: 8px 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 800;
+            font-size: 0.9rem;
+            cursor: pointer;
+            box-shadow: 3px 3px 0 var(--black);
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .section-header {
+            font-size: 1.8rem;
+            text-transform: uppercase;
+            padding: 8px 20px;
+            background: var(--black);
+            color: #fff;
+            line-height: 1;
+        }
+
+        .search-container {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 18px;
+            border: 4px solid var(--black);
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 800;
+            font-size: 1.1rem;
+            box-shadow: 5px 5px 0 var(--black);
+            background: var(--white);
+            text-transform: uppercase;
+        }
+
+        .op-block {
+            background: var(--white);
+            border: var(--border);
+            margin-bottom: 2rem;
+            box-shadow: 8px 8px 0px var(--black);
+            transition: 0.1s;
+            overflow: hidden;
+        }
+
+        .op-block.hidden {
+            display: none;
+        }
+
+        .op-sum {
+            padding: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            cursor: pointer;
+            border-bottom: 4px solid var(--black);
+        }
+
+        .op-sum:hover {
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        .method {
+            background: var(--green);
+            padding: 5px 15px;
+            border: 3px solid var(--black);
+            font-weight: 900;
+            font-size: 1rem;
+            box-shadow: 3px 3px 0 var(--black);
+            text-transform: uppercase;
+        }
+
+        .path {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: clamp(0.9rem, 2.5vw, 1.2rem);
+            font-weight: 800;
+        }
+
+        .summary {
+            color: #555;
+            font-size: 0.8rem;
+            flex: 1;
+            text-align: right;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .op-content {
+            padding: 1.5rem;
+            display: none;
+            background: #fff;
+        }
+
+        .op-content.active {
+            display: block;
+        }
+
+        .op-desc {
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+            border-left: 6px solid var(--magenta);
+            padding-left: 1rem;
+            font-weight: 500;
+            color: #333;
+            line-height: 1.4;
+            background: #fafafa;
+            padding: 1rem;
+        }
+
+        .params-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            background: #f9f9f9;
+            padding: 1rem;
+            border: 3px solid #000;
+        }
+
+        .param-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .param-group label {
+            font-weight: 900;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .param-input {
+            padding: 8px;
+            border: 3px solid #000;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            outline: none;
+        }
+
+        .param-input:focus {
+            background: var(--yellow);
+        }
+
+        .try-btn {
+            width: 100%;
+            padding: 1.2rem;
+            background: var(--black);
+            color: #fff;
+            border: 4px solid var(--black);
+            font-size: clamp(1rem, 3vw, 1.3rem);
+            font-weight: 900;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: 0.1s;
+            box-shadow: 4px 4px 0 var(--cyan);
+        }
+
+        .try-btn:hover {
+            background: var(--magenta);
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0 var(--black);
+        }
+
+        .response-box {
+            margin-top: 2rem;
+            background: #000;
+            border: 4px solid var(--black);
+            padding: 1.5rem;
+            display: none;
+            position: relative;
+        }
+
+        .res-header {
+            background: var(--white);
+            border: 2px solid var(--black);
+            color: var(--black);
+            padding: 3px 10px;
+            position: absolute;
+            top: -15px;
+            left: 1rem;
+            font-size: 0.75rem;
+            font-weight: 900;
+            box-shadow: 3px 3px 0 var(--black);
+        }
+
+        .direct-link {
+            color: var(--cyan);
+            text-decoration: none;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            margin-bottom: 1rem;
+            display: inline-block;
+            border-bottom: 1px solid var(--cyan);
+        }
+
+        pre {
+            color: var(--green);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            line-height: 1.4;
+            margin-top: 0.5rem;
+        }
+
+        footer {
+            margin-top: 4rem;
+            padding: 3rem 1.5rem;
+            background: var(--black);
+            border: var(--border);
+            box-shadow: var(--shadow);
+            text-align: center;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .footer-logo {
+            font-size: clamp(2rem, 8vw, 4rem);
+            font-weight: 900;
+            letter-spacing: -3px;
+            color: var(--magenta);
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+
+        .footer-links a {
+            color: #fff;
+            text-decoration: none;
+            border-bottom: 3px solid var(--yellow);
+        }
+
+        .footer-copy {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: #888;
+        }
+
+        @media (max-width: 700px) {
+            .op-sum {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+
+            .summary {
+                text-align: left;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="top-bar">
+            <div class="logo">YE-MO.API</div>
+            <div class="header-meta">
+                <span class="badge">v1.0.0</span>
+                <span class="badge" style="background:var(--cyan); color:#000">ONLINE</span>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <h1>NEO-SWAGGER PORTAL</h1>
+            <p>About Simple and easy to use API. ⭐️ Star to support our work!</p>
+            <div class="header-meta">
+                <span class="badge">OAS 3.0.0</span>
+                <a href="/docs" class="docs-link">VIEW /docs</a>
+            </div>
+        </div>
+
+        <div class="servers-box">
+            <label>SERVERS</label>
+            <select id="server-select"></select>
+        </div>
+
+        <div class="controls">
+            <div class="section-header">Endpoints</div>
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="SEARCH..." oninput="filterEndpoints(this.value)">
+            </div>
+        </div>
+
+        <div id="endpoint-list"></div>
+    </div>
+
+    <footer>
+        <div class="footer-logo">YEMO.IO</div>
+        <div class="footer-links">
+            <a href="/docs">Docs</a>
+            <a href="https://github.com/yemo-dev">Github</a>
+            <a href="https://whatsapp.com/channel/0029Vb7RdArLikg1BHzpH20A">Support</a>
+        </div>
+        <div class="footer-copy">Pure Data. No Fluff. &copy; 2026 INFRASTRUCTURE</div>
+    </footer>
+
+    <script>
+        async function initPortal() {
+            try {
+                const res = await fetch('/docs');
+                const spec = await res.json();
+                renderServers(spec.servers);
+                renderEndpoints(spec.paths);
+            } catch (e) {
+                document.getElementById('endpoint-list').innerHTML = `<div class="op-block" style="padding:2rem; background:var(--yellow)">ERROR LOADING SPEC: ${e.message}</div>`;
+            }
+        }
+
+        function renderServers(servers) {
+            const select = document.getElementById('server-select');
+            select.innerHTML = servers.map(s => `<option value="${s.url}">${s.url} - ${s.description || ''}</option>`).join('');
+        }
+
+        function renderEndpoints(paths) {
+            const list = document.getElementById('endpoint-list');
+            let html = '';
+
+            for (const [path, methods] of Object.entries(paths)) {
+                for (const [method, details] of Object.entries(methods)) {
+                    html += `
+                        <div class="op-block" data-path="${path}">
+                            <div class="op-sum" onclick="toggle(this)">
+                                <span class="method">${method}</span>
+                                <span class="path">${path}</span>
+                                <span class="summary">${details.summary || ''}</span>
+                            </div>
+                            <div class="op-content">
+                                <p class="op-desc">${details.description || 'No description provided.'}</p>
+                                ${renderParams(details.parameters)}
+                                <button class="try-btn" onclick="execute('${path}', this)">Execute Call</button>
+                                <div class="response-box">
+                                    <div class="res-header">JSON RESPONSE</div>
+                                    <a href="${path}" target="_blank" class="direct-link">GET ${path.toUpperCase()}</a>
+                                    <pre></pre>
+                                </div>
+                            </div>
+                        </div>`;
+                }
+            }
+            list.innerHTML = html;
+        }
+
+        function renderParams(params) {
+            if (!params || params.length === 0) return '';
+            let html = '<div class="params-grid">';
+            params.forEach(p => {
+                html += `
+                    <div class="param-group">
+                        <label>${p.name}${p.required ? '*' : ''}</label>
+                        <input type="text" class="param-input" data-key="${p.name}" data-in="${p.in}" placeholder="${p.name}...">
+                    </div>`;
+            });
+            html += '</div>';
+            return html;
+        }
+
+        function toggle(el) {
+            el.nextElementSibling.classList.toggle('active');
+        }
+
+        function filterEndpoints(query) {
+            const q = query.toLowerCase();
+            document.querySelectorAll('.op-block').forEach(block => {
+                const text = block.innerText.toLowerCase();
+                block.classList.toggle('hidden', !text.includes(q));
+            });
+        }
+
+        async function execute(path, btn) {
+            const opContent = btn.closest('.op-content');
+            const container = opContent.querySelector('.response-box');
+            const pre = container.querySelector('pre');
+            const link = container.querySelector('.direct-link');
+            const inputs = opContent.querySelectorAll('.param-input');
+            const server = document.getElementById('server-select').value;
+
+            let fullPath = path;
+            const queryParams = new URLSearchParams();
+
+            inputs.forEach(input => {
+                if (input.value) {
+                    const key = input.getAttribute('data-key');
+                    const type = input.getAttribute('data-in');
+                    if (type === 'path') fullPath = fullPath.replace(`{${key}}`, input.value);
+                    else if (type === 'query') queryParams.append(key, input.value);
+                }
+            });
+
+            if (queryParams.toString()) fullPath += '?' + queryParams.toString();
+
+            btn.textContent = 'EXECUTING...';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch(fullPath);
+                const data = await res.json();
+                container.style.display = 'block';
+                pre.textContent = JSON.stringify(data, null, 2);
+                link.href = fullPath;
+                link.textContent = 'GET ' + server.toUpperCase() + fullPath.toUpperCase();
+            } catch (e) {
+                container.style.display = 'block';
+                pre.textContent = '// ERROR: ' + e.message;
+            } finally {
+                btn.textContent = 'Execute Call';
+                btn.disabled = false;
+            }
+        }
+
+        initPortal();
+    </script>
+</body>
+
+</html>

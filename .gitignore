@@ -1,0 +1,9 @@
+node_modules
+package-lock.json
+.env
+.DS_Store
+dist
+.gemini
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
