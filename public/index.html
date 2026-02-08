@@ -17,6 +17,9 @@
             --cyan: #00E0FF;
             --magenta: #FF00FF;
             --green: #00FF66;
+            --orange: #FF8800;
+            --red: #FF0055;
+            --blue: #0088FF;
             --border: 5px solid #000;
             --shadow: 10px 10px 0px #000;
         }
@@ -218,13 +221,30 @@
         }
 
         .method {
-            background: var(--green);
             padding: 5px 15px;
             border: 3px solid var(--black);
             font-weight: 900;
             font-size: 1rem;
             box-shadow: 3px 3px 0 var(--black);
             text-transform: uppercase;
+            color: #fff;
+        }
+
+        .method.get {
+            background: var(--blue);
+        }
+
+        .method.post {
+            background: var(--green);
+            color: #000;
+        }
+
+        .method.put {
+            background: var(--orange);
+        }
+
+        .method.delete {
+            background: var(--red);
         }
 
         .path {
@@ -296,6 +316,23 @@
 
         .param-input:focus {
             background: var(--yellow);
+        }
+
+        .body-input {
+            width: 100%;
+            height: 150px;
+            padding: 1rem;
+            border: 3px solid #000;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            resize: vertical;
+            background: #fff;
+        }
+
+        .body-input:focus {
+            background: var(--yellow);
+            outline: none;
         }
 
         .try-btn {
@@ -491,20 +528,24 @@
 
             for (const [path, methods] of Object.entries(paths)) {
                 for (const [method, details] of Object.entries(methods)) {
+                    const methodClass = method.toLowerCase();
+                    const hasBody = details.requestBody;
+
                     html += `
                         <div class="op-block" data-path="${path}">
                             <div class="op-sum" onclick="toggle(this)">
-                                <span class="method">${method}</span>
+                                <span class="method ${methodClass}">${method}</span>
                                 <span class="path">${path}</span>
                                 <span class="summary">${details.summary || ''}</span>
                             </div>
                             <div class="op-content">
                                 <p class="op-desc">${details.description || 'No description provided.'}</p>
                                 ${renderParams(details.parameters)}
-                                <button class="try-btn" onclick="execute('${path}', this)">Execute Call</button>
+                                ${hasBody ? `<textarea class="body-input" placeholder='{ "key": "value" }'>${getMethodExampleById(details.operationId)}</textarea>` : ''}
+                                <button class="try-btn" onclick="execute('${path}', '${method}', this)">Execute Call</button>
                                 <div class="response-box">
                                     <div class="res-header">JSON RESPONSE</div>
-                                    <a href="${path}" target="_blank" class="direct-link">GET ${path.toUpperCase()}</a>
+                                    <a href="${path}" target="_blank" class="direct-link">${method.toUpperCase()} ${path.toUpperCase()}</a>
                                     <pre></pre>
                                 </div>
                             </div>
@@ -512,6 +553,10 @@
                 }
             }
             list.innerHTML = html;
+        }
+
+        function getMethodExampleById(opId) {
+            return '';
         }
 
         function renderParams(params) {
@@ -540,12 +585,13 @@
             });
         }
 
-        async function execute(path, btn) {
+        async function execute(path, method, btn) {
             const opContent = btn.closest('.op-content');
             const container = opContent.querySelector('.response-box');
             const pre = container.querySelector('pre');
             const link = container.querySelector('.direct-link');
             const inputs = opContent.querySelectorAll('.param-input');
+            const bodyInput = opContent.querySelector('.body-input');
             const server = document.getElementById('server-select').value;
 
             let fullPath = path;
@@ -565,13 +611,38 @@
             btn.textContent = 'EXECUTING...';
             btn.disabled = true;
 
+            const options = {
+                method: method.toUpperCase(),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            };
+
+            if (bodyInput && bodyInput.value) {
+                try {
+                    options.body = JSON.stringify(JSON.parse(bodyInput.value));
+                } catch (e) {
+                    alert('Invalid JSON Body!');
+                    btn.textContent = 'Execute Call';
+                    btn.disabled = false;
+                    return;
+                }
+            }
+
             try {
-                const res = await fetch(fullPath);
-                const data = await res.json();
+                const res = await fetch(fullPath, options);
+                let data;
+                const contentType = res.headers.get("content-type");
+                if (contentType && contentType.indexOf("application/json") !== -1) {
+                    data = await res.json();
+                } else {
+                    data = await res.text();
+                }
+
                 container.style.display = 'block';
-                pre.textContent = JSON.stringify(data, null, 2);
+                pre.textContent = typeof data === 'object' ? JSON.stringify(data, null, 2) : data;
                 link.href = fullPath;
-                link.textContent = 'GET ' + server.toUpperCase() + fullPath.toUpperCase();
+                link.textContent = method.toUpperCase() + ' ' + server.toUpperCase() + fullPath.toUpperCase();
             } catch (e) {
                 container.style.display = 'block';
                 pre.textContent = '// ERROR: ' + e.message;

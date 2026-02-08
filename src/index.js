@@ -24,6 +24,7 @@ app.openapi(jadwalShalatRoute, jadwalShalatHandler)
 app.openapi(imsakiyahRoute, imsakiyahHandler)
 
 
+
 const openApiConfig = {
     openapi: '3.0.0',
     info: {
