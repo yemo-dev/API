@@ -6,6 +6,7 @@ import { secureHeaders } from 'hono/secure-headers'
 import { readFile } from 'node:fs/promises'
 import { statsRoute, statsHandler } from './api/stats/routes.js'
 import { jadwalShalatRoute, jadwalShalatHandler, imsakiyahRoute, imsakiyahHandler } from './api/bimasislam/routes.js'
+import { getGamebrottNewsRoute, getGamebrottNewsHandler, getGamebrottDetailRoute, getGamebrottDetailHandler } from './api/gamebrott/routes.js'
 import { logApiRequest } from './utils/logApiRequest.js'
 import { rateLimiter } from './utils/rateLimit.js'
 import { prettyPrint } from './utils/pretty.js'
@@ -22,6 +23,9 @@ app.use('*', prettyPrint)
 app.openapi(statsRoute, statsHandler)
 app.openapi(jadwalShalatRoute, jadwalShalatHandler)
 app.openapi(imsakiyahRoute, imsakiyahHandler)
+
+app.openapi(getGamebrottNewsRoute, getGamebrottNewsHandler)
+app.openapi(getGamebrottDetailRoute, getGamebrottDetailHandler)
 
 
 
