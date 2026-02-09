@@ -7,6 +7,7 @@ import { readFile } from 'node:fs/promises'
 import { statsRoute, statsHandler } from './api/stats/routes.js'
 import { jadwalShalatRoute, jadwalShalatHandler, imsakiyahRoute, imsakiyahHandler } from './api/bimasislam/routes.js'
 import { getGamebrottNewsRoute, getGamebrottNewsHandler, getGamebrottDetailRoute, getGamebrottDetailHandler } from './api/gamebrott/routes.js'
+import { getTwitterRoute, getTwitterHandler } from './api/twitter/routes.js'
 import { logApiRequest } from './utils/logApiRequest.js'
 import { rateLimiter } from './utils/rateLimit.js'
 import { prettyPrint } from './utils/pretty.js'
@@ -26,6 +27,8 @@ app.openapi(imsakiyahRoute, imsakiyahHandler)
 
 app.openapi(getGamebrottNewsRoute, getGamebrottNewsHandler)
 app.openapi(getGamebrottDetailRoute, getGamebrottDetailHandler)
+
+app.openapi(getTwitterRoute, getTwitterHandler)
 
 
 

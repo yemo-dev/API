@@ -63,9 +63,84 @@
         }
 
         .logo {
-            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            font-size: clamp(2rem, 5vw, 3rem);
             font-weight: 900;
             letter-spacing: -2px;
+            position: relative;
+            text-transform: uppercase;
+            color: #fff;
+            text-shadow: 2px 2px 0 var(--magenta), -2px -2px 0 var(--yellow);
+            animation: glitch 1s linear infinite;
+        }
+
+        @keyframes glitch {
+
+            2%,
+            64% {
+                transform: translate(2px, 0) skew(0deg);
+            }
+
+            4%,
+            60% {
+                transform: translate(-2px, 0) skew(0deg);
+            }
+
+            62% {
+                transform: translate(0, 0) skew(5deg);
+            }
+        }
+
+        .logo::before,
+        .logo::after {
+            content: attr(data-text);
+            position: absolute;
+            left: 0;
+        }
+
+        .logo::before {
+            animation: glitchTop 1s linear infinite;
+            clip-path: polygon(0 0, 100% 0, 100% 33%, 0 33%);
+            -webkit-clip-path: polygon(0 0, 100% 0, 100% 33%, 0 33%);
+        }
+
+        @keyframes glitchTop {
+
+            2%,
+            64% {
+                transform: translate(2px, -2px);
+            }
+
+            4%,
+            60% {
+                transform: translate(-2px, 2px);
+            }
+
+            62% {
+                transform: translate(13px, -1px) skew(-13deg);
+            }
+        }
+
+        .logo::after {
+            animation: glitchBotom 1.5s linear infinite;
+            clip-path: polygon(0 67%, 100% 67%, 100% 100%, 0 100%);
+            -webkit-clip-path: polygon(0 67%, 100% 67%, 100% 100%, 0 100%);
+        }
+
+        @keyframes glitchBotom {
+
+            2%,
+            64% {
+                transform: translate(-2px, 0);
+            }
+
+            4%,
+            60% {
+                transform: translate(-2px, 0);
+            }
+
+            62% {
+                transform: translate(-22px, 5px) skew(21deg);
+            }
         }
 
         .info-box {
@@ -464,7 +539,7 @@
 <body>
     <div class="container">
         <div class="top-bar">
-            <div class="logo">YE-MO.API</div>
+            <div class="logo" data-text="YE-MO.API">YE-MO.API</div>
             <div class="header-meta">
                 <span class="badge">v1.0.0</span>
                 <span class="badge" style="background:var(--cyan); color:#000">ONLINE</span>
@@ -506,6 +581,7 @@
     </footer>
 
     <script>
+
         async function initPortal() {
             try {
                 const res = await fetch('/docs');
