@@ -69,19 +69,17 @@ Controls the endpoint's availability status.
 
 ```
 
-## Security & Protection
+## 🛡️ Security & Protection
 
-### 1. Rate Limiting
-- **Limit:** 100 requests per 15 minutes per IP.
-- **Exceeded:** Users receive a **Neo-Brutalist 429 Page**.
+We take security seriously. The API is fortified with multiple layers of protection.
 
-### 2. IP Whitelist
-- **Bypass:** IP addresses in `whitelist` enjoy unlimited requests.
-- **Config:** Edit `src/utils/rateLimit.js`.
+| Feature | Limit / Config | Action on Breach |
+| :--- | :--- | :--- |
+| **Rate Limiter** | `100 req / 15 min` | **429** Neo-Brutalist Error Page |
+| **IP Whitelist** | Check `src/utils/rateLimit.js` | **Unlimited Access** |
+| **IP Ban System** | Check `src/utils/rateLimit.js` | **403** Access Denied Page |
 
-### 3. IP Ban System
-- **Block:** Malicious IPs in `banList` are instantly rejected.
-- **Response:** Users receive a scary **Neo-Brutalist 403 Page**.
+> **Note:** Error pages are located in `public/errors/` and feature a custom Neo-Brutalist design.
 
 ## How to Add a New Endpoint
 
