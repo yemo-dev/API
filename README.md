@@ -65,6 +65,24 @@ Controls the endpoint's availability status.
 'x-status': 'ONLINE', // or 'OFFLINE'
 ```
 
+'x-status': 'ONLINE', // or 'OFFLINE'
+
+```
+
+## Security & Protection
+
+### 1. Rate Limiting
+- **Limit:** 100 requests per 15 minutes per IP.
+- **Exceeded:** Users receive a **Neo-Brutalist 429 Page**.
+
+### 2. IP Whitelist
+- **Bypass:** IP addresses in `whitelist` enjoy unlimited requests.
+- **Config:** Edit `src/utils/rateLimit.js`.
+
+### 3. IP Ban System
+- **Block:** Malicious IPs in `banList` are instantly rejected.
+- **Response:** Users receive a scary **Neo-Brutalist 403 Page**.
+
 ## How to Add a New Endpoint
 
 Follow this guide to add new API resources. We use src/api/[resource]/routes.js to define routes and handlers.
