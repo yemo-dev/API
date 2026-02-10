@@ -1,23 +1,23 @@
-# ⚡ YEMO API
+# YEMO API
 
 > **High-Performance. Scalable. Neo-Brutalist.**
 > *Built with Hono, Node.js, and a focus on Developer Experience.*
 
 ---
 
-## 🚀 CORE FEATURES
+## CORE FEATURES
 
 | Feature | Description |
 | :--- | :--- |
-| **🏎️ Ultrafast** | Powered by `Hono` + `Node.js` for low latency. |
-| **🎨 Neo-Swagger** | Custom-designed API Portal (Not your boring swagger). |
-| **🛡️ Fortified** | Built-in Rate Limiting, IP Whitelist & Ban System. |
-| **✅ Type-Safe** | Full validation using `Zod` & `OpenAPI`. |
-| **📂 Modular** | Clean architecture for easy scalability. |
+| **Ultrafast** | Powered by `Hono` + `Node.js` for low latency. |
+| **Neo-Swagger** | Custom-designed API Portal (Not your boring swagger). |
+| **Fortified** | Built-in Rate Limiting, IP Whitelist & Ban System. |
+| **Type-Safe** | Full validation using `Zod` & `OpenAPI`. |
+| **Modular** | Clean architecture for easy scalability. |
 
 ---
 
-## 🛠️ QUICK START
+## QUICK START
 
 ### 1. Clone & Install
 
@@ -37,7 +37,7 @@ npm run dev
 
 ---
 
-## 🔌 API ENDPOINTS
+## API ENDPOINTS
 
 | Method | Endpoint | Description | Status Config |
 | :--- | :--- | :--- | :--- |
@@ -47,21 +47,21 @@ npm run dev
 
 ---
 
-## 🛡️ SECURITY SYSTEM
+## SECURITY SYSTEM
 
 We take security seriously. This API includes a robust protection layer within `src/utils/rateLimit.js`.
 
 | System | Default Config | Effect on Breach |
 | :--- | :--- | :--- |
-| **🚦 Rate Limiter** | `100 req` / `15 min` | **429** Neo-Brutalist Page |
-| **✅ IP Whitelist** | Unlimited Access | Bypasses all limits |
-| **⛔ IP Ban List** | Permanent Block | **403** Access Denied Page |
+| **Rate Limiter** | `100 req` / `15 min` | **429** Neo-Brutalist Page |
+| **IP Whitelist** | Unlimited Access | Bypasses all limits |
+| **IP Ban List** | Permanent Block | **403** Access Denied Page |
 
-> **🎨 UI Note:** Error pages are located in `public/errors/` and feature a custom premium design.
+> **UI Note:** Error pages are located in `public/errors/` and feature a custom premium design.
 
 ---
 
-## 💻 DEVELOPER GUIDE
+## DEVELOPER GUIDE
 
 ### Adding a New Endpoint
 
@@ -85,19 +85,19 @@ export const myHandler = (c) => c.json({ hello: 'world' })
 ```
 
 **2. Register in `index.js`**
-> ⚠️ **IMPORTANT:** Use the `register` utility, NOT `app.openapi`.
+> **IMPORTANT:** Use the `register` utility, NOT `app.openapi`.
 
 ```javascript
 import { myRoute, myHandler } from './api/example/routes.js'
 import { register } from './utils/route.js'
 
-// ✅ Correct Way
+// Correct Way
 register(app, myRoute, myHandler)
 ```
 
 ---
 
-## 📂 PROJECT STRUCTURE
+## PROJECT STRUCTURE
 
 ```
 API/
