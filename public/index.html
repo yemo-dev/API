@@ -661,9 +661,6 @@
             select.innerHTML = servers.map(s => `<option value="${s.url}">${s.url} - ${s.description || ''}</option>`).join('');
         }
 
-        function getStatus(path) {
-            return 'ONLINE';
-        }
 
         function getStatusColor(status) {
             if (status === 'ONLINE') return 'var(--green)';
@@ -679,7 +676,7 @@
                 for (const [method, details] of Object.entries(methods)) {
                     const methodClass = method.toLowerCase();
                     const hasBody = details.requestBody;
-                    const status = getStatus(path);
+                    const status = details['x-status'] || 'ONLINE';
                     const statusColor = getStatusColor(status);
 
                     html += `
