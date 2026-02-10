@@ -57,7 +57,6 @@ export const statsRoute = createRoute({
 
 export const statsHandler = (c) => {
 
-    // Uptime formatting
     const formatUptime = (seconds) => {
         const d = Math.floor(seconds / (3600 * 24))
         const h = Math.floor(seconds % (3600 * 24) / 3600)
@@ -66,16 +65,13 @@ export const statsHandler = (c) => {
         return `${d}d ${h}h ${m}m ${s}s`
     }
 
-    // Memory formatting
     const formatBytes = (bytes) => `${(bytes / 1024 / 1024).toFixed(2)} MB`
 
-    // CPU Info
     const cpus = os.cpus()
     const cpuModel = cpus[0].model
     const cpuSpeed = `${cpus[0].speed} MHz`
     const cpuCores = cpus.length
 
-    // Memory Info
     const totalMem = os.totalmem()
     const freeMem = os.freemem()
     const usedMem = totalMem - freeMem

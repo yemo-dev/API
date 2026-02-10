@@ -624,16 +624,8 @@
 
         async function initPortal() {
             try {
-                const [docsRes, statusRes] = await Promise.all([
-                    fetch('/docs'),
-                    fetch('/api/status')
-                ]);
+                const docsRes = await fetch('/docs');
                 const spec = await docsRes.json();
-                try {
-                    STATUS_CONFIG = await statusRes.json();
-                } catch (e) {
-                    console.warn('Could not fetch status config', e);
-                }
 
                 renderServers(spec.servers);
                 renderEndpoints(spec.paths);
@@ -648,7 +640,7 @@
         }
 
         function getStatus(path) {
-            return STATUS_CONFIG.overrides[path] || STATUS_CONFIG.default;
+            return 'ONLINE';
         }
 
         function getStatusColor(status) {
