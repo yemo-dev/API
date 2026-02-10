@@ -5,6 +5,7 @@ import { cors } from 'hono/cors'
 import { secureHeaders } from 'hono/secure-headers'
 import { readFile } from 'node:fs/promises'
 import { statsRoute, statsHandler } from './api/stats/routes.js'
+import { jaStatsRoute, jaStatsHandler } from './api/jastats/routes.js'
 import { logApiRequest } from './utils/logApiRequest.js'
 import { rateLimiter } from './utils/rateLimit.js'
 import { prettyPrint } from './utils/pretty.js'
@@ -21,6 +22,7 @@ app.use('*', prettyPrint)
 import { register } from './utils/route.js'
 
 register(app, statsRoute, statsHandler)
+register(app, jaStatsRoute, jaStatsHandler)
 
 const openApiConfig = {
     openapi: '3.0.0',
