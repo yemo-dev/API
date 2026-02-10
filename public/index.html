@@ -338,13 +338,22 @@
         }
 
         .op-content {
-            padding: 1.5rem;
-            display: none;
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.3s ease-out;
             background: #fff;
+            padding: 0 1.5rem;
         }
 
         .op-content.active {
-            display: block;
+            grid-template-rows: 1fr;
+            padding: 1.5rem;
+        }
+
+        .op-inner {
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
         .op-desc {
@@ -411,17 +420,19 @@
         }
 
         .try-btn {
-            width: 100%;
-            padding: 1.2rem;
+            width: auto;
+            min-width: 150px;
+            padding: 0.8rem 1.5rem;
             background: var(--black);
             color: #fff;
-            border: 4px solid var(--black);
-            font-size: clamp(1rem, 3vw, 1.3rem);
-            font-weight: 900;
+            border: 3px solid var(--black);
+            font-size: 1rem;
+            font-weight: 800;
             text-transform: uppercase;
             cursor: pointer;
             transition: 0.1s;
             box-shadow: 4px 4px 0 var(--cyan);
+            margin-top: 1rem;
         }
 
         .try-btn:hover {
@@ -669,14 +680,16 @@
                                 <span class="summary">${details.summary || ''}</span>
                             </div>
                             <div class="op-content">
-                                <p class="op-desc">${details.description || 'No description provided.'}</p>
-                                ${renderParams(details.parameters)}
-                                ${hasBody ? `<textarea class="body-input" placeholder='{ "key": "value" }'>${getMethodExampleById(details.operationId)}</textarea>` : ''}
-                                <button class="try-btn" onclick="execute('${path}', '${method}', this)">Execute Call</button>
-                                <div class="response-box">
-                                    <div class="res-header">JSON RESPONSE</div>
-                                    <a href="${path}" target="_blank" class="direct-link">${method.toUpperCase()} ${path.toUpperCase()}</a>
-                                    <pre></pre>
+                                <div class="op-inner">
+                                    <p class="op-desc">${details.description || 'No description provided.'}</p>
+                                    ${renderParams(details.parameters)}
+                                    ${hasBody ? `<textarea class="body-input" placeholder='{ "key": "value" }'>${getMethodExampleById(details.operationId)}</textarea>` : ''}
+                                    <button class="try-btn" onclick="execute('${path}', '${method}', this)">Execute Call</button>
+                                    <div class="response-box">
+                                        <div class="res-header">JSON RESPONSE</div>
+                                        <a href="${path}" target="_blank" class="direct-link">${method.toUpperCase()} ${path.toUpperCase()}</a>
+                                        <pre></pre>
+                                    </div>
                                 </div>
                             </div>
                         </div>`;
