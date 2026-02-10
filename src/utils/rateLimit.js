@@ -5,12 +5,22 @@ const clients = new Map()
 const config = {
     windowMs: 15 * 60 * 1000,
     max: 100,
-    whitelist: ['15.235.142.149']
+    whitelist: ['127.0.0.1'],
+    banList: []
 }
 
 export const rateLimiter = () => {
     return async (c, next) => {
         const ip = c.req.header('x-forwarded-for') || '127.0.0.1'
+
+        if (config.banList.includes(ip)) {
+            try {
+                const html = await readFile('./public/403.html', 'utf8')
+                return c.html(html, 403)
+            } catch (e) {
+                return c.text('Forbidden', 403)
+            }
+        }
 
         if (config.whitelist.includes(ip)) {
             await next()
