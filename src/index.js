@@ -4,7 +4,11 @@ import { OpenAPIHono } from '@hono/zod-openapi'
 import { cors } from 'hono/cors'
 import { secureHeaders } from 'hono/secure-headers'
 import { readFile } from 'node:fs/promises'
+
+// --------- API ROUTES ---------
 import { statsRoute, statsHandler } from './api/stats/routes.js'
+
+// --------- UTILS ---------
 import { logApiRequest } from './utils/logApiRequest.js'
 import { rateLimiter } from './utils/rateLimit.js'
 import { prettyPrint } from './utils/pretty.js'
