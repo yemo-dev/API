@@ -10,6 +10,15 @@ Includes a custom Neo-Brutalist Swagger UI for a premium developer experience.
 - Zod OpenAPI: Type-safe schema validation and documentation.
 - Architecture: Modular and scalable folder structure.
 
+## Available Endpoints
+
+### System Stats
+
+`GET /api/stats`
+
+- **Description:** Get detailed server system information (CPU, RAM, OS, Network).
+- **Status:** Check `x-status` in route config.
+
 ## Setup
 
 1. Clone Repository
