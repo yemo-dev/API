@@ -33,6 +33,29 @@ Includes a custom Neo-Brutalist Swagger UI for a premium developer experience.
 
     Access the portal at <http://localhost:3000>.
 
+## Endpoint Configuration
+
+You can customize each endpoint's behavior directly in its route definition.
+
+### 1. Description
+
+Displayed in the Swagger UI to explain what the endpoint does.
+
+```javascript
+description: 'Get detailed system stats',
+```
+
+### 2. Status Label (x-status)
+
+Controls the endpoint's availability status.
+
+- **ONLINE**: Endpoint works normally.
+- **OFFLINE**: Endpoint returns `503 Service Unavailable` automatically.
+
+```javascript
+'x-status': 'ONLINE', // or 'OFFLINE'
+```
+
 ## How to Add a New Endpoint
 
 Follow this guide to add new API resources. We use src/api/[resource]/routes.js to define routes and handlers.
@@ -47,18 +70,8 @@ import { createRoute, z } from '@hono/zod-openapi'
 export const getBooksRoute = createRoute({
     method: 'get',
     path: '/api/books',
-
-    // --- CONFIGURATION ---
-
-    // 1. Description: displayed in Swagger UI
     description: 'Get list of books',
-
-    // 2. Status Label: ONLINE or OFFLINE
-    // If set to OFFLINE, the endpoint will automatically return 503 Service Unavailable.
     'x-status': 'ONLINE',
-
-    // ---------------------
-
     responses: {
         200: {
             content: {
