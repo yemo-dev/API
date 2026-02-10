@@ -1,133 +1,117 @@
-# YeMo - High Performance API
+# ⚡ YEMO API
 
-A high-performance codebase for building scalable APIs with Hono and Node.js.
-Includes a custom Neo-Brutalist Swagger UI for a premium developer experience.
+> **High-Performance. Scalable. Neo-Brutalist.**
+> *Built with Hono, Node.js, and a focus on Developer Experience.*
 
-## Features
+---
 
-- Hono: Ultrafast web framework.
-- Neo-Swagger: Custom API documentation portal.
-- Zod OpenAPI: Type-safe schema validation and documentation.
-- Architecture: Modular and scalable folder structure.
+## 🚀 CORE FEATURES
 
-## Available Endpoints
+| Feature | Description |
+| :--- | :--- |
+| **🏎️ Ultrafast** | Powered by `Hono` + `Node.js` for low latency. |
+| **🎨 Neo-Swagger** | Custom-designed API Portal (Not your boring swagger). |
+| **🛡️ Fortified** | Built-in Rate Limiting, IP Whitelist & Ban System. |
+| **✅ Type-Safe** | Full validation using `Zod` & `OpenAPI`. |
+| **📂 Modular** | Clean architecture for easy scalability. |
 
-### System Stats
+---
 
-`GET /api/stats`
+## 🛠️ QUICK START
 
-- **Description:** Get detailed server system information (CPU, RAM, OS, Network).
-- **Status:** Check `x-status` in route config.
+### 1. Clone & Install
 
-## Setup
-
-1. Clone Repository
-
-    ```bash
-    git clone https://github.com/yemo-dev/API.git
-    cd API
-    ```
-
-2. Install Dependencies
-
-    ```bash
-    npm install
-    ```
-
-3. Run Development Server
-
-    ```bash
-    npm run dev
-    ```
-
-    Access the portal at <http://localhost:3000>.
-
-## Endpoint Configuration
-
-You can customize each endpoint's behavior directly in its route definition.
-
-### 1. Description
-
-Displayed in the Swagger UI to explain what the endpoint does.
-
-```javascript
-description: 'Get detailed system stats',
+```bash
+git clone https://github.com/yemo-dev/API.git
+cd API
+npm install
 ```
 
-### 2. Status Label (x-status)
+### 2. Run Server
 
-Controls the endpoint's availability status.
-
-- **ONLINE**: Endpoint works normally.
-- **OFFLINE**: Endpoint returns `503 Service Unavailable` automatically.
-
-```javascript
-'x-status': 'ONLINE', // or 'OFFLINE'
+```bash
+npm run dev
 ```
 
-'x-status': 'ONLINE', // or 'OFFLINE'
+> Access Portal: **<http://localhost:3000>**
 
-```
+---
 
-## 🛡️ Security & Protection
+## 🔌 API ENDPOINTS
 
-We take security seriously. The API is fortified with multiple layers of protection.
+| Method | Endpoint | Description | Status Config |
+| :--- | :--- | :--- | :--- |
+| `GET` | **/api/stats** | System CPU, RAM, Network info. | `x-status` |
 
-| Feature | Limit / Config | Action on Breach |
+> *Check endpoint status availability in their respective route files.*
+
+---
+
+## 🛡️ SECURITY SYSTEM
+
+We take security seriously. This API includes a robust protection layer within `src/utils/rateLimit.js`.
+
+| System | Default Config | Effect on Breach |
 | :--- | :--- | :--- |
-| **Rate Limiter** | `100 req / 15 min` | **429** Neo-Brutalist Error Page |
-| **IP Whitelist** | Check `src/utils/rateLimit.js` | **Unlimited Access** |
-| **IP Ban System** | Check `src/utils/rateLimit.js` | **403** Access Denied Page |
+| **🚦 Rate Limiter** | `100 req` / `15 min` | **429** Neo-Brutalist Page |
+| **✅ IP Whitelist** | Unlimited Access | Bypasses all limits |
+| **⛔ IP Ban List** | Permanent Block | **403** Access Denied Page |
 
-> **Note:** Error pages are located in `public/errors/` and feature a custom Neo-Brutalist design.
+> **🎨 UI Note:** Error pages are located in `public/errors/` and feature a custom premium design.
 
-## How to Add a New Endpoint
+---
 
-Follow this guide to add new API resources. We use src/api/[resource]/routes.js to define routes and handlers.
+## 💻 DEVELOPER GUIDE
 
-### 1. Basic Structure
+### Adding a New Endpoint
 
-Create src/api/books/routes.js and import necessary modules.
+ We use a specific pattern to ensure **Offline/Online** status checks work automatically.
+
+**1. Create Route File**
+`src/api/example/routes.js`
 
 ```javascript
 import { createRoute, z } from '@hono/zod-openapi'
 
-export const getBooksRoute = createRoute({
+export const myRoute = createRoute({
     method: 'get',
-    path: '/api/books',
-    description: 'Get list of books',
-    'x-status': 'ONLINE',
-    responses: {
-        200: {
-            content: {
-                'application/json': {
-                    schema: z.object({
-                        status: z.boolean(),
-                        data: z.array(z.string())
-                    })
-                }
-            },
-            description: 'Get list of books'
-        }
-    }
+    path: '/api/example',
+    description: 'My cool endpoint',
+    'x-status': 'ONLINE', // Config Status Here
+    responses: { ... }
 })
 
-export const getBooksHandler = (c) => {
-    return c.json({
-        status: true,
-        data: ['Book 1', 'Book 2']
-    })
-}
+export const myHandler = (c) => c.json({ hello: 'world' })
 ```
 
-### 2. Register Routes
-
-Finally, import and register your new routes in src/index.js using the `register` utility.
-**Note:** We use `register` instead of `app.openapi` to automatically enforce the `x-status` (Offline/Online) checks.
+**2. Register in `index.js`**
+> ⚠️ **IMPORTANT:** Use the `register` utility, NOT `app.openapi`.
 
 ```javascript
-import { getBooksRoute, getBooksHandler } from './api/books/routes.js'
+import { myRoute, myHandler } from './api/example/routes.js'
 import { register } from './utils/route.js'
 
-register(app, getBooksRoute, getBooksHandler)
+// ✅ Correct Way
+register(app, myRoute, myHandler)
 ```
+
+---
+
+## 📂 PROJECT STRUCTURE
+
+```
+API/
+├── public/
+│   └── errors/       # Custom 403, 404, 429, 500 Pages
+├── src/
+│   ├── api/          # Route Logic (Folder per endpoint)
+│   ├── utils/        # Security & Helpers (RateLimit, Logger)
+│   └── index.js      # Main Entry Point
+└── package.json
+```
+
+---
+
+<p align="center">
+  <b>Built by YeMo Dev</b>
+</p>
