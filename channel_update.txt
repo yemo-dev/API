@@ -1,0 +1,29 @@
+🚀 **MAJOR UPDATE: YE-MO API v1.1.0** 🚀
+
+Update besar-besaran telah mendarat! Project makin solid dengan fitur scraping baru dan tampilan Neo-Brutalist yang makin gahar.
+
+**🔥 APA YANG BARU?**
+
+1.  **🐦 Twitter/X Downloader API**
+    *   Scrape Video & Image High Quality.
+    *   Auto-detect media type.
+    *   Include Stats: Views, Likes, Reposts, Replies.
+    *   *Powered by Puppeteer Stealth.*
+
+2.  **🎮 Gamebrott News API**
+    *   Dapatkan berita gaming terbaru realtime.
+    *   Endpoint: List Berita & Detail Berita.
+
+3.  **⚡ Visual Upgrade**
+    *   **Glitch Logo Effect**: Animasi logo "YE-MO.API" dengan efek glitch RGB split + skew.
+    *   **Clean Look**: Favicon dihapus untuk tampilan yang lebih minimalis dan fokus ke performa.
+
+4.  **🧹 Code Cleanup**
+    *   "No-Comment" rule applied strict.
+    *   Optimasi routing Hono & Zod OpenAPI.
+
+**🔗 Repository:** https://github.com/yemo-dev/API
+**📖 Docs:** /docs (Neo-Swagger UI)
+
+*Pure Data. Speed. Power.*
+#NodeJS #Hono #API #Scraping #OpenSource

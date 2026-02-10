@@ -8,6 +8,7 @@ import { statsRoute, statsHandler } from './api/stats/routes.js'
 import { jadwalShalatRoute, jadwalShalatHandler, imsakiyahRoute, imsakiyahHandler } from './api/bimasislam/routes.js'
 import { getGamebrottNewsRoute, getGamebrottNewsHandler, getGamebrottDetailRoute, getGamebrottDetailHandler } from './api/gamebrott/routes.js'
 import { getTwitterRoute, getTwitterHandler } from './api/twitter/routes.js'
+import { STATUS_CONFIG } from './config/status.js'
 import { logApiRequest } from './utils/logApiRequest.js'
 import { rateLimiter } from './utils/rateLimit.js'
 import { prettyPrint } from './utils/pretty.js'
@@ -20,6 +21,21 @@ app.use('*', cors())
 app.use('*', logApiRequest)
 app.use('*', rateLimiter())
 app.use('*', prettyPrint)
+
+app.use('*', async (c, next) => {
+    const path = c.req.path
+    const status = STATUS_CONFIG.overrides[path] || STATUS_CONFIG.default
+    if (status === 'OFFLINE') {
+        return c.json({
+            status: false,
+            message: `Endpoint is currently ${status}`,
+            code: 503
+        }, 503)
+    }
+    await next()
+})
+
+app.get('/api/status', (c) => c.json(STATUS_CONFIG))
 
 app.openapi(statsRoute, statsHandler)
 app.openapi(jadwalShalatRoute, jadwalShalatHandler)
