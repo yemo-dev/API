@@ -107,6 +107,7 @@ export const getBooksHandler = (c) => {
 ### 2. Register Routes
 
 Finally, import and register your new routes in src/index.js using the `register` utility.
+**Note:** We use `register` instead of `app.openapi` to automatically enforce the `x-status` (Offline/Online) checks.
 
 ```javascript
 import { getBooksRoute, getBooksHandler } from './api/books/routes.js'
