@@ -528,20 +528,82 @@
             color: #888;
         }
 
-        @media (max-width: 700px) {
-            .op-sum {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 0.5rem;
+        @media (max-width: 768px) {
+            body {
+                padding: 0.5rem;
             }
 
-            .summary {
-                text-align: left;
+            .container {
+                width: 100%;
+            }
+
+            .top-bar {
+                flex-direction: column;
+                padding: 1rem;
+                text-align: center;
+                gap: 1rem;
+            }
+
+            .header-meta {
+                justify-content: center;
+            }
+
+            .info-box {
+                padding: 1.5rem;
+                text-align: center;
+            }
+
+            .info-box h1 {
+                font-size: 2.5rem;
+            }
+
+            .servers-box {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 1rem;
             }
 
             .controls {
                 flex-direction: column;
-                align-items: stretch;
+                gap: 1rem;
+            }
+
+            .section-header {
+                width: 100%;
+                text-align: center;
+            }
+
+            .search-container {
+                width: 100%;
+            }
+
+            .op-sum {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.8rem;
+                position: relative;
+            }
+
+            .op-arrow {
+                position: absolute;
+                top: 1rem;
+                right: 1rem;
+            }
+
+            .method {
+                width: 100%;
+                text-align: center;
+            }
+
+            .path {
+                font-size: 1rem;
+                word-break: break-all;
+            }
+
+            .status-badge {
+                margin-left: 0;
+                width: 100%;
+                justify-content: center;
             }
         }
 
