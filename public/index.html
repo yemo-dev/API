@@ -693,7 +693,7 @@
                                     <p class="op-desc">${details.description || 'No description provided.'}</p>
                                     ${renderParams(details.parameters)}
                                     ${hasBody ? `<textarea class="body-input" placeholder='{ "key": "value" }'>${getMethodExampleById(details.operationId)}</textarea>` : ''}
-                                    <button class="try-btn" onclick="execute('${path}', '${method}', this)">Execute Call</button>
+                                    <button class="try-btn" onclick="execute('${path}', '${method}', '${status}', this)">Execute Call</button>
                                     <div class="response-box">
                                         <div class="res-header">JSON RESPONSE</div>
                                         <a href="${path}" target="_blank" class="direct-link">${method.toUpperCase()} ${path.toUpperCase()}</a>
@@ -738,7 +738,7 @@
             });
         }
 
-        async function execute(path, method, btn) {
+        async function execute(path, method, status, btn) {
             const opContent = btn.closest('.op-content');
             const container = opContent.querySelector('.response-box');
             const pre = container.querySelector('pre');
@@ -746,6 +746,16 @@
             const inputs = opContent.querySelectorAll('.param-input');
             const bodyInput = opContent.querySelector('.body-input');
             const server = document.getElementById('server-select').value;
+
+            if (status === 'OFFLINE') {
+                container.style.display = 'block';
+                pre.textContent = JSON.stringify({
+                    error: 'Service Unavailable',
+                    message: 'This endpoint is currently OFFLINE.',
+                    status: 503
+                }, null, 2);
+                return;
+            }
 
             let fullPath = path;
             const queryParams = new URLSearchParams();
