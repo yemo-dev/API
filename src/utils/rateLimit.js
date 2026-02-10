@@ -1,3 +1,5 @@
+import { readFile } from 'node:fs/promises'
+
 const clients = new Map()
 
 const config = {
@@ -18,13 +20,13 @@ export const rateLimiter = () => {
                 clients.set(ip, { count: 1, resetTime: now + config.windowMs })
             } else {
                 client.count++
-
-                c.res.headers.set('X-RateLimit-Limit', config.max.toString())
-                c.res.headers.set('X-RateLimit-Remaining', Math.max(0, config.max - client.count).toString())
-                c.res.headers.set('X-RateLimit-Reset', Math.ceil(client.resetTime / 1000).toString())
-
                 if (client.count > config.max) {
-                    return c.json({ error: 'Too many requests, please try again later.' }, 429)
+                    try {
+                        const html = await readFile('./public/429.html', 'utf8')
+                        return c.html(html, 429)
+                    } catch (e) {
+                        return c.text('Too Many Requests', 429)
+                    }
                 }
             }
         }

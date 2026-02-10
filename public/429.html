@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>429 | TOO MANY REQUESTS</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;700;900&family=JetBrains+Mono:wght@800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #F0F0F0;
+            --black: #000000;
+            --white: #FFFFFF;
+            --yellow: #FFEE00;
+            --cyan: #00E0FF;
+            --magenta: #FF00FF;
+            --border: 5px solid #000;
+            --shadow: 10px 10px 0px #000;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--black);
+            font-family: 'Space Grotesk', sans-serif;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .container {
+            background: var(--white);
+            border: var(--border);
+            padding: 3rem;
+            box-shadow: var(--shadow);
+            max-width: 600px;
+            width: 90%;
+            position: relative;
+        }
+
+        h1 {
+            font-size: clamp(3rem, 10vw, 6rem);
+            font-weight: 900;
+            line-height: 0.9;
+            margin-bottom: 1rem;
+            text-shadow: 4px 4px 0 var(--magenta);
+        }
+
+        p {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            text-transform: uppercase;
+        }
+
+        .btn {
+            display: inline-block;
+            background: var(--black);
+            color: #fff;
+            text-decoration: none;
+            padding: 1rem 2rem;
+            font-weight: 900;
+            font-size: 1.2rem;
+            border: 3px solid var(--black);
+            box-shadow: 5px 5px 0 var(--cyan);
+            transition: 0.1s;
+        }
+
+        .btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 8px 8px 0 var(--cyan);
+            background: var(--magenta);
+        }
+
+        .icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <span class="icon">🚦</span>
+        <h1>429</h1>
+        <p>WHOA! SLOW DOWN. TOO MANY REQUESTS.</p>
+        <a href="/" class="btn">BACK TO HOME</a>
+    </div>
+</body>
+
+</html>
