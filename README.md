@@ -47,8 +47,18 @@ import { createRoute, z } from '@hono/zod-openapi'
 export const getBooksRoute = createRoute({
     method: 'get',
     path: '/api/books',
+
+    // --- CONFIGURATION ---
+
+    // 1. Description: displayed in Swagger UI
     description: 'Get list of books',
-    'x-status': 'ONLINE', // Use ONLINE or OFFLINE
+
+    // 2. Status Label: ONLINE or OFFLINE
+    // If set to OFFLINE, the endpoint will automatically return 503 Service Unavailable.
+    'x-status': 'ONLINE',
+
+    // ---------------------
+
     responses: {
         200: {
             content: {
@@ -81,11 +91,3 @@ import { getBooksRoute, getBooksHandler } from './api/books/routes.js'
 
 app.openapi(getBooksRoute, getBooksHandler)
 ```
-
-## Contributing
-
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
-
-## License
-
-MIT
