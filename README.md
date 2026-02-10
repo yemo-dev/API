@@ -106,10 +106,11 @@ export const getBooksHandler = (c) => {
 
 ### 2. Register Routes
 
-Finally, import and register your new routes in src/index.js.
+Finally, import and register your new routes in src/index.js using the `register` utility.
 
 ```javascript
 import { getBooksRoute, getBooksHandler } from './api/books/routes.js'
+import { register } from './utils/route.js'
 
-app.openapi(getBooksRoute, getBooksHandler)
+register(app, getBooksRoute, getBooksHandler)
 ```
