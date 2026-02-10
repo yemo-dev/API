@@ -4,12 +4,19 @@ const clients = new Map()
 
 const config = {
     windowMs: 15 * 60 * 1000,
-    max: 100
+    max: 100,
+    whitelist: ['15.235.142.149']
 }
 
 export const rateLimiter = () => {
     return async (c, next) => {
         const ip = c.req.header('x-forwarded-for') || '127.0.0.1'
+
+        if (config.whitelist.includes(ip)) {
+            await next()
+            return
+        }
+
         const now = Date.now()
 
         if (!clients.has(ip)) {
