@@ -33,6 +33,22 @@ Includes a custom **Neo-Brutalist Swagger UI** for a premium developer experienc
 
     Access the portal at `http://localhost:3000`.
 
+## Configuration
+
+### Endpoint Status
+
+`src/config/status.js`
+
+```javascript
+export const STATUS_CONFIG = {
+    default: 'ONLINE',
+    overrides: {
+        '/api/twitter': 'OFFLINE',
+        '/api/gamebrott/news': 'ONLINE'
+    }
+}
+```
+
 ## 🛠️ How to Add a New Endpoint
 
 Follow this guide to add new API resources. We use `src/api/[resource]/routes.js` to define routes and handlers.
