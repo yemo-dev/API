@@ -582,6 +582,17 @@
                 opacity: 1;
             }
         }
+
+        .op-arrow {
+            margin-left: 10px;
+            font-size: 1.2rem;
+            transition: transform 0.3s ease;
+            font-weight: 900;
+        }
+
+        .op-sum.active .op-arrow {
+            transform: rotate(180deg);
+        }
     </style>
 </head>
 
@@ -678,6 +689,7 @@
                                 <span class="path">${path}</span>
                                 <span class="status-badge" style="background:${statusColor}">${status}</span>
                                 <span class="summary">${details.summary || ''}</span>
+                                <span class="op-arrow">▼</span>
                             </div>
                             <div class="op-content">
                                 <div class="op-inner">
@@ -717,6 +729,7 @@
         }
 
         function toggle(el) {
+            el.classList.toggle('active');
             el.nextElementSibling.classList.toggle('active');
         }
 
