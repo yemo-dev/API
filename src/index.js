@@ -53,7 +53,7 @@ app.notFound(async (c) => {
     }
 
     try {
-        const html = await readFile('./public/404.html', 'utf8')
+        const html = await readFile('./public/errors/404.html', 'utf8')
         return c.html(html, 404)
     } catch (e) {
         return c.text('404 Not Found', 404)
@@ -71,7 +71,7 @@ app.onError(async (err, c) => {
     }
 
     try {
-        const html = await readFile('./public/500.html', 'utf8')
+        const html = await readFile('./public/errors/500.html', 'utf8')
         return c.html(html, 500)
     } catch (e) {
         return c.text('Internal Server Error', 500)

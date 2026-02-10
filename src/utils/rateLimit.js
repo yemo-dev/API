@@ -6,7 +6,7 @@ const config = {
     windowMs: 15 * 60 * 1000,
     max: 100,
     whitelist: ['127.0.0.1'],
-    banList: ['127.0.0.1']
+    banList: ['']
 }
 
 export const rateLimiter = () => {
@@ -15,7 +15,7 @@ export const rateLimiter = () => {
 
         if (config.banList.includes(ip)) {
             try {
-                const html = await readFile('./public/403.html', 'utf8')
+                const html = await readFile('./public/errors/403.html', 'utf8')
                 return c.html(html, 403)
             } catch (e) {
                 return c.text('Forbidden', 403)
@@ -39,7 +39,7 @@ export const rateLimiter = () => {
                 client.count++
                 if (client.count > config.max) {
                     try {
-                        const html = await readFile('./public/429.html', 'utf8')
+                        const html = await readFile('./public/errors/429.html', 'utf8')
                         return c.html(html, 429)
                     } catch (e) {
                         return c.text('Too Many Requests', 429)
