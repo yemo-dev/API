@@ -24,6 +24,7 @@ app.use('*', prettyPrint)
 
 import { register } from './utils/route.js'
 
+// --------- REGISTER ROUTES ---------
 register(app, statsRoute, statsHandler)
 
 const openApiConfig = {
