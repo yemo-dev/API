@@ -6,7 +6,7 @@ const config = {
     windowMs: 15 * 60 * 1000,
     max: 100,
     whitelist: ['127.0.0.1'],
-    banList: []
+    banList: ['127.0.0.1']
 }
 
 export const rateLimiter = () => {
