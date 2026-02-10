@@ -4,20 +4,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>429 | TOO MANY REQUESTS</title>
+    <title>429 | RATE LIMIT EXCEEDED</title>
     <link
         href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;700;900&family=JetBrains+Mono:wght@800&display=swap"
         rel="stylesheet">
     <style>
         :root {
-            --bg: #F0F0F0;
-            --black: #000000;
-            --white: #FFFFFF;
-            --yellow: #FFEE00;
-            --cyan: #00E0FF;
-            --magenta: #FF00FF;
-            --border: 5px solid #000;
-            --shadow: 10px 10px 0px #000;
+            --bg: #111;
+            --white: #fff;
+            --yellow: #FFE800;
+            --red: #FF2E2E;
+            --purple: #B24BF3;
+            --cyan: #00F0FF;
         }
 
         * {
@@ -28,7 +26,7 @@
 
         body {
             background: var(--bg);
-            color: var(--black);
+            color: var(--white);
             font-family: 'Space Grotesk', sans-serif;
             height: 100vh;
             display: flex;
@@ -39,63 +37,113 @@
         }
 
         .container {
-            background: var(--white);
-            border: var(--border);
-            padding: 3rem;
-            box-shadow: var(--shadow);
-            max-width: 600px;
-            width: 90%;
             position: relative;
+            z-index: 10;
+            padding: 2rem;
         }
 
-        h1 {
-            font-size: clamp(3rem, 10vw, 6rem);
+        .error-code {
+            font-size: clamp(6rem, 20vw, 15rem);
             font-weight: 900;
-            line-height: 0.9;
-            margin-bottom: 1rem;
-            text-shadow: 4px 4px 0 var(--magenta);
+            line-height: 0.8;
+            color: var(--yellow);
+            text-shadow:
+                8px 8px 0 var(--red),
+                -8px -8px 0 var(--cyan);
+            position: relative;
+            display: inline-block;
+            animation: float 3s ease-in-out infinite;
         }
 
-        p {
-            font-size: 1.2rem;
-            font-weight: 700;
-            margin-bottom: 2rem;
+        .glitch-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: clamp(1.2rem, 3vw, 2rem);
+            background: var(--white);
+            color: var(--bg);
+            padding: 10px 20px;
+            font-weight: 800;
             text-transform: uppercase;
+            letter-spacing: -1px;
+            margin-top: -2rem;
+            position: relative;
+            display: inline-block;
+            transform: rotate(-3deg);
+            box-shadow: 6px 6px 0 var(--red);
+        }
+
+        .desc {
+            margin-top: 2rem;
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.5;
+            color: #ddd;
         }
 
         .btn {
+            margin-top: 2.5rem;
             display: inline-block;
-            background: var(--black);
-            color: #fff;
+            background: transparent;
+            color: var(--cyan);
+            border: 3px solid var(--cyan);
+            padding: 1rem 2.5rem;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
             text-decoration: none;
-            padding: 1rem 2rem;
-            font-weight: 900;
-            font-size: 1.2rem;
-            border: 3px solid var(--black);
+            font-size: 1.1rem;
+            text-transform: uppercase;
             box-shadow: 5px 5px 0 var(--cyan);
-            transition: 0.1s;
+            transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
 
         .btn:hover {
-            transform: translate(-2px, -2px);
-            box-shadow: 8px 8px 0 var(--cyan);
-            background: var(--magenta);
+            transform: translate(-3px, -3px);
+            box-shadow: 8px 8px 0 var(--yellow);
+            border-color: var(--yellow);
+            color: var(--yellow);
+            background: #222;
         }
 
-        .icon {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            display: block;
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+                linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
         }
     </style>
 </head>
 
 <body>
+    <div class="overlay"></div>
     <div class="container">
-        <span class="icon">🚦</span>
-        <h1>429</h1>
-        <p>WHOA! SLOW DOWN. TOO MANY REQUESTS.</p>
-        <a href="/" class="btn">BACK TO HOME</a>
+        <div class="error-code">429</div>
+        <br>
+        <div class="glitch-text">SYSTEM OVERLOADED</div>
+        <p class="desc">
+            Kamu terlalu cepat! Server butuh istirahat sejenak.<br>
+            Tunggu beberapa saat sebelum mencoba lagi.
+        </p>
+        <a href="/" class="btn">COOLDOWN_RETRY()</a>
     </div>
 </body>
 
