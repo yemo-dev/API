@@ -58,13 +58,6 @@ export const statsRoute = createRoute({
 })
 
 export const statsHandler = (c) => {
-    if (statsRoute['x-status'] === 'OFFLINE') {
-        return c.json({
-            error: 'Service Unavailable',
-            message: 'This endpoint is currently OFFLINE.',
-            status: 503
-        }, 503)
-    }
 
     const formatUptime = (seconds) => {
         const d = Math.floor(seconds / (3600 * 24))

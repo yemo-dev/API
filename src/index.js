@@ -18,7 +18,16 @@ app.use('*', logApiRequest)
 app.use('*', rateLimiter())
 app.use('*', prettyPrint)
 
-app.openapi(statsRoute, statsHandler)
+app.openapi(statsRoute, (c) => {
+    if (statsRoute['x-status'] === 'OFFLINE') {
+        return c.json({
+            error: 'Service Unavailable',
+            message: 'This endpoint is currently OFFLINE.',
+            status: 503
+        }, 503)
+    }
+    return statsHandler(c)
+})
 
 const openApiConfig = {
     openapi: '3.0.0',
