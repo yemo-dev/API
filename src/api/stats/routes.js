@@ -5,7 +5,7 @@ export const statsRoute = createRoute({
     method: 'get',
     path: '/api/stats',
     description: 'Get detailed server system information (CPU, RAM, OS, etc)',
-    'x-status': 'ONLINE',
+    'x-status': 'OFFLINE',
     responses: {
         200: {
             content: {
@@ -58,6 +58,13 @@ export const statsRoute = createRoute({
 })
 
 export const statsHandler = (c) => {
+    if (statsRoute['x-status'] === 'OFFLINE') {
+        return c.json({
+            error: 'Service Unavailable',
+            message: 'This endpoint is currently OFFLINE.',
+            status: 503
+        }, 503)
+    }
 
     const formatUptime = (seconds) => {
         const d = Math.floor(seconds / (3600 * 24))
