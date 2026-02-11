@@ -99,8 +99,8 @@
 
         .logo::before {
             animation: glitchTop 1s linear infinite;
-            clip-path: polygon(0 0, 100% 0, 100% 33%, 0 33%);
             -webkit-clip-path: polygon(0 0, 100% 0, 100% 33%, 0 33%);
+            clip-path: polygon(0 0, 100% 0, 100% 33%, 0 33%);
         }
 
         @keyframes glitchTop {
@@ -122,8 +122,8 @@
 
         .logo::after {
             animation: glitchBotom 1.5s linear infinite;
-            clip-path: polygon(0 67%, 100% 67%, 100% 100%, 0 100%);
             -webkit-clip-path: polygon(0 67%, 100% 67%, 100% 100%, 0 100%);
+            clip-path: polygon(0 67%, 100% 67%, 100% 100%, 0 100%);
         }
 
         @keyframes glitchBotom {
@@ -181,6 +181,11 @@
             font-size: 0.8rem;
             font-weight: 800;
             border: 3px solid var(--black);
+        }
+
+        .badge.online {
+            background: var(--cyan);
+            color: var(--black);
         }
 
         .docs-link {
@@ -636,7 +641,7 @@
             <div class="logo" data-text="YE-MO.API">YE-MO.API</div>
             <div class="header-meta">
                 <span class="badge">v1.0.0</span>
-                <span class="badge" style="background:var(--cyan); color:#000">ONLINE</span>
+                <span class="badge online">ONLINE</span>
             </div>
         </div>
 
@@ -651,7 +656,7 @@
 
         <div class="servers-box">
             <label>SERVERS</label>
-            <select id="server-select"></select>
+            <select id="server-select" aria-label="Select Server"></select>
         </div>
 
         <div class="controls">

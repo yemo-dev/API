@@ -1,5 +1,5 @@
 {
-    "name": "API",
+    "name": "api",
     "version": "1.0.0",
     "description": "About Simple and easy to use API. ⭐️ Star to support our work!",
     "license": "MIT",
@@ -12,6 +12,7 @@
     "scripts": {
         "start": "node src/index.js",
         "dev": "npm run kill-port && node --watch src/index.js",
+        "dev:cluster": "npm run kill-port && node --watch src/index.js --cluster",
         "kill-port": "node src/utils/killPort.js"
     },
     "dependencies": {

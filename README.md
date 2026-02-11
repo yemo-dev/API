@@ -12,6 +12,7 @@
 | **Ultrafast** | Powered by `Hono` + `Node.js` for low latency. |
 | **Neo-Swagger** | Custom-designed API Portal (Not your boring swagger). |
 | **Fortified** | Built-in Rate Limiting, IP Whitelist & Ban System. |
+| **Cluster Mode** | Auto-scales to use all available CPU cores. |
 | **Type-Safe** | Full validation using `Zod` & `OpenAPI`. |
 | **Modular** | Clean architecture for easy scalability. |
 
@@ -33,6 +34,12 @@ npm install
 npm run dev
 ```
 
+> **Note:** To run in **Cluster Mode** (multi-core support), use:
+>
+> ```bash
+> npm run dev:cluster
+> ```
+>
 > Access Portal: **<http://localhost:3000>**
 
 ---
@@ -84,15 +91,17 @@ export const myRoute = createRoute({
 export const myHandler = (c) => c.json({ hello: 'world' })
 ```
 
-**2. Register in `index.js`**
-> **IMPORTANT:** Use the `register` utility, NOT `app.openapi`.
+**2. Register in `src/api/index.js`**
+> **IMPORTANT:** Add your route and handler to the `setupRoutes` function.
 
 ```javascript
-import { myRoute, myHandler } from './api/example/routes.js'
-import { register } from './utils/route.js'
+import { myRoute, myHandler } from './example/routes.js'
+import { register } from '../utils/route.js'
 
-// Correct Way
-register(app, myRoute, myHandler)
+export const setupRoutes = (app) => {
+    // ... existing registers
+    register(app, myRoute, myHandler)
+}
 ```
 
 ---
@@ -104,9 +113,11 @@ API/
 ├── public/
 │   └── errors/       # Custom 403, 404, 429, 500 Pages
 ├── src/
-│   ├── api/          # Route Logic (Folder per endpoint)
+│   ├── api/          # Route Logic
+│   │   ├── stats/    # Stats endpoint logic
+│   │   └── index.js  # Centralized Route Setup
 │   ├── utils/        # Security & Helpers (RateLimit, Logger)
-│   └── index.js      # Main Entry Point
+│   └── index.js      # Main Entry Point (Server & Cluster)
 └── package.json
 ```
 
