@@ -141,9 +141,31 @@
         <div class="glitch-text">SYSTEM OVERLOADED</div>
         <p class="desc">
             Kamu terlalu cepat! Server butuh istirahat sejenak.<br>
-            Tunggu beberapa saat sebelum mencoba lagi.
+            Coba lagi dalam <span id="timer" style="color: var(--yellow); font-weight: 900;">--</span> detik.
         </p>
-        <a href="/" class="btn">COOLDOWN_RETRY()</a>
+        <a href="/" class="btn" id="retry-btn" style="opacity: 0.5; pointer-events: none;">COOLDOWN_ACTIVE</a>
+
+        <script>
+            let seconds = {{ RETRY_AFTER }};
+            const timerEl = document.getElementById('timer');
+            const btnEl = document.getElementById('retry-btn');
+
+            function updateTimer() {
+                timerEl.textContent = seconds;
+                if (seconds <= 0) {
+                    timerEl.parentElement.innerHTML = "Rate limit sudah direset! Silakan coba lagi.";
+                    btnEl.style.opacity = "1";
+                    btnEl.style.pointerEvents = "auto";
+                    btnEl.textContent = "RETRY_NOW()";
+                    btnEl.style.background = "var(--cyan)";
+                    btnEl.style.color = "var(--bg)";
+                    return;
+                }
+                seconds--;
+                setTimeout(updateTimer, 1000);
+            }
+            updateTimer();
+        </script>
     </div>
 </body>
 
