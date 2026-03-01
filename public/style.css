@@ -844,3 +844,7 @@ footer {
         transform: translate(0)
     }
 }
+
+.hidden {
+    display: none !important;
+}
