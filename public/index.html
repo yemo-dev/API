@@ -25,11 +25,16 @@
         <div class="info-box">
             <h1>NEO-SWAGGER PORTAL</h1>
             <p>About Simple and easy to use API. ⭐️ Star to support our work!</p>
-            <div class="header-meta" style="margin-top: 1.5rem; justify-content: flex-start;">
-                <span class="badge oas-badge">OAS 3.0.0</span>
-                <a href="/docs" class="docs-link">VIEW /docs</a>
-                <button class="docs-link" onclick="downloadSpec()"
-                    style="background: var(--yellow); color: var(--black); cursor: pointer;">DOWNLOAD SPEC</button>
+            <div class="header-meta"
+                style="margin-top: 1.5rem; justify-content: flex-start; flex-direction: column; align-items: flex-start;">
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <span class="badge oas-badge" style="font-size: 0.75rem; padding: 4px 8px;">OAS 3.0.0</span>
+                    <a href="/docs" class="docs-link">VIEW /docs</a>
+                </div>
+                <div style="margin-top: 10px;">
+                    <button class="docs-link" onclick="downloadSpec()"
+                        style="background: var(--yellow); color: var(--black); cursor: pointer;">DOWNLOAD SPEC</button>
+                </div>
             </div>
         </div>
 
