@@ -69,12 +69,27 @@ function handleHashRoute() {
     /* Format: #/api/stats?someparam=value */
     const [pathPart, queryPart] = hash.substring(1).split('?');
 
+    /* Handle #/method/path or just #/path */
+    let methodPart = null;
+    let effectivePath = pathPart;
+
+    const parts = pathPart.split('/').filter(p => p);
+    const commonMethods = ['get', 'post', 'put', 'delete', 'patch', 'options', 'head'];
+    if (parts.length > 1 && commonMethods.includes(parts[0].toLowerCase())) {
+        methodPart = parts[0].toLowerCase();
+        effectivePath = '/' + parts.slice(1).join('/');
+    }
+
     const blocks = document.querySelectorAll('.op-block');
     let targetBlock = null;
 
     blocks.forEach(block => {
         const pathSpan = block.querySelector('.path');
-        if (pathSpan && pathSpan.textContent.trim() === pathPart) {
+        const methodSpan = block.querySelector('.method');
+        const matchPath = pathSpan && pathSpan.textContent.trim() === effectivePath;
+        const matchMethod = !methodPart || (methodSpan && methodSpan.textContent.trim().toLowerCase() === methodPart);
+
+        if (matchPath && matchMethod) {
             targetBlock = block;
         }
     });
@@ -247,7 +262,7 @@ function renderTagGroup(tag, endpoints) {
                             ${hasBody ? `<textarea class="body-input" placeholder='{ "key": "value" }'>${getMethodExampleById(details.operationId)}</textarea>` : ''}
                             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                                 <button class="try-btn" onclick="execute('${path}', '${method}', '${status}', this)">Execute</button>
-                                <button class="try-btn" style="background: var(--blue); color: #fff; box-shadow: 4px 4px 0 var(--black);" onclick="shareApi('${path}', this)">Share API</button>
+                                <button class="try-btn" style="background: var(--blue); color: #fff; box-shadow: 4px 4px 0 var(--black);" onclick="shareApi('${path}', '${method}', this)">Share API</button>
                                 <button class="try-btn" style="background: var(--orange); color: #000; box-shadow: 4px 4px 0 var(--black);" onclick="toggleSnippets(this, '${path}', '${method}')">Generate Code</button>
                             </div>
                             <div class="snippet-box" style="display: none; margin-top: 15px; border: 3px solid var(--black); padding: 15px; background: var(--white); box-shadow: 4px 4px 0 var(--magenta);">
@@ -501,9 +516,9 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
-function shareApi(path, btn) {
+function shareApi(path, method, btn) {
     const opContent = btn.closest('.op-content');
-    let fullPath = path;
+    let fullPath = `/${method.toLowerCase()}${path}`;
     const queryParams = new URLSearchParams();
 
     const inputs = opContent.querySelectorAll('.param-input');
