@@ -81,7 +81,7 @@ function handleHashRoute() {
 
     if (targetBlock) {
         const groupContent = targetBlock.closest('.tag-group-content');
-        if (groupContent && groupContent.style.display === 'none') {
+        if (groupContent && getComputedStyle(groupContent).display === 'none') {
             const header = groupContent.previousElementSibling;
             if (header) toggleCategory(header);
         }
@@ -649,7 +649,7 @@ function switchSnippet(btn, type) {
 
 function downloadSpec() {
     const server = document.getElementById('server-select').value;
-    const url = server.endsWith('/') ? server + 'openapi.json' : server + '/openapi.json';
+    const url = server.endsWith('/') ? server + 'docs' : server + '/docs';
     fetch(url).then(res => {
         if (!res.ok) throw new Error();
         return res.blob();
