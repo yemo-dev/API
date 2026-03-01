@@ -681,13 +681,19 @@ footer {
         border-left-width: 3px;
     }
 
-    .filter-group div {
+    .filter-group {
         flex-direction: column;
+        align-items: stretch !important;
+    }
+
+    .filter-input {
+        width: 100%;
+        flex: none !important;
     }
 
     .filter-btn {
         width: 100%;
-        margin-top: 5px;
+        margin-top: 2px;
     }
 
     .res-controls {

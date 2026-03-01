@@ -235,11 +235,9 @@ function renderEndpoints(paths) {
                             <div class="response-box">
                                 <div class="res-header">JSON RESPONSE</div>
                                 <div class="res-controls" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; padding-top: 10px;">
-                                    <div class="filter-group" style="display: flex; flex-direction: column; gap: 8px;">
-                                        <div style="display: flex; gap: 5px;">
-                                            <input type="text" class="filter-input" placeholder="Filter path... (e.g. data.user.name)" style="flex: 1; background: var(--black); color: var(--yellow); border: 2px solid var(--black); padding: 8px 12px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; box-shadow: 2px 2px 0 var(--cyan);">
-                                            <button class="filter-btn" onclick="filterJsonResponse(this)" style="background: var(--yellow); color: var(--black); border: 2px solid var(--black); padding: 8px 15px; font-size: 0.85rem; font-weight: 800; cursor: pointer; box-shadow: 2px 2px 0 var(--magenta); text-transform: uppercase; white-space: nowrap;">Filter</button>
-                                        </div>
+                                    <div class="filter-group" style="display: flex; gap: 5px; flex-wrap: wrap;">
+                                        <input type="text" class="filter-input" placeholder="Filter path... (e.g. data.user.name)" style="flex: 1; min-width: 0; background: var(--black); color: var(--yellow); border: 2px solid var(--black); padding: 8px 12px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; box-shadow: 2px 2px 0 var(--cyan);">
+                                        <button class="filter-btn" onclick="filterJsonResponse(this)" style="background: var(--yellow); color: var(--black); border: 2px solid var(--black); padding: 8px 15px; font-size: 0.85rem; font-weight: 800; cursor: pointer; box-shadow: 2px 2px 0 var(--magenta); text-transform: uppercase;">Filter</button>
                                     </div>
                                     <button class="copy-btn-main" onclick="copyResponse(this)" style="width: 100%; background: var(--cyan); color: var(--black); border: 2px solid var(--black); padding: 10px; font-size: 0.9rem; font-weight: 800; cursor: pointer; box-shadow: 2px 2px 0 var(--magenta); text-transform: uppercase;">Copy Full JSON</button>
                                 </div>
