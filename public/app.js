@@ -249,7 +249,6 @@ function renderTagGroup(tag, endpoints) {
                         <span class="path">${path}</span>
                         <span class="favorite-star" onclick="toggleFavorite('${path}', '${method}', event)" style="cursor: pointer; font-size: 1.2rem; margin-left: 10px; transition: 0.2s;" title="Add to Favorites">${isFavorite(path, method) ? '⭐' : '☆'}</span>
                         <span class="status-badge" style="background:${statusColor}">${status}</span>
-                        <span class="latency-badge" style="display: none; padding: 2px 8px; font-size: 0.65rem; border: 2px solid var(--black); box-shadow: 2px 2px 0 var(--black); font-weight: 900; text-transform: uppercase;">0ms</span>
                         <span class="summary">${details.summary || ''}</span>
                         <span class="op-arrow">▼</span>
                     </div>
@@ -282,7 +281,10 @@ function renderTagGroup(tag, endpoints) {
                                 </div>
                             </div>
                             <div class="response-box" style="display: none;">
-                                <div class="res-header">JSON RESPONSE</div>
+                                <div class="res-header" style="display: flex; justify-content: space-between; align-items: center; padding-right: 5px;">
+                                    <span>JSON RESPONSE</span>
+                                    <span class="latency-badge" style="display: none; padding: 2px 10px; font-size: 0.75rem; border: 2px solid var(--black); box-shadow: 2px 2px 0 var(--black); font-weight: 900; text-transform: uppercase;">0ms</span>
+                                </div>
                                 <div class="res-controls" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; padding-top: 10px;">
                                     <div class="filter-group" style="display: flex; gap: 5px; flex-wrap: wrap;">
                                         <input type="text" class="filter-input" placeholder="Filter path... (e.g. data.user.name)" style="flex: 1; min-width: 0; background: var(--black); color: var(--yellow); border: 2px solid var(--black); padding: 8px 12px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; box-shadow: 2px 2px 0 var(--cyan);">
