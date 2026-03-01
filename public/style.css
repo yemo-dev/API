@@ -205,21 +205,16 @@ body {
 .servers-box {
     background: var(--yellow);
     border: var(--border);
-    padding: 1.5rem;
+    padding: 1rem 1.5rem;
     box-shadow: 6px 6px 0 var(--black);
     margin-bottom: 2rem;
     display: flex;
-    flex-direction: column;
-    /* Mobile first column */
-    align-items: flex-start;
+    flex-direction: row;
+    /* Force row on all screens */
+    align-items: center;
+    flex-wrap: wrap;
+    /* Wrap if too small */
     gap: 1rem;
-}
-
-@media (min-width: 768px) {
-    .servers-box {
-        flex-direction: row;
-        align-items: center;
-    }
 }
 
 .servers-box label {
@@ -242,8 +237,9 @@ body {
     font-size: 1rem;
     cursor: pointer;
     box-shadow: 4px 4px 0 var(--black);
-    flex: 1 1 100%;
-    min-width: 0;
+    flex: 1;
+    min-width: 200px;
+    /* Ensure it stays readable */
     max-width: 100%;
     color: var(--black);
     text-transform: uppercase;

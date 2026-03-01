@@ -337,7 +337,7 @@ function renderParams(params) {
 function toggle(el) {
     const isNowActive = el.classList.contains('active');
 
-    // Close all other open endpoints
+    /* Close all other open endpoints */
     document.querySelectorAll('.op-sum.active').forEach(openSum => {
         if (openSum !== el) {
             openSum.classList.remove('active');
@@ -345,7 +345,7 @@ function toggle(el) {
         }
     });
 
-    // Toggle the clicked one
+    /* Toggle the clicked one */
     if (!isNowActive) {
         el.classList.add('active');
         el.nextElementSibling.classList.add('active');
@@ -358,25 +358,24 @@ function toggle(el) {
 function filterEndpoints(query) {
     const q = query.toLowerCase();
 
-    // First, hide/show the endpoint blocks
+    /* Filter visibility for endpoint blocks */
     document.querySelectorAll('.op-block').forEach(block => {
         const text = block.innerText.toLowerCase();
         block.classList.toggle('hidden', !text.includes(q));
     });
 
-    // Handle Category visibility
+    /* Handle Category visibility */
     document.querySelectorAll('.tag-group-content').forEach(content => {
         const header = content.previousElementSibling;
         const hasVisible = content.querySelector('.op-block:not(.hidden)') !== null;
 
         if (q === '') {
-            // Restore everything if search is cleared
+            /* Restore everything if search is cleared */
             header.classList.remove('hidden');
-            // Keep current user toggle state for content
         } else {
             if (hasVisible) {
                 header.classList.remove('hidden');
-                // Automatically expand category if match found during search
+                /* Automatically expand category if match found during search */
                 content.style.display = 'block';
                 const arrow = header.querySelector('.cat-arrow');
                 if (arrow) arrow.style.transform = 'rotate(0deg)';
@@ -474,7 +473,7 @@ async function execute(path, method, status, btn) {
         link.textContent = method.toUpperCase() + ' ' + requestUrl.toUpperCase();
     } catch (e) {
         container.style.display = 'block';
-        pre.textContent = '// ERROR: ' + e.message;
+        pre.textContent = '/* ERROR: ' + e.message + ' */';
     } finally {
         btn.classList.remove('glitch-loading');
         btn.textContent = 'Execute';
