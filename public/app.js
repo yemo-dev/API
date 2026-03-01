@@ -283,7 +283,7 @@ function renderTagGroup(tag, endpoints) {
                             <div class="response-box" style="display: none;">
                                 <div class="res-header" style="display: flex; justify-content: space-between; align-items: center;">
                                     <span>JSON RESPONSE</span>
-                                    <span class="latency-badge" style="display: none; background: var(--black); color: var(--yellow); padding: 2px 8px; font-size: 0.7rem; border: 2px solid var(--black); box-shadow: 2px 2px 0 var(--cyan); font-weight: 900;">0ms</span>
+                                    <span class="latency-badge" style="display: none; padding: 2px 10px; font-size: 0.75rem; border: 2px solid var(--black); box-shadow: 2px 2px 0 var(--black); font-weight: 900; text-transform: uppercase;">0ms</span>
                                 </div>
                                 <div class="res-controls" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; padding-top: 10px;">
                                     <div class="filter-group" style="display: flex; gap: 5px; flex-wrap: wrap;">
@@ -462,9 +462,17 @@ async function execute(path, method, status, btn) {
         if (latencyBadge) {
             latencyBadge.textContent = `${duration}ms`;
             latencyBadge.style.display = 'inline-block';
-            if (duration < 300) latencyBadge.style.boxShadow = '2px 2px 0 var(--green)';
-            else if (duration < 1000) latencyBadge.style.boxShadow = '2px 2px 0 var(--orange)';
-            else latencyBadge.style.boxShadow = '2px 2px 0 var(--red)';
+
+            if (duration < 300) {
+                latencyBadge.style.background = 'var(--green)';
+                latencyBadge.style.color = 'var(--black)';
+            } else if (duration < 1000) {
+                latencyBadge.style.background = 'var(--orange)';
+                latencyBadge.style.color = 'var(--black)';
+            } else {
+                latencyBadge.style.background = 'var(--red)';
+                latencyBadge.style.color = 'var(--white)';
+            }
         }
 
         let data;
