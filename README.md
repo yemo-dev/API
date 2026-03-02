@@ -66,7 +66,7 @@ npm run dev
 | Method | Endpoint | Description | Status Config |
 | :--- | :--- | :--- | :--- |
 | GET | /api/stats | System CPU, RAM, Network info. | x-status |
-| GET | /api/random/blue-archive | Random Blue Archive image URL. | x-status |
+| GET | /api/ba | Random Blue Archive image URL. | x-status |
 
 > *Check endpoint status availability in their respective route files.*
 
@@ -143,14 +143,14 @@ Endpoints can now return raw binary data (images, videos, etc.) directly.
 
 - **Frontend Handling**: The API portal automatically detects binary `Content-Type` and renders a premium preview using `Blob` objects.
 - **UI Logic**: When binary data is displayed, JSON-specific controls (Filter/Copy) are automatically hidden for a cleaner experience.
-- **BA API Example**: `GET /api/ba/blue-archive` returns a direct image buffer.
+- **BA API Example**: `GET /api/ba` returns a direct image buffer.
 
 ### Direct Link / Redirect
 
 Need to use the API directly in an `<img>` or `<video>` tag? Just add the `redirect=true` query parameter.
 
 **Usage:**
-`GET /api/ba/blue-archive?redirect=true`
+`GET /api/ba?redirect=true`
 
 - **Behavior**: The API will return a **302 Redirect** directly to the raw media file.
 - **Limitation**: If the endpoint returns multiple results, it will redirect to the first item.
