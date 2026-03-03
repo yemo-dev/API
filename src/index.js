@@ -21,9 +21,54 @@ if (isCluster && cluster.isPrimary) {
     logger.info(`Primary ${process.pid} is running`)
     logger.info(`Starting ${numCPUs} workers...`)
 
+    const masterClients = new Map()
+
     for (let i = 0; i < numCPUs; i++) {
-        cluster.fork()
+        const worker = cluster.fork()
+
+        /* IPC for rate limit sync */
+        worker.on('message', (msg) => {
+            if (msg.type === 'RATE_LIMIT_SYNC') {
+                const { ip, count, resetTime, method } = msg.data
+                const now = Date.now()
+
+                if (!masterClients.has(ip)) {
+                    masterClients.set(ip, {
+                        count: method === 'HEAD' ? 0 : 1,
+                        resetTime: now + msg.data.windowMs
+                    })
+                } else {
+                    const client = masterClients.get(ip)
+                    if (now > client.resetTime) {
+                        masterClients.set(ip, {
+                            count: method === 'HEAD' ? 0 : 1,
+                            resetTime: now + msg.data.windowMs
+                        })
+                    } else {
+                        if (method !== 'HEAD') {
+                            client.count++
+                        }
+                    }
+                }
+
+                const clientData = masterClients.get(ip)
+                worker.send({
+                    type: 'RATE_LIMIT_SYNC_RES',
+                    data: { ip, ...clientData }
+                })
+            }
+        })
     }
+
+    /* Cleanup expired clients in master process */
+    setInterval(() => {
+        const now = Date.now()
+        for (const [ip, data] of masterClients.entries()) {
+            if (now > data.resetTime) {
+                masterClients.delete(ip)
+            }
+        }
+    }, 10 * 60 * 1000)
 
     cluster.on('exit', (worker, code, signal) => {
         logger.warn(`Worker ${worker.process.pid} died. Restarting...`)

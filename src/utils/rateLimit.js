@@ -1,4 +1,4 @@
-import { readFile } from 'node:fs/promises'
+import cluster from 'node:cluster'
 
 const clients = new Map()
 
@@ -7,6 +7,19 @@ const config = {
     max: 100,
     whitelist: ['127.0.0.1', '::1', '::ffff:127.0.0.1'],
     banList: ['']
+}
+
+const syncRateLimit = (data) => {
+    return new Promise((resolve) => {
+        const handler = (msg) => {
+            if (msg.type === 'RATE_LIMIT_SYNC_RES' && msg.data.ip === data.ip) {
+                process.off('message', handler)
+                resolve(msg.data)
+            }
+        }
+        process.on('message', handler)
+        process.send({ type: 'RATE_LIMIT_SYNC', data })
+    })
 }
 
 export const rateLimiter = () => {
@@ -52,54 +65,63 @@ export const rateLimiter = () => {
         }
 
         const now = Date.now()
+        let clientData
 
-        if (!clients.has(ip)) {
-            /* status detection */
-            clients.set(ip, { count: c.req.method === 'HEAD' ? 0 : 1, resetTime: now + config.windowMs })
+        if (cluster.isWorker) {
+            clientData = await syncRateLimit({
+                ip,
+                method: c.req.method,
+                windowMs: config.windowMs
+            })
         } else {
-            const client = clients.get(ip)
-            if (now > client.resetTime) {
+            if (!clients.has(ip)) {
+                /* status detection */
                 clients.set(ip, { count: c.req.method === 'HEAD' ? 0 : 1, resetTime: now + config.windowMs })
             } else {
-                if (c.req.method !== 'HEAD') {
-                    client.count++
-                }
-
-                if (client.count > config.max) {
-                    const retryAfter = Math.ceil((client.resetTime - now) / 1000);
-                    c.header('X-RateLimit-Limit', config.max.toString())
-                    c.header('X-RateLimit-Remaining', '0')
-                    c.header('Retry-After', retryAfter.toString());
-
-                    const formatTime = (s) => {
-                        const h = Math.floor(s / 3600);
-                        const m = Math.floor((s % 3600) / 60);
-                        const sec = s % 60;
-                        const parts = [];
-                        if (h > 0) parts.push(`${h} hours`);
-                        if (m > 0) parts.push(`${m} minutes`);
-                        if (sec > 0 || parts.length === 0) parts.push(`${sec} seconds`);
-                        return parts.join(', ');
-                    };
-
-                    const timeStr = formatTime(retryAfter);
-
-                    if (c.req.path.startsWith('/api/') || c.req.header('accept')?.includes('json')) {
-                        return c.json({
-                            success: false,
-                            status: 429,
-                            error: 'Too Many Requests',
-                            message: `Rate limit exceeded. Please try again in ${timeStr}.`,
-                            retryAfter
-                        }, 429);
+                const client = clients.get(ip)
+                if (now > client.resetTime) {
+                    clients.set(ip, { count: c.req.method === 'HEAD' ? 0 : 1, resetTime: now + config.windowMs })
+                } else {
+                    if (c.req.method !== 'HEAD') {
+                        client.count++
                     }
-
-                    return c.text(`Too Many Requests. Retry after ${timeStr}.`, 429);
                 }
             }
+            clientData = clients.get(ip)
         }
 
-        const clientData = clients.get(ip)
+        if (clientData.count > config.max) {
+            const retryAfter = Math.ceil((clientData.resetTime - now) / 1000);
+            c.header('X-RateLimit-Limit', config.max.toString())
+            c.header('X-RateLimit-Remaining', '0')
+            c.header('Retry-After', retryAfter.toString());
+
+            const formatTime = (s) => {
+                const h = Math.floor(s / 3600);
+                const m = Math.floor((s % 3600) / 60);
+                const sec = s % 60;
+                const parts = [];
+                if (h > 0) parts.push(`${h} hours`);
+                if (m > 0) parts.push(`${m} minutes`);
+                if (sec > 0 || parts.length === 0) parts.push(`${sec} seconds`);
+                return parts.join(', ');
+            };
+
+            const timeStr = formatTime(retryAfter);
+
+            if (c.req.path.startsWith('/api/') || c.req.header('accept')?.includes('json')) {
+                return c.json({
+                    success: false,
+                    status: 429,
+                    error: 'Too Many Requests',
+                    message: `Rate limit exceeded. Please try again in ${timeStr}.`,
+                    retryAfter
+                }, 429);
+            }
+
+            return c.text(`Too Many Requests. Retry after ${timeStr}.`, 429);
+        }
+
         if (clientData) {
             c.header('X-RateLimit-Limit', config.max.toString())
             c.header('X-RateLimit-Remaining', Math.max(0, config.max - clientData.count).toString())
