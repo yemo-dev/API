@@ -1,211 +1,179 @@
 # YEMO API
 
-High-performance, scalable, and secure API infrastructure built with the Hono framework and Node.js. Designed for developers who require a professional, modular, and high-performance base for their services.
+> **High-Performance. Scalable. Neo-Brutalist.**
+> *Built with Hono, Node.js, and a focus on Developer Experience.*
 
 ---
 
-## Technical Architecture
+## CORE FEATURES
 
-The system is built on a modern, lightweight, and type-safe stack designed for low latency and high scalability.
-
-- **Engine**: Powered by Hono and @hono/node-server.
-- **Validation**: Schema-based validation using Zod and @hono/zod-openapi.
-- **Documentation**: Automatic OpenAPI (Swagger) generation.
-- **Portal**: Custom-built, high-performance API Portal with integrated media previews.
-- **Multitasking**: Built-in Node.js Cluster support for multi-core scaling.
-- **IPC-Sync**: Inter-Process Communication for unified state management across workers.
-
----
-
-## Key Features
-
-### High-Performance Core
-
-- Optimized request handling with Hono.
-- Minimal overhead for core middleware.
-- JSON-first responses with optional redirect support for media assets.
-
-### Advanced Cluster Synchronization
-
-When running in cluster mode, the API utilizes a centralized state management system. All worker processes synchronize their internal state (including rate limits) with the primary process via IPC. This ensures that security policies are enforced consistently across all CPU cores.
-
-### Integrated Security Layer
-
-- **Global Rate Limiting**: Distributed counting across all workers.
-- **Dynamic IP Management**: Integrated whitelist for trusted sources and a ban list for permanent blocks.
-- **Intelligent Detection**: Normalized IP detection supporting reverse proxies and local variations.
-
-### Developer Experience
-
-- **Live Portal**: A custom, high-end technical interface for exploring and testing endpoints.
-- **Code Generation**: Real-time generation of cURL, Fetch, and Python snippets.
-- **Binary Support**: Native support for direct binary rendering (images/videos) in the browser.
+| Feature | Description |
+| :--- | :--- |
+| **Ultrafast** | Powered by `Hono` + `Node.js` for low latency. |
+| **Neo-Swagger** | Custom-designed API Portal (Not your boring swagger). |
+| **Productivity** | Built-in Code Snippets (cURL, Fetch, Python). |
+| **Accessibility** | Bookmarking (Favorites) & Precise Deep Linking. |
+| **Fortified** | Built-in Rate Limiting, IP Whitelist & Ban System. |
+| **Cluster Mode** | Auto-scales to use all available CPU cores. |
+| **Type-Safe** | Full validation using `Zod` & `OpenAPI`. |
+| **Modular** | Clean architecture for easy scalability. |
 
 ---
 
-## Getting Started
+## PORTAL FEATURES
 
-### Installation
+Our custom UI is designed for high-performance development workflows.
 
-1. Clone the repository:
-
-   ```bash
-   git clone https://github.com/yemo-dev/API.git
-   cd API
-   ```
-
-2. Install dependencies:
-
-   ```bash
-   npm install
-   ```
-
-### Running the Server
-
-- **Development Mode**:
-
-  ```bash
-  npm run dev
-  ```
-
-- **Clustered Production Mode**:
-
-  ```bash
-  npm run dev:cluster
-  ```
-
-Access the API Portal at: **<http://localhost:3000>**
+| Feature | Functionality |
+| :--- | :--- |
+| **Favorites (⭐)** | Bookmarks endpoints with LocalStorage persistence. |
+| **Code Snippets** | Real-time generation for cURL, Fetch, and Python. |
+| **Spec Download** | One-click download of the `openapi.json` definition. |
+| **Accordion UX** | Auto-collapses other endpoints for focused debugging. |
+| **Deep Link v2** | Precision hash routing (e.g., `#/get/api/stats`). |
+| **Copy Feedback** | Instant "COPIED!" visual confirmation on all actions. |
 
 ---
 
-## GitHub Pages Hosting (Portal Only)
+## QUICK START
 
-This repository includes a GitHub Actions workflow to deploy the `page/` portal to GitHub Pages.
-
-### Enable Deployment
-
-1. Go to **Settings → Pages** in your repository.
-2. Set **Source** to **GitHub Actions**.
-3. Push changes to `main` (or run the workflow manually).
-
-### Configure API URL
-
-Because GitHub Pages is static hosting, the API server still needs to run separately.
-
-You can point the portal to your API using one of these methods:
-
-- Set `window.PORTAL_CONFIG.apiBaseUrl` in `page/config.js`
-- Or open the portal with query param:
-
-```text
-https://<user>.github.io/<repo>/?api=https://your-api-domain.com
-```
-
-The query parameter takes priority and is saved in local storage.
-
----
-
-## 24/7 Backend Deployment via GitHub Actions
-
-If you need the API online 24/7, use GitHub Actions for CI/CD and run the app on a VPS with PM2 (process manager).
-
-This repository now includes: `.github/workflows/deploy-vps.yml`.
-
-### Required GitHub Secrets
-
-Set these in **Settings → Secrets and variables → Actions**:
-
-- `VPS_HOST` : VPS IP/domain
-- `VPS_USER` : SSH user
-- `VPS_SSH_KEY` : Private SSH key (recommended deploy key)
-- `VPS_PORT` : SSH port (optional, default `22`)
-- `APP_DIR` : Absolute app directory on VPS (example: `/var/www/yemo-api`)
-- `APP_PORT` : App port on VPS (optional, default from app is `3000`)
-
-### One-time VPS Setup
+### 1. Clone & Install
 
 ```bash
-sudo apt update
-sudo apt install -y nodejs npm
-sudo npm install -g pm2
-mkdir -p /var/www/yemo-api
+git clone https://github.com/yemo-dev/API.git
+cd API
+npm install
 ```
 
-### How it Works
-
-- Push to `main` triggers the workflow.
-- Workflow uploads app files (`src`, `page`, `package*.json`) to VPS.
-- Workflow runs `npm ci --omit=dev` on VPS.
-- Workflow starts/restarts process `yemo-api` with PM2.
-- PM2 keeps service alive and auto-restarts on crash/reboot.
-
-### Verify on VPS
+### 2. Run Server
 
 ```bash
-pm2 status
-pm2 logs yemo-api --lines 100
+npm run dev
 ```
+
+> **Note:** To run in **Cluster Mode** (multi-core support), use:
+>
+> ```bash
+> npm run dev:cluster
+> ```
+>
+> Access Portal: **<http://localhost:3000>**
 
 ---
 
-## Security Configuration
+## API ENDPOINTS
 
-Configuration is managed centrally within the `src/utils/rateLimit.js` utility.
+| Method | Endpoint | Description | Status Config |
+| :--- | :--- | :--- | :--- |
+| GET | /api/stats | System CPU, RAM, Network info. | x-status |
+| GET | /api/ba | Random Blue Archive image URL. | x-status |
 
-| Component | Default Configuration | Effect |
+> *Check endpoint status availability in their respective route files.*
+
+---
+
+## SECURITY SYSTEM
+
+We take security seriously. This API includes a robust protection layer within `src/utils/rateLimit.js`.
+
+| System | Default Config | Effect on Breach |
 | :--- | :--- | :--- |
-| **Rate Limiter** | 100 requests / 10 minutes | Returns 429 Too Many Requests |
-| **Whitelist** | Internal local IPs | Bypasses all rate limit counters |
-| **Ban List** | Dynamic | Returns 403 Forbidden |
+| **Rate Limiter** | `100 req` / `10 min` | **429** Neo-Brutalist Page |
+| **IP Whitelist** | Unlimited Access | Bypasses all limits |
+| **IP Ban List** | Permanent Block | **403** Access Denied Page |
+
+> **UI Note:** Error pages are located in `page/status/` and feature a custom premium design.
 
 ---
 
-## Developer Guide
+## DEVELOPER GUIDE
 
-### Adding New Routes
+### Adding a New Endpoint
 
-Routes should be defined in their respective directories under `src/api/`.
+We use a specific pattern to ensure **Offline/Online** status checks and **Media Previews** work automatically.
+
+**1. Create Route File**
+`src/api/example/routes.js`
 
 ```javascript
 import { createRoute, z } from '@hono/zod-openapi'
 import { MediaSchema } from '../../utils/media.js'
 
-export const exampleRoute = createRoute({
+export const myRoute = createRoute({
     method: 'get',
     path: '/api/example',
-    description: 'Endpoint technical description',
-    'x-status': 'ONLINE',
-    'x-auto-media': true,
+    description: 'My cool media endpoint',
+    'x-status': 'ONLINE', 
+    'x-auto-media': true, /* magic flag */
     responses: {
         200: {
             content: {
                 'application/json': {
-                    schema: MediaSchema
+                    schema: MediaSchema /* standardized schema */
                 }
             },
-            description: 'Operation successful'
+            description: 'Success'
         }
     }
 })
+
+export const myHandler = async (c) => {
+    /* auto wrapper */
+    return "https://example.com/image.jpg"
+}
 ```
+
+### Auto-Docs & Media Support
+
+By setting `'x-auto-media': true` in your route:
+
+- **Multi-Media Support**: If you return an array of URLs, the framework automatically formats each one and the portal renders a gallery of previews.
+- **Automatic Detection**: It uses `getMediaType` internally to detect if each asset is an `image`, `video`, or `audio`.
+- **Portal Previews**: The API Portal renders specialized players or viewers for every detected media asset in the response.
+
+**If `'x-auto-media': false` (or omitted):**
+
+- The framework still wraps string returns into a basic JSON object: `{ status: 'success', url: YOUR_STRING }`.
+- **Note**: This mode does **NOT** show a media preview in the portal as it lacks the specialized `result` structure.
+
+### Direct Binary Support
+
+Endpoints can now return raw binary data (images, videos, etc.) directly.
+
+- **Frontend Handling**: The API portal automatically detects binary `Content-Type` and renders a premium preview using `Blob` objects.
+- **UI Logic**: When binary data is displayed, JSON-specific controls (Filter/Copy) are automatically hidden for a cleaner experience.
+- **BA API Example**: `GET /api/ba` returns a standardized JSON response with image/video URL and type detection.
+
+### Direct Link / Redirect
+
+Need to use the API directly in an `<img>` or `<video>` tag? Just add the `redirect=true` query parameter.
+
+**Usage:**
+`GET /api/ba?redirect=true`
+
+- **Behavior**: The API will return a **302 Redirect** directly to the raw media file.
+- **Limitation**: If the endpoint returns multiple results, it will redirect to the first item.
 
 ---
 
-## Project Structure
+## PROJECT STRUCTURE
 
 ```text
 API/
 ├── page/
-│   └── status/       # Custom Error Pages (403, 404, 429)
+│   └── status/       # Custom 403, 404, 429, 500 Pages
 ├── src/
-│   ├── api/          # Route and Handler Implementations
-│   │   ├── stats/    # Internal stats logic
-│   │   └── index.js  # Main Router setup
-│   ├── utils/        # Core utilities (Security, Logger, IPC)
-│   └── index.js      # Server entry point and Cluster logic
+│   ├── api/          # Route Logic
+│   │   ├── ba/       # Blue Archive assets
+│   │   ├── stats/    # Stats endpoint logic
+│   │   └── index.js  # Centralized Route Setup
+│   ├── utils/        # Security & Helpers (RateLimit, Logger, Media)
+│   └── index.js      # Main Entry Point (Server & Cluster)
 └── package.json
 ```
 
 ---
 
-**Maintained by the YeMo Dev Team.**
+<p align="center">
+  <b>Built by YeMo Dev</b>
+</p>
