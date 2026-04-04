@@ -1,4 +1,56 @@
 let STATUS_CONFIG = { default: 'ONLINE', overrides: {} };
+let PORTAL_SPEC = null;
+
+function normalizeBaseUrl(url) {
+    if (!url || typeof url !== 'string') return '';
+    const trimmed = url.trim();
+    if (!trimmed) return '';
+
+    let parsed;
+    try {
+        parsed = new URL(trimmed);
+    } catch {
+        return '';
+    }
+
+    const protocol = parsed.protocol.toLowerCase();
+    if (protocol !== 'http:' && protocol !== 'https:') return '';
+    parsed.hash = '';
+
+    return parsed.toString().replace(/\/+$/, '');
+}
+
+function getApiBaseUrl() {
+    const queryApi = new URLSearchParams(window.location.search).get('api');
+    if (queryApi) {
+        const normalized = normalizeBaseUrl(queryApi);
+        if (normalized) {
+            localStorage.setItem('apiBaseUrl', normalized);
+            return normalized;
+        }
+    }
+
+    const storedApi = localStorage.getItem('apiBaseUrl');
+    if (storedApi) {
+        const normalizedStored = normalizeBaseUrl(storedApi);
+        if (normalizedStored) return normalizedStored;
+        localStorage.removeItem('apiBaseUrl');
+    }
+
+    if (window.PORTAL_CONFIG?.apiBaseUrl) {
+        const configured = normalizeBaseUrl(window.PORTAL_CONFIG.apiBaseUrl);
+        if (configured) return configured;
+    }
+
+    return normalizeBaseUrl(window.location.origin);
+}
+
+function buildApiUrl(path) {
+    if (!path || typeof path !== 'string') return getApiBaseUrl();
+    const trimmedPath = path.trim();
+    if (!trimmedPath) return getApiBaseUrl();
+    return `${getApiBaseUrl()}${trimmedPath.startsWith('/') ? trimmedPath : `/${trimmedPath}`}`;
+}
 
 window.updateRateLimit = function (res, directLimit, directRemaining) {
     const limit = directLimit || res?.headers?.get('x-ratelimit-limit');
@@ -96,8 +148,14 @@ window.setGlobalLock = function (locked) {
 
 async function initPortal() {
     try {
+        const apiBase = getApiBaseUrl();
+
+        document.querySelectorAll('.docs-link[href="/docs"]').forEach(link => {
+            link.href = `${apiBase}/docs`;
+        });
+
         /* rate limit detection */
-        fetch('/api/stats', { method: 'HEAD' })
+        fetch(buildApiUrl('/api/stats'), { method: 'HEAD' })
             .then(res => {
                 window.updateRateLimit(res);
                 if (window.lastRateLimit) {
@@ -106,8 +164,9 @@ async function initPortal() {
             })
             .catch(() => { });
 
-        const docsRes = await fetch('/docs');
+        const docsRes = await fetch(buildApiUrl('/docs'));
         const spec = await docsRes.json();
+        PORTAL_SPEC = spec;
 
         renderServers(spec.servers);
         renderEndpoints(spec.paths);
@@ -118,7 +177,14 @@ async function initPortal() {
         }
 
     } catch (e) {
-        document.getElementById('endpoint-list').innerHTML = `<div class="op-block" style="padding:2rem; background:var(--yellow)">ERROR LOADING SPEC: ${e.message}</div>`;
+        const endpointList = document.getElementById('endpoint-list');
+        endpointList.textContent = '';
+        const errorBox = document.createElement('div');
+        errorBox.className = 'op-block';
+        errorBox.style.padding = '2rem';
+        errorBox.style.background = 'var(--yellow)';
+        errorBox.textContent = `ERROR LOADING SPEC: ${e?.message || 'Unknown error'}. Add ?api=https://your-api-domain.com on URL or set PORTAL_CONFIG.apiBaseUrl in page/config.js`;
+        endpointList.appendChild(errorBox);
     }
 
     /* load last search query */
@@ -259,7 +325,26 @@ function showToast(message, type = 'info') {
 
 function renderServers(servers) {
     const select = document.getElementById('server-select');
-    select.innerHTML = servers.map(s => `<option value="${s.url}">${s.url} - ${s.description || ''}</option>`).join('');
+    const apiBase = getApiBaseUrl();
+    /* Fallback is used when OpenAPI spec has no `servers` (or malformed) so portal still works. */
+    const safeServers = Array.isArray(servers) && servers.length > 0 ? servers : [{ url: apiBase, description: 'Configured API Server' }];
+    select.textContent = '';
+
+    safeServers.forEach((s) => {
+        const safeUrl = normalizeBaseUrl(s?.url);
+        if (!safeUrl) return;
+        const option = document.createElement('option');
+        option.value = safeUrl;
+        option.textContent = `${safeUrl} - ${String(s?.description || '')}`;
+        select.appendChild(option);
+    });
+
+    if (!select.options.length) {
+        const option = document.createElement('option');
+        option.value = apiBase;
+        option.textContent = `${apiBase} - Configured API Server`;
+        select.appendChild(option);
+    }
 }
 
 function getStatusColor(status) {
@@ -807,7 +892,9 @@ function toggleFavorite(path, method, event) {
     }
     localStorage.setItem('favorites', JSON.stringify(favorites));
     /* reload favorited group */
-    renderEndpoints(spec.paths);
+    if (PORTAL_SPEC?.paths) {
+        renderEndpoints(PORTAL_SPEC.paths);
+    }
 }
 
 function getFavorites() {
@@ -862,7 +949,7 @@ function switchSnippet(btn, type) {
 }
 
 function downloadSpec() {
-    const server = document.getElementById('server-select').value;
+    const server = document.getElementById('server-select')?.value || getApiBaseUrl();
     const url = server.endsWith('/') ? server + 'docs' : server + '/docs';
     fetch(url).then(res => {
         if (!res.ok) throw new Error();
