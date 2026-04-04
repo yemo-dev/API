@@ -105,6 +105,49 @@ The query parameter takes priority and is saved in local storage.
 
 ---
 
+## 24/7 Backend Deployment via GitHub Actions
+
+If you need the API online 24/7, use GitHub Actions for CI/CD and run the app on a VPS with PM2 (process manager).
+
+This repository now includes: `.github/workflows/deploy-vps.yml`.
+
+### Required GitHub Secrets
+
+Set these in **Settings → Secrets and variables → Actions**:
+
+- `VPS_HOST` : VPS IP/domain
+- `VPS_USER` : SSH user
+- `VPS_SSH_KEY` : Private SSH key (recommended deploy key)
+- `VPS_PORT` : SSH port (optional, default `22`)
+- `APP_DIR` : Absolute app directory on VPS (example: `/var/www/yemo-api`)
+- `APP_PORT` : App port on VPS (optional, default from app is `3000`)
+
+### One-time VPS Setup
+
+```bash
+sudo apt update
+sudo apt install -y nodejs npm
+sudo npm install -g pm2
+mkdir -p /var/www/yemo-api
+```
+
+### How it Works
+
+- Push to `main` triggers the workflow.
+- Workflow uploads app files (`src`, `page`, `package*.json`) to VPS.
+- Workflow runs `npm ci --omit=dev` on VPS.
+- Workflow starts/restarts process `yemo-api` with PM2.
+- PM2 keeps service alive and auto-restarts on crash/reboot.
+
+### Verify on VPS
+
+```bash
+pm2 status
+pm2 logs yemo-api --lines 100
+```
+
+---
+
 ## Security Configuration
 
 Configuration is managed centrally within the `src/utils/rateLimit.js` utility.

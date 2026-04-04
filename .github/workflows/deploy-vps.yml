@@ -1,0 +1,59 @@
+name: Deploy Backend to VPS
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/deploy-vps.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Upload application files to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT || '22' }}
+          source: "src,page,package.json,package-lock.json"
+          target: ${{ secrets.APP_DIR }}
+          overwrite: true
+          strip_components: 0
+
+      - name: Install dependencies and restart with PM2
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT || '22' }}
+          script: |
+            set -e
+            cd "${{ secrets.APP_DIR }}"
+            npm ci --omit=dev
+            export NODE_ENV=production
+            if [ -n "${{ secrets.APP_PORT }}" ]; then
+              export PORT="${{ secrets.APP_PORT }}"
+            fi
+
+            if pm2 describe yemo-api > /dev/null 2>&1; then
+              pm2 restart yemo-api --update-env
+            else
+              pm2 start src/index.js --name yemo-api --time
+            fi
+
+            pm2 save
+            pm2 status yemo-api
