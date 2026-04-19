@@ -2,8 +2,8 @@
   <h1>MiuuAPI Infrastructure</h1>
   <p>A high-performance, modular API gateway and server infrastructure built for modern web services.</p>
 
-  <p><strong>Technologies and Tools:</strong></p>
-  <img src="https://skillicons.dev/icons?i=js,nodejs,npm,git,github,vscode,windows&theme=dark" />
+  <p><strong>Core Technology Stack:</strong></p>
+  <img src="https://skillicons.dev/icons?i=js,nodejs,hono,zod,npm,git,github,vscode,windows&theme=dark" />
 </div>
 
 <hr />
@@ -37,10 +37,59 @@ An interactive API reference is served at the root URL, featuring:
 - **Integrated Auth Testing**: Direct API Key authorization and request testing.
 - **Conditional Visibility**: Intelligent UI protection that masks sensitive features on public domains while remaining fully accessible on localhost.
 
-### System Monitoring
-Built-in endpoints provide real-time visibility:
-- **System Metrics**: Monitoring CPU load, memory utilization (RSS/Heap), and OS-level statistics.
-- **Authentication Status**: Dynamic tracking of API Key usage, remaining quotas, and reset intervals.
+## Development Guide
+
+### Adding a New Endpoint
+
+To maintain the OpenAPI documentation and schema validation, follow this professional pattern:
+
+#### 1. Define the Route and Handler
+Create a new directory and file in `src/routes/your-feature/index.js`:
+
+```javascript
+import { createRoute, z } from '@hono/zod-openapi'
+
+// Define the schema and route metadata
+export const exampleRoute = createRoute({
+    method: 'get',
+    path: '/api/example',
+    tags: ['example'],
+    description: 'Detailed description of the endpoint',
+    security: [{ ApiKeyAuth: [] }],
+    responses: {
+        200: {
+            content: {
+                'application/json': {
+                    schema: z.object({
+                        success: z.boolean(),
+                        message: z.string()
+                    })
+                }
+            },
+            description: 'Success response'
+        }
+    }
+})
+
+// Implement the business logic
+export const exampleHandler = (c) => {
+    return c.json({
+        success: true,
+        message: 'Endpoint is working correctly'
+    }, 200)
+}
+```
+
+#### 2. Register the Route
+Update `src/routes/index.js` to register your new route:
+
+```javascript
+import { exampleRoute, exampleHandler } from './example/index.js'
+
+export const setupRoutes = (app) => {
+    app.openapi(exampleRoute, exampleHandler)
+}
+```
 
 ## Getting Started
 
