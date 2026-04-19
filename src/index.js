@@ -111,44 +111,15 @@ if (isCluster && cluster.isPrimary) {
 
     app.doc('/docs', openApiConfig)
 
-    app.get('/', async (c) => {
-        const host = c.req.header('host') || ''
-        const isLocal = host.includes('localhost') || host.includes('127.0.0.1')
-
-        return apiReference({
-            theme: 'purple',
-            darkMode: true,
-            pageTitle: `${appConfig.title} - Documentation Portal`,
-            spec: { url: '/docs' },
-            authentication: {
-                preferredSecurityScheme: 'ApiKeyAuth'
-            },
-            customCss: `
-                .powered-by-scalar, .scalar-footer > a {
-                    display: none !important;
-                }
-                .scalar-footer::after {
-                    content: 'Powered by MiuuAPI Infrastructure';
-                    display: block;
-                    text-align: center;
-                    font-size: 12px;
-                    color: var(--scalar-color-3);
-                    padding: 20px 0;
-                    cursor: pointer;
-                }
-                ${!isLocal ? `
-                    .sidebar-search, 
-                    .scalar-header, 
-                    .scalar-client-lib-title, 
-                    .scalar-client-lib-list, 
-                    .scalar-client-lib-select,
-                    .scalar-button-ghost[href*="github.com"] { 
-                        display: none !important; 
-                    }
-                ` : ''}
-            `
-        })(c)
-    })
+    app.get('/', apiReference({
+        theme: 'purple',
+        darkMode: true,
+        pageTitle: `${appConfig.title} - Documentation Portal`,
+        spec: { url: '/docs' },
+        authentication: {
+            preferredSecurityScheme: 'ApiKeyAuth'
+        }
+    }))
 
     app.notFound((c) => {
         return c.json({
