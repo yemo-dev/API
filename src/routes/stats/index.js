@@ -1,12 +1,13 @@
 import { createRoute, z } from '@hono/zod-openapi'
-import os from 'os'
+import os from 'node:os'
+import { ErrorSchema, RateLimitSchema } from '../../configs/app.js'
 
 export const statsRoute = createRoute({
     method: 'get',
     path: '/api/stats',
     tags: ['server'],
-    description: 'Get detailed server system information (CPU, RAM, OS, etc)',
-    'x-status': 'ONLINE',
+    description: 'Ambil informasi sistem server secara mendalam (CPU, RAM, OS, dll)',
+    security: [{ ApiKeyAuth: [] }],
     responses: {
         200: {
             content: {
@@ -31,6 +32,7 @@ export const statsRoute = createRoute({
                             total: z.string(),
                             free: z.string(),
                             used: z.string(),
+                            usage_percent: z.string(),
                             active_process_rss: z.string(),
                             heap_total: z.string(),
                             heap_used: z.string()
@@ -53,13 +55,28 @@ export const statsRoute = createRoute({
                     }),
                 },
             },
-            description: 'Retrieve detailed server statistics',
+            description: 'Berhasil mengambil statistik server',
         },
+        429: {
+            content: {
+                'application/json': {
+                    schema: RateLimitSchema
+                }
+            },
+            description: 'Terlalu banyak permintaan (Rate limit)'
+        },
+        500: {
+            content: {
+                'application/json': {
+                    schema: ErrorSchema
+                }
+            },
+            description: 'Internal Server Error'
+        }
     },
 })
 
 export const statsHandler = (c) => {
-
     const formatUptime = (seconds) => {
         const d = Math.floor(seconds / (3600 * 24))
         const h = Math.floor(seconds % (3600 * 24) / 3600)
@@ -78,9 +95,10 @@ export const statsHandler = (c) => {
     const totalMem = os.totalmem()
     const freeMem = os.freemem()
     const usedMem = totalMem - freeMem
+    const memUsagePercent = ((usedMem / totalMem) * 100).toFixed(2)
     const processMem = process.memoryUsage()
 
-    const data = {
+    return c.json({
         status: 'online',
         system: {
             platform: os.platform(),
@@ -100,6 +118,7 @@ export const statsHandler = (c) => {
             total: formatBytes(totalMem),
             free: formatBytes(freeMem),
             used: formatBytes(usedMem),
+            usage_percent: `${memUsagePercent}%`,
             active_process_rss: formatBytes(processMem.rss),
             heap_total: formatBytes(processMem.heapTotal),
             heap_used: formatBytes(processMem.heapUsed)
@@ -113,7 +132,5 @@ export const statsHandler = (c) => {
         },
         time: new Date().toLocaleTimeString('id-ID', { hour12: false }),
         date: new Date().toLocaleDateString('id-ID')
-    }
-
-    return c.json(data, 200)
+    }, 200)
 }

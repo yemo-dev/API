@@ -1,18 +1,37 @@
+import { execSync } from 'node:child_process'
+import { platform } from 'node:os'
 import { serve } from '@hono/node-server'
-import { serveStatic } from '@hono/node-server/serve-static'
 import { OpenAPIHono } from '@hono/zod-openapi'
+import { apiReference } from '@scalar/hono-api-reference'
 import { cors } from 'hono/cors'
 import { secureHeaders } from 'hono/secure-headers'
-import { readFile } from 'node:fs/promises'
 import cluster from 'node:cluster'
 import os from 'node:os'
 
 import logger from './utils/logger.js'
-import { setupRoutes } from './api/index.js'
+import { appConfig, openApiConfig } from './configs/app.js'
+import { setupRoutes } from './routes/index.js'
+import { logApiRequest } from './middlewares/accessLog.js'
+import { rateLimiter } from './middlewares/rateLimit.js'
+import { prettyPrint } from './middlewares/pretty.js'
 
-import { logApiRequest } from './utils/logApiRequest.js'
-import { rateLimiter } from './utils/rateLimit.js'
-import { prettyPrint } from './utils/pretty.js'
+const port = appConfig.port
+
+const killPort = () => {
+    try {
+        if (platform() === 'win32') {
+            const cmd = `powershell -Command "Get-NetTCPConnection -LocalPort ${port} -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess | ForEach-Object { Stop-Process -Id $_ -Force }"`
+            execSync(cmd, { stdio: 'ignore' })
+        } else {
+            const commands = [`lsof -t -i:${port} | xargs kill -9`, `fuser -k ${port}/tcp`]
+            for (const cmd of commands) {
+                try { execSync(cmd, { stdio: 'ignore' }) } catch (e) { }
+            }
+        }
+    } catch (e) { }
+}
+
+killPort()
 
 const numCPUs = os.cpus().length
 const isCluster = process.argv.includes('--cluster')
@@ -26,51 +45,45 @@ if (isCluster && cluster.isPrimary) {
     for (let i = 0; i < numCPUs; i++) {
         const worker = cluster.fork()
 
-        /* IPC for rate limit sync */
         worker.on('message', (msg) => {
             if (msg.type === 'RATE_LIMIT_SYNC') {
-                const { ip, count, resetTime, method } = msg.data
+                const { id, windowMs, method } = msg.data
                 const now = Date.now()
 
-                if (!masterClients.has(ip)) {
-                    masterClients.set(ip, {
+                if (!masterClients.has(id)) {
+                    masterClients.set(id, {
                         count: method === 'HEAD' ? 0 : 1,
-                        resetTime: now + msg.data.windowMs
+                        resetTime: now + windowMs
                     })
                 } else {
-                    const client = masterClients.get(ip)
+                    const client = masterClients.get(id)
                     if (now > client.resetTime) {
-                        masterClients.set(ip, {
+                        masterClients.set(id, {
                             count: method === 'HEAD' ? 0 : 1,
-                            resetTime: now + msg.data.windowMs
+                            resetTime: now + windowMs
                         })
                     } else {
-                        if (method !== 'HEAD') {
-                            client.count++
-                        }
+                        if (method !== 'HEAD') client.count++
                     }
                 }
 
-                const clientData = masterClients.get(ip)
+                const clientData = masterClients.get(id)
                 worker.send({
                     type: 'RATE_LIMIT_SYNC_RES',
-                    data: { ip, ...clientData }
+                    data: { id, ...clientData }
                 })
             }
         })
     }
 
-    /* Cleanup expired clients in master process */
     setInterval(() => {
         const now = Date.now()
-        for (const [ip, data] of masterClients.entries()) {
-            if (now > data.resetTime) {
-                masterClients.delete(ip)
-            }
+        for (const [id, data] of masterClients.entries()) {
+            if (now > data.resetTime) masterClients.delete(id)
         }
     }, 10 * 60 * 1000)
 
-    cluster.on('exit', (worker, code, signal) => {
+    cluster.on('exit', (worker) => {
         logger.warn(`Worker ${worker.process.pid} died. Restarting...`)
         cluster.fork()
     })
@@ -79,6 +92,8 @@ if (isCluster && cluster.isPrimary) {
 
     app.use('*', secureHeaders())
     app.use('*', cors({
+        origin: '*',
+        allowHeaders: ['X-RateLimit-Limit', 'X-RateLimit-Remaining', 'x-api-key', 'Authorization', 'Content-Type'],
         exposeHeaders: ['X-RateLimit-Limit', 'X-RateLimit-Remaining']
     }))
     app.use('*', logApiRequest)
@@ -87,58 +102,64 @@ if (isCluster && cluster.isPrimary) {
 
     setupRoutes(app)
 
-    const openApiConfig = {
-        openapi: '3.0.0',
-        info: {
-            version: '1.0.0',
-            title: 'YeMo',
-            description: 'About Simple and easy to use API. ⭐️ Star to support our work!',
-        },
-        servers: [{ url: 'http://localhost:3000', description: 'Development Server' }]
-    }
+    app.openAPIRegistry.registerComponent('securitySchemes', 'ApiKeyAuth', {
+        type: 'apiKey',
+        in: 'header',
+        name: 'x-api-key',
+        description: 'Enter your custom API Key to get higher rate limits.'
+    })
 
     app.doc('/docs', openApiConfig)
 
-    app.use('*', serveStatic({ root: './page' }))
+    app.get('/', async (c) => {
+        const host = c.req.header('host') || ''
+        const isLocal = host.includes('localhost') || host.includes('127.0.0.1')
 
-    app.notFound(async (c) => {
-        if (c.req.path.startsWith('/api/') || c.req.path === '/docs' || c.req.header('accept')?.includes('json')) {
-            return c.json({
-                success: false,
-                status: 404,
-                error: 'Not Found',
-                message: `Route ${c.req.method} ${c.req.path} not found.`
-            }, 404)
-        }
+        return apiReference({
+            theme: 'purple',
+            darkMode: true,
+            pageTitle: `${appConfig.title} - Documentation Portal`,
+            spec: { url: '/docs' },
+            authentication: {
+                preferredSecurityScheme: 'ApiKeyAuth'
+            },
+            customCss: `
+                .powered-by-scalar, .scalar-client-lib-title, .scalar-footer > a {
+                    display: none !important;
+                }
+                .scalar-footer::after {
+                    content: 'Powered by MiuuAPI';
+                    display: block;
+                    text-align: center;
+                    font-size: 12px;
+                    color: var(--scalar-color-3);
+                    padding: 20px 0;
+                }
+                ${!isLocal ? '.sidebar-search, .scalar-header { display: none !important; }' : ''}
+            `
+        })(c)
+    })
 
-        try {
-            const html = await readFile('./page/status/404.html', 'utf8')
-            return c.html(html, 404)
-        } catch (e) {
-            return c.text('404 Not Found', 404)
-        }
+    app.notFound((c) => {
+        return c.json({
+            success: false,
+            status: 404,
+            error: 'Not Found',
+            message: `Route ${c.req.method} ${c.req.path} not found.`
+        }, 404)
     })
 
     app.onError(async (err, c) => {
         logger.error(`[Error] ${err.message}`)
-        if (c.req.path.startsWith('/api/') || c.req.header('accept')?.includes('json')) {
-            return c.json({
-                success: false,
-                status: 500,
-                error: 'Internal Server Error',
-                message: err.message || 'An unexpected error occurred.'
-            }, 500)
-        }
-
-        return c.text('Internal Server Error', 500)
+        return c.json({
+            success: false,
+            status: 500,
+            error: 'Internal Server Error',
+            message: err.message || 'An unexpected error occurred.'
+        }, 500)
     })
 
-    const port = process.env.PORT || 3000
-
-    serve({
-        fetch: app.fetch,
-        port
-    }, (info) => {
+    serve({ fetch: app.fetch, port: appConfig.port }, (info) => {
         logger.ready(`Worker ${process.pid} is running on port ${info.port}`)
     })
 }

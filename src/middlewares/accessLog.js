@@ -1,5 +1,5 @@
-import logger from './logger.js'
-import Color from './color.js'
+import logger from '../utils/logger.js'
+import Color from '../utils/color.js'
 
 export const logApiRequest = async (c, next) => {
     const start = performance.now()

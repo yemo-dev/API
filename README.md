@@ -1,141 +1,73 @@
-# YEMO API
+# MiuuAPI Infrastructure
 
-High-performance, scalable, and secure API infrastructure built with the Hono framework and Node.js. Designed for developers who require a professional, modular, and high-performance base for their services.
+MiuuAPI is a high-performance, modular API gateway and server infrastructure built on Node.js and the Hono framework. It provides a robust foundation for building scalable web services with built-in security, documentation, and monitoring.
 
----
+## Core Features
+
+- **High-Performance Routing**: Optimized for low-latency request handling.
+- **Automated Documentation**: Integrated Scalar API Reference with a modern dark theme and secure authorization.
+- **Security-First Architecture**: Per-client API key authentication with granular rate limiting and IP-based access control.
+- **System Resilience**: Built-in process synchronization and automatic port management for development and production environments.
+- **Real-Time Monitoring**: Detailed system statistics and authentication status tracking.
 
 ## Technical Architecture
 
-The system is built on a modern, lightweight, and type-safe stack designed for low latency and high scalability.
+The project follows a clean, modular architecture:
+- **configs/**: Centralized application settings and security definitions.
+- **middlewares/**: Request processing pipeline including rate limiting, logging, and data formatting.
+- **routes/**: Declarative API endpoint definitions using OpenAPI specifications.
+- **utils/**: Core system utilities for logging and terminal formatting.
 
-- **Engine**: Powered by Hono and @hono/node-server.
-- **Validation**: Schema-based validation using Zod and @hono/zod-openapi.
-- **Documentation**: Automatic OpenAPI (Swagger) generation.
-- **Portal**: Custom-built, high-performance API Portal with integrated media previews.
-- **Multitasking**: Built-in Node.js Cluster support for multi-core scaling.
-- **IPC-Sync**: Inter-Process Communication for unified state management across workers.
+## Installation and Deployment
 
----
+### Prerequisites
+- Node.js (version 20 or higher)
+- npm or yarn
 
-## Key Features
-
-### High-Performance Core
-
-- Optimized request handling with Hono.
-- Minimal overhead for core middleware.
-- JSON-first responses with optional redirect support for media assets.
-
-### Advanced Cluster Synchronization
-
-When running in cluster mode, the API utilizes a centralized state management system. All worker processes synchronize their internal state (including rate limits) with the primary process via IPC. This ensures that security policies are enforced consistently across all CPU cores.
-
-### Integrated Security Layer
-
-- **Global Rate Limiting**: Distributed counting across all workers.
-- **Dynamic IP Management**: Integrated whitelist for trusted sources and a ban list for permanent blocks.
-- **Intelligent Detection**: Normalized IP detection supporting reverse proxies and local variations.
-
-### Developer Experience
-
-- **Live Portal**: A custom, high-end technical interface for exploring and testing endpoints.
-- **Code Generation**: Real-time generation of cURL, Fetch, and Python snippets.
-- **Binary Support**: Native support for direct binary rendering (images/videos) in the browser.
-
----
-
-## Getting Started
-
-### Installation
-
+### Setup
 1. Clone the repository:
-
    ```bash
-   git clone https://github.com/yemo-dev/API.git
+   git clone https://github.com/miuubyte/API.git
    cd API
-   ```
-
-2. Install dependencies:
-
-   ```bash
    npm install
    ```
 
-### Running the Server
+### Running the Application
+To start the server in a development environment with hot-reloading:
+```bash
+npm run dev
+```
 
-- **Development Mode**:
+To deploy in a production environment:
+```bash
+npm start
+```
 
-  ```bash
-  npm run dev
-  ```
+## Configuration
 
-- **Clustered Production Mode**:
+### API Key Management
+Authentication is managed via `src/configs/apiKeys.js`. You can define custom limits and window durations for individual clients. Setting the limit to `0` enables unlimited access.
 
-  ```bash
-  npm run dev:cluster
-  ```
-
-Access the API Portal at: **<http://localhost:3000>**
-
----
-
-## Security Configuration
-
-Configuration is managed centrally within the `src/utils/rateLimit.js` utility.
-
-| Component | Default Configuration | Effect |
-| :--- | :--- | :--- |
-| **Rate Limiter** | 100 requests / 10 minutes | Returns 429 Too Many Requests |
-| **Whitelist** | Internal local IPs | Bypasses all rate limit counters |
-| **Ban List** | Dynamic | Returns 403 Forbidden |
-
----
-
-## Developer Guide
-
-### Adding New Routes
-
-Routes should be defined in their respective directories under `src/api/`.
-
+Example configuration:
 ```javascript
-import { createRoute, z } from '@hono/zod-openapi'
-import { MediaSchema } from '../../utils/media.js'
-
-export const exampleRoute = createRoute({
-    method: 'get',
-    path: '/api/example',
-    description: 'Endpoint technical description',
-    'x-status': 'ONLINE',
-    'x-auto-media': true,
-    responses: {
-        200: {
-            content: {
-                'application/json': {
-                    schema: MediaSchema
-                }
-            },
-            description: 'Operation successful'
-        }
+export const apiKeys = [
+    {
+        name: 'Internal Admin',
+        key: 'your_secret_key',
+        limit: 0,
+        windowMs: 600000
     }
-})
+]
 ```
 
----
+### Rate Limiting
+The system implements a sophisticated rate limiter that supports Cloudflare-transparent IP detection and master-worker synchronization in cluster mode.
 
-## Project Structure
+## API Documentation
+The interactive documentation portal is accessible at the root URL of the server. It provides a comprehensive overview of all available endpoints, including request/response schemas and testing tools.
 
-```text
-API/
-├── page/
-│   └── status/       # Custom Error Pages (403, 404, 429)
-├── src/
-│   ├── api/          # Route and Handler Implementations
-│   │   ├── stats/    # Internal stats logic
-│   │   └── index.js  # Main Router setup
-│   ├── utils/        # Core utilities (Security, Logger, IPC)
-│   └── index.js      # Server entry point and Cluster logic
-└── package.json
-```
+## Development and Contributions
+The codebase is maintained with a strict "clean code" policy. All system logic is documented within this README to ensure the source code remains focused and efficient.
 
----
-
-**Maintained by the YeMo Dev Team.**
+## License
+This project is licensed under the MIT License. Developed and maintained by the Miuu project team.
