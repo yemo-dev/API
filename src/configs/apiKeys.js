@@ -8,8 +8,12 @@ export const apiKeys = [
 ]
 
 export const guestConfig = {
-    limit: 20,
+    limit: 100,
     windowMs: 10 * 60 * 1000
 }
 
 export const banList = []
+
+export const getApiKeyInfo = (key) => {
+    return apiKeys.find(k => k.key === key)
+}

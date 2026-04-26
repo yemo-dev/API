@@ -1,134 +1,113 @@
-<div align="center">
-  <h1>MiuuAPI Infrastructure</h1>
-  <p>A high-performance, modular API gateway and server infrastructure built for modern web services.</p>
+# MiuuAPI Infrastructure
 
-</div>
+MiuuAPI is a state-of-the-art API gateway and documentation infrastructure engineered for high-availability web services. Built on a modular Hono architecture with native Node.js clustering, it delivers exceptional performance, real-time monitoring, and a premium developer experience.
 
-<hr />
+---
 
-## Overview
+## System Preview
 
-MiuuAPI is engineered for scalability and security. Leveraging the Hono framework and Node.js runtime, it provides a robust foundation with integrated OpenAPI documentation, multi-core processing, and advanced security layers.
+### Main Interface
+![Desktop View](src/public/preview/desktop.png)
+
+---
+
+## Core Capabilities
+
+### High Availability Clustering
+Native implementation of the Node.js Cluster module allows for seamless multi-core process management. This ensures maximum CPU utilization, automatic worker recovery, and zero-downtime service availability under high traffic loads.
+
+### Premium Documentation Engine
+A highly customized Scalar integration featuring a glassmorphism design system. Includes a theme-aware preloader and hardware-accelerated transitions that automatically adapt to system-level light and dark mode preferences.
+
+### Security and Rate Management
+Robust security layer providing mandatory header validation, CORS policy enforcement, and a tiered rate-limiting system. Supports high-throughput access via secure API Key authentication.
+
+---
 
 ## Technical Specifications
 
-| Feature | Description |
-| :--- | :--- |
-| **Framework** | Hono (Ultra-fast web framework for Node.js) |
-| **Documentation** | Scalar API Reference (OpenAPI 3.1.0) |
-| **Validation** | Zod (Schema-first validation and documentation) |
-| **Runtime** | Node.js (Standardized for high-concurrency environments) |
-| **Authentication** | API Key Security with granular permission levels |
+| Component | Technology | Role |
+| :--- | :--- | :--- |
+| Core Framework | Hono | Ultra-fast routing and middleware execution |
+| Runtime Environment | Node.js | Asynchronous event-driven execution |
+| API Specification | OpenAPI 3.1.0 | Standardized documentation and schema definition |
+| Data Validation | Zod | Runtime type-safety and request validation |
+| Interface Styling | Vanilla CSS | Custom-built design tokens and animations |
 
-## Core Components
+---
 
-### Security and Rate Limiting
-The system implements a multi-layered security strategy:
-- **Per-Key Rate Limiting**: Customizable request thresholds per API Key.
-- **Dynamic Identification**: Accurate client identification using Cloudflare-transparent IP detection.
-- **Cluster Synchronization**: Seamless rate limit tracking across multiple CPU cores via Master-Worker IPC.
-- **IP Access Control**: Integrated blacklist support for immediate IP-based blocking.
-
-### Documentation Portal
-An interactive API reference is served at the root URL, featuring:
-- **Dark Mode Architecture**: Optimized for developer accessibility.
-- **Integrated Auth Testing**: Direct API Key authorization and request testing.
-- **Conditional Visibility**: Intelligent UI protection that masks sensitive features on public domains while remaining fully accessible on localhost.
-
-## Development Guide
-
-### Adding a New Endpoint
-
-To maintain the OpenAPI documentation and schema validation, follow this professional pattern:
-
-#### 1. Define the Route and Handler
-Create a new directory and file in `src/routes/your-feature/index.js`:
-
-```javascript
-import { createRoute, z } from '@hono/zod-openapi'
-
-// Define the schema and route metadata
-export const exampleRoute = createRoute({
-    method: 'get',
-    path: '/api/example',
-    tags: ['example'],
-    description: 'Detailed description of the endpoint',
-    security: [{ ApiKeyAuth: [] }],
-    responses: {
-        200: {
-            content: {
-                'application/json': {
-                    schema: z.object({
-                        success: z.boolean(),
-                        message: z.string()
-                    })
-                }
-            },
-            description: 'Success response'
-        }
-    }
-})
-
-// Implement the business logic
-export const exampleHandler = (c) => {
-    return c.json({
-        success: true,
-        message: 'Endpoint is working correctly'
-    }, 200)
-}
-```
-
-#### 2. Register the Route
-Update `src/routes/index.js` to register your new route:
-
-```javascript
-import { exampleRoute, exampleHandler } from './example/index.js'
-
-export const setupRoutes = (app) => {
-    app.openapi(exampleRoute, exampleHandler)
-}
-```
-
-## Getting Started
+## Deployment Guide
 
 ### Prerequisites
-Ensure Node.js 20 or higher is installed in your environment.
+* Node.js v20.0.0 or higher
+* npm v10.0.0 or higher
 
-### Setup Instructions
+### Installation
 ```bash
-# Clone the repository
 git clone https://github.com/miuubyte/API.git
-
-# Navigate to project directory
 cd API
-
-# Install dependencies
 npm install
 ```
 
-### Execution
-For local development with hot-reloading:
+### Execution Profiles
+
+**Standard Execution**
 ```bash
-npm run dev
+npm run start
 ```
 
-For production deployment:
+**Cluster Performance Mode**
 ```bash
-npm start
+npm run dev:cluster
 ```
 
-## Configuration Interface
+---
 
-### Global Application Settings
-Primary configurations are centralized in `src/configs/app.js`, including port definitions and documentation metadata.
+## API Reference
 
-### API Key Definitions
-Manage authentication keys in `src/configs/apiKeys.js`. 
-- Set `limit: 0` for unlimited throughput.
-- Configure `windowMs` to define the duration of the rate limit cycle.
+### Anime and Media Services
+Endpoints for comprehensive media metadata retrieval.
 
-## Project Structure
-- `configs/`: Centralized settings and security definitions.
-- `middlewares/`: Request processing pipeline (logging, rate limiting, formatting).
-- `routes/`: Declarative API endpoint definitions.
-- `utils/`: Core system utilities for terminal logging and formatting.
+| Endpoint | Method | Parameter | Description |
+| :--- | :--- | :--- | :--- |
+| `/api/anime/home` | GET | None | Global featured content and latest updates. |
+| `/api/anime/search` | GET | `q` | Full-text search across the media database. |
+| `/api/anime/detail/{slug}` | GET | `slug` | Comprehensive metadata for a single entry. |
+| `/api/anime/episode/{slug}` | GET | `slug` | Direct streaming assets and mirror availability. |
+| `/api/anime/popular` | GET | None | High-engagement titles based on user traffic. |
+
+### Infrastructure Monitoring
+System-level diagnostics and real-time health metrics.
+
+| Endpoint | Method | Description |
+| :--- | :--- | :--- |
+| `/api/stats` | GET | Detailed hardware metrics (CPU, RAM, Uptime, Network). |
+| `/api/auth/check` | GET | Authentication token validation and tier status. |
+
+---
+
+## Integration Example
+
+### Standard API Request
+```bash
+curl -X GET "http://localhost:4000/api/anime/search?q=query" \
+     -H "x-api-key: your_api_token" \
+     -H "Content-Type: application/json"
+```
+
+### Standard JSON Response
+```json
+{
+  "success": true,
+  "status": 200,
+  "data": {
+    "title": "Example Media",
+    "slug": "example-media",
+    "status": "Ongoing",
+    "episodes": 12
+  }
+}
+```
+
+---
+Developed by MiuuPS

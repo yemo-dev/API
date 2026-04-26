@@ -2,18 +2,20 @@ import { execSync } from 'node:child_process'
 import { platform } from 'node:os'
 import { serve } from '@hono/node-server'
 import { OpenAPIHono } from '@hono/zod-openapi'
-import { apiReference } from '@scalar/hono-api-reference'
+import { renderApiReference } from '@scalar/client-side-rendering'
 import { cors } from 'hono/cors'
 import { secureHeaders } from 'hono/secure-headers'
+import { serveStatic } from '@hono/node-server/serve-static'
 import cluster from 'node:cluster'
 import os from 'node:os'
 
 import logger from './utils/logger.js'
-import { appConfig, openApiConfig } from './configs/app.js'
+import { appConfig, openApiConfig, scalarConfig } from './configs/app.js'
 import { setupRoutes } from './routes/index.js'
 import { logApiRequest } from './middlewares/accessLog.js'
 import { rateLimiter } from './middlewares/rateLimit.js'
 import { prettyPrint } from './middlewares/pretty.js'
+import { buildBrandingScript } from './utils/portalCustoms.js'
 
 const port = appConfig.port
 
@@ -31,10 +33,12 @@ const killPort = () => {
     } catch (e) { }
 }
 
-killPort()
-
 const numCPUs = os.cpus().length
 const isCluster = process.argv.includes('--cluster')
+
+if (cluster.isPrimary) {
+    killPort()
+}
 
 if (isCluster && cluster.isPrimary) {
     logger.info(`Primary ${process.pid} is running`)
@@ -99,6 +103,8 @@ if (isCluster && cluster.isPrimary) {
     app.use('*', logApiRequest)
     app.use('*', prettyPrint)
     app.use('*', rateLimiter())
+    app.use('/assets/*', serveStatic({ root: './src/public' }))
+    app.use('/favicon.png', serveStatic({ path: './src/public/favicon.png' }))
 
     setupRoutes(app)
 
@@ -109,17 +115,29 @@ if (isCluster && cluster.isPrimary) {
         description: 'Enter your custom API Key to get higher rate limits.'
     })
 
-    app.doc('/docs', openApiConfig)
+    app.get('/docs', (c) => {
+        const url = new URL(c.req.url)
+        const proto = c.req.header('x-forwarded-proto') || (url.protocol.includes('https') || c.req.header('cf-visitor')?.includes('https') ? 'https' : 'http')
+        const host = c.req.header('x-forwarded-host') || c.req.header('host') || url.host
+        const origin = `${proto}://${host}`
+        const fullSpec = app.getOpenAPIDocument(openApiConfig)
+        return c.json({
+            ...fullSpec,
+            servers: [
+                { url: origin, description: 'Current Server' },
+                ...(fullSpec.servers || []).filter(s => s.url !== origin)
+            ]
+        })
+    })
 
-    app.get('/', apiReference({
-        theme: 'purple',
-        darkMode: true,
-        pageTitle: `${appConfig.title} - Documentation Portal`,
-        spec: { url: '/docs' },
-        authentication: {
-            preferredSecurityScheme: 'ApiKeyAuth'
-        }
-    }))
+    app.get('/', (c) => {
+        const { branding, ...config } = scalarConfig
+        const html = renderApiReference({
+            config: { ...config, spec: { url: '/docs' } },
+            pageTitle: `${appConfig.title} - Documentation Portal`
+        })
+        return c.html(html.replace('</body>', `${buildBrandingScript()}</body>`))
+    })
 
     app.notFound((c) => {
         return c.json({

@@ -1,75 +1,91 @@
 import { createRoute, z } from '@hono/zod-openapi'
-import { apiKeys } from '../../configs/apiKeys.js'
-import { getClientData } from '../../middlewares/rateLimit.js'
-import { ErrorSchema } from '../../configs/app.js'
+import { getApiKeyInfo } from '../../configs/apiKeys.js'
+import { ErrorSchema, RateLimitSchema, UnauthorizedSchema, ForbiddenSchema } from '../../configs/app.js'
+
+const KeyStatusResponseSchema = z.object({
+    success: z.boolean().openapi({ example: true }),
+    key: z.string().openapi({ example: 'your_api_key_here' }),
+    type: z.string().openapi({ example: 'Premium' }),
+    limit: z.number().openapi({ example: 1000 }),
+    description: z.string().openapi({ example: 'High performance API access' }),
+    owner: z.string().openapi({ example: 'Miuu Support' })
+})
 
 export const keyStatusRoute = createRoute({
     method: 'get',
-    path: '/api/auth/me',
+    path: '/api/auth/check',
     tags: ['auth'],
-    description: 'Cek status dan sisa limit API Key abang',
+    summary: 'Check API Key Status',
+    description: 'Verify your API Key and retrieve limit information.',
     security: [{ ApiKeyAuth: [] }],
+    request: {
+        headers: z.object({
+            'x-api-key': z.string().openapi({
+                description: 'The API Key to check',
+                example: 'your_api_key_here'
+            })
+        })
+    },
     responses: {
         200: {
             content: {
                 'application/json': {
-                    schema: z.object({
-                        success: z.boolean(),
-                        data: z.object({
-                            name: z.string(),
-                            key: z.string(),
-                            limit: z.number(),
-                            used: z.number(),
-                            remaining: z.number(),
-                            reset_in: z.string(),
-                            reset_at: z.string()
-                        })
-                    })
+                    schema: KeyStatusResponseSchema
                 }
             },
-            description: 'Berhasil mengambil status key'
+            description: 'Key is valid'
         },
         401: {
+            content: {
+                'application/json': {
+                    schema: UnauthorizedSchema
+                }
+            },
+            description: 'Invalid API Key'
+        },
+        403: {
+            content: {
+                'application/json': {
+                    schema: ForbiddenSchema
+                }
+            },
+            description: 'Access denied'
+        },
+        429: {
+            content: {
+                'application/json': {
+                    schema: RateLimitSchema
+                }
+            },
+            description: 'Rate limit exceeded'
+        },
+        500: {
             content: {
                 'application/json': {
                     schema: ErrorSchema
                 }
             },
-            description: 'API Key tidak valid atau tidak ditemukan'
+            description: 'Internal Server Error'
         }
     }
 })
 
-export const keyStatusHandler = async (c) => {
+export const keyStatusHandler = (c) => {
     const apiKey = c.req.header('x-api-key')
-    const keyData = apiKeys.find(k => k.key === apiKey)
+    const keyInfo = getApiKeyInfo(apiKey)
 
-    if (!keyData) {
+    if (!keyInfo) {
         return c.json({
             success: false,
             status: 401,
             error: 'Unauthorized',
-            message: 'API Key tidak valid.'
+            message: 'Invalid API Key'
         }, 401)
     }
 
-    const id = `key:${apiKey}`
-    const clientData = await getClientData(id, keyData.windowMs)
-    const now = Date.now()
-    const diff = Math.max(0, clientData.resetTime - now)
-    const reset_in = `${Math.ceil(diff / 1000)} seconds`
-    const reset_at = new Date(clientData.resetTime).toLocaleString('id-ID')
-
     return c.json({
         success: true,
-        data: {
-            name: keyData.name,
-            key: apiKey,
-            limit: keyData.limit === 0 ? 'Unlimited' : keyData.limit,
-            used: clientData.count,
-            remaining: keyData.limit === 0 ? 'Unlimited' : Math.max(0, keyData.limit - clientData.count),
-            reset_in,
-            reset_at
-        }
+        key: apiKey,
+        ...keyInfo
     }, 200)
 }
