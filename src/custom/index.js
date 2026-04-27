@@ -1,13 +1,34 @@
 import { preloaderCSS } from './styles/preloader.js'
 import { bannerCSS } from './styles/banner.js'
 import { scalarConfig } from '../configs/app.js'
-
+import { adsConfig } from '../configs/ads.js'
 const ICONS = {
   discord: '<svg viewBox="0 0 127.14 96.36"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.71,32.65-1.82,56.6.4,80.21a105.73,105.73,0,0,0,32.17,16.15,77.7,77.7,0,0,0,6.89-11.11,68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1,105.25,105.25,0,0,0,32.19-16.14c3.39-29,1.24-52.75-16.9-72.13ZM42.45,65.69C36.18,65.69,31,60,31,53s5.12-12.67,11.45-12.67S54,46,53.86,53,48.74,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5.12-12.67,11.44-12.67S96.14,46,96,53,90.89,65.69,84.69,65.69Z"/></svg>'
 }
 
 export function buildBrandingScript() {
-  const combinedCSS = preloaderCSS + bannerCSS;
+  const sponsorCSS = `
+    .sponsor-modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 100000; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.4s ease; pointer-events: none; }
+    .sponsor-modal-overlay.show { opacity: 1; pointer-events: auto; }
+    .sponsor-modal { width: 90%; max-width: 600px; background: var(--scalar-background-1); border: 1px solid var(--scalar-border-color); border-radius: 12px; overflow: hidden; transform: scale(0.95) translateY(20px); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); font-family: var(--scalar-font); }
+    .sponsor-modal-overlay.show .sponsor-modal { transform: scale(1) translateY(0); }
+    .sponsor-modal-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--scalar-border-color); }
+    .sponsor-modal-title { font-size: 18px; font-weight: 600; color: var(--scalar-color-1); margin: 0; }
+    .sponsor-close-btn { background: transparent; border: none; color: var(--scalar-color-3); cursor: pointer; padding: 4px; border-radius: 6px; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+    .sponsor-close-btn:hover { background: var(--scalar-background-2); color: var(--scalar-color-1); }
+    .sponsor-modal-body { padding: 20px; }
+    .sponsor-card { border-radius: 10px; overflow: hidden; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; border: 1px solid var(--scalar-border-color); }
+    .sponsor-card:hover { transform: translateY(-2px); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3); border-color: var(--scalar-color-accent); }
+    .sponsor-card-header { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--scalar-background-2); }
+    .sponsor-logo { width: 32px; height: 32px; border-radius: 50%; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
+    .sponsor-logo img { width: 100%; height: 100%; object-fit: cover; }
+    .sponsor-name { font-size: 15px; font-weight: 600; margin: 0; color: var(--scalar-color-1); }
+    .sponsor-card-body { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+    .sponsor-banner-image { width: 100%; border-radius: 6px; display: block; object-fit: cover; max-height: 200px; }
+    .sponsor-modal-footer { padding: 12px 20px; text-align: center; border-top: 1px solid var(--scalar-border-color); background: var(--scalar-background-2); }
+    .sponsor-support-text { font-size: 13px; color: var(--scalar-color-3); margin: 0; }
+  `;
+  const combinedCSS = preloaderCSS + bannerCSS + sponsorCSS;
   const { footer, clientButton } = scalarConfig.customBranding;
   const btnIcon = ICONS[clientButton.icon] || '';
 
@@ -193,8 +214,49 @@ export function buildBrandingScript() {
         };
       }
 
+      function initSponsorModal() {
+        var cfg = ${JSON.stringify(adsConfig)};
+        if (!cfg.enabled) return;
+        
+        var overlay = document.createElement('div');
+        overlay.className = 'sponsor-modal-overlay';
+        overlay.innerHTML = '<div class="sponsor-modal">' +
+          '<div class="sponsor-modal-header">' +
+            '<h3 class="sponsor-modal-title">' + cfg.title + '</h3>' +
+            '<button class="sponsor-close-btn" aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>' +
+          '</div>' +
+          '<div class="sponsor-modal-body">' +
+            '<div class="sponsor-card" onclick="window.open(\\'' + cfg.sponsor.targetUrl + '\\', \\'_blank\\')">' +
+              '<div class="sponsor-card-header">' +
+                '<div class="sponsor-logo"><img src="' + cfg.sponsor.logoUrl + '" alt="' + cfg.sponsor.name + '"></div>' +
+                '<h4 class="sponsor-name">' + cfg.sponsor.name + '</h4>' +
+              '</div>' +
+              '<div class="sponsor-card-body" style="background: ' + cfg.sponsor.bgColor + '; color: ' + cfg.sponsor.textColor + ';">' +
+                '<img src="' + cfg.sponsor.bannerUrl + '" class="sponsor-banner-image" alt="Banner">' +
+              '</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="sponsor-modal-footer">' +
+            '<p class="sponsor-support-text">' + cfg.footerText + '</p>' +
+          '</div>' +
+        '</div>';
+        
+        document.body.appendChild(overlay);
+        
+        var closeBtn = overlay.querySelector('.sponsor-close-btn');
+        closeBtn.addEventListener('click', function() {
+          overlay.classList.remove('show');
+          setTimeout(function() { overlay.remove(); }, 400);
+        });
+
+        setTimeout(function() {
+          overlay.classList.add('show');
+        }, cfg.delayMs);
+      }
+
       customizeUI();
       initRateLimitBanner();
+      initSponsorModal();
       var observer = new MutationObserver(customizeUI);
       observer.observe(document.body, { childList: true, subtree: true });
     }
