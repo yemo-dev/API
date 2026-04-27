@@ -131,11 +131,28 @@ export function buildBrandingScript() {
 
       function initRateLimitBanner() {
         if (document.getElementById('rate-limit-banner')) return;
-        var rateLimitBanner = document.createElement('div');
-        rateLimitBanner.id = 'rate-limit-banner';
-        rateLimitBanner.style.cssText = 'position:fixed;bottom:20px;left:20px;background:var(--scalar-background-2);color:var(--scalar-color-1);padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;z-index:9999;border:1px solid var(--scalar-border-color);box-shadow:0 4px 12px rgba(0,0,0,0.2);font-family:var(--scalar-font);transition:all 0.3s ease;display:flex;align-items:center;gap:8px;';
-        rateLimitBanner.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Rate Limit: <span id="rl-val">Checking...</span>';
-        document.body.appendChild(rateLimitBanner);
+        
+        // Find Miuu Support link to match its style and location
+        var contactEls = Array.from(document.querySelectorAll('*')).filter(e => e.innerText && e.innerText.includes('Miuu Support') && e.children.length === 0);
+        if (contactEls.length > 0) {
+            var contactEl = contactEls[0];
+            var aTag = contactEl.parentElement;
+            var container = aTag.parentElement;
+            var flexContainer = container.parentElement;
+
+            var rateLimitBanner = document.createElement('div');
+            rateLimitBanner.id = 'rate-limit-banner';
+            rateLimitBanner.className = container.className;
+            rateLimitBanner.innerHTML = '<span class="' + aTag.className + '" style="cursor:default;user-select:none"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-3 text-current"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><span class="ml-1 empty:hidden">Rate Limit: <span id="rl-val">Checking...</span></span></span>';
+            flexContainer.appendChild(rateLimitBanner);
+        } else {
+            // Fallback if not found
+            var rateLimitBanner = document.createElement('div');
+            rateLimitBanner.id = 'rate-limit-banner';
+            rateLimitBanner.style.cssText = 'position:fixed;bottom:20px;left:20px;background:var(--scalar-background-2);color:var(--scalar-color-1);padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;z-index:9999;border:1px solid var(--scalar-border-color);box-shadow:0 4px 12px rgba(0,0,0,0.2);font-family:var(--scalar-font);transition:all 0.3s ease;display:flex;align-items:center;gap:8px;';
+            rateLimitBanner.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Rate Limit: <span id="rl-val">Checking...</span>';
+            document.body.appendChild(rateLimitBanner);
+        }
 
         var originalFetch = window.fetch;
         window.fetch = async function() {
@@ -152,7 +169,7 @@ export function buildBrandingScript() {
                         if (parseInt(remaining) < (parseInt(limit) * 0.2)) {
                             rlVal.style.color = '#f87171';
                         } else {
-                            rlVal.style.color = 'var(--scalar-color-1)';
+                            rlVal.style.color = 'inherit';
                         }
                     }
                 }
