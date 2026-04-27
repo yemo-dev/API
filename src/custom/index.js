@@ -135,17 +135,43 @@ export function buildBrandingScript() {
           var rateLimitBtn = document.createElement('div');
           rateLimitBtn.id = 'rate-limit-btn';
           rateLimitBtn.className = 'text-c-1 mr-2 flex min-h-7 min-w-7 items-center rounded-lg border px-2 py-1 group-last:mr-0 xl:border-none no-underline hover:bg-b-2';
-          rateLimitBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="1em" height="1em" class="size-3 text-current"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><span class="ml-1 empty:hidden" id="rl-val" style="font-size: 13px; font-weight: 600;">RATE LIMIT: Checking...</span>';
+          // Custom Zap/Lightning SVG for Rate Limit
+          rateLimitBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="1em" height="1em" class="size-3 text-current"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg><span class="ml-1 empty:hidden" id="rl-val" style="font-size: 13px; font-weight: 600;">RATE LIMIT: Checking...</span>';
           emailBtn.parentNode.insertBefore(rateLimitBtn, emailBtn);
           
           window.fetch('/api/auth/check', { method: 'HEAD' }).catch(function(){});
         }
       }
 
+      function showToast(msg) {
+          var toast = document.createElement('div');
+          toast.style.cssText = 'position:fixed;bottom:24px;right:24px;background:var(--scalar-background-1);color:var(--scalar-color-1);border:1px solid #ef4444;padding:12px 20px;border-radius:8px;font-size:14px;font-weight:600;z-index:99999;box-shadow:0 10px 15px -3px rgba(0,0,0,0.2);opacity:0;transform:translateY(20px);transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1);display:flex;align-items:center;gap:12px;font-family:var(--scalar-font);';
+          toast.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg><span>' + msg + '</span>';
+          document.body.appendChild(toast);
+          
+          requestAnimationFrame(function() {
+              toast.style.opacity = '1';
+              toast.style.transform = 'translateY(0)';
+          });
+          
+          setTimeout(function() {
+              toast.style.opacity = '0';
+              toast.style.transform = 'translateY(20px)';
+              setTimeout(function() { toast.remove(); }, 300);
+          }, 3500);
+      }
+
       function initRateLimitBanner() {
         var originalFetch = window.fetch;
         window.fetch = async function() {
             var response = await originalFetch.apply(this, arguments);
+            
+            // Check for Invalid API Key (401)
+            var url = typeof arguments[0] === 'string' ? arguments[0] : (arguments[0] && arguments[0].url ? arguments[0].url : '');
+            if (response.status === 401 && url.includes('/api/')) {
+                showToast('Invalid API Key provided');
+            }
+
             var remaining = response.headers.get('X-RateLimit-Remaining');
             var limit = response.headers.get('X-RateLimit-Limit');
             if (remaining && limit) {
