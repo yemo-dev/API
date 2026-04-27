@@ -136,7 +136,6 @@ export function buildBrandingScript() {
           var rateLimitBtn = document.createElement('div');
           rateLimitBtn.id = 'rate-limit-btn';
           rateLimitBtn.className = 'text-c-1 mr-2 flex min-h-7 min-w-7 items-center rounded-lg border px-2 py-1 group-last:mr-0 xl:border-none no-underline hover:bg-b-2';
-          // Custom Zap/Lightning SVG for Rate Limit
           rateLimitBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="1em" height="1em" class="size-3 text-current"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg><span class="ml-1 empty:hidden" id="rl-val" style="font-size: 13px; font-weight: 600;">RATE LIMIT: Checking...</span>';
           emailBtn.parentNode.insertBefore(rateLimitBtn, emailBtn);
           
@@ -167,7 +166,6 @@ export function buildBrandingScript() {
         window.fetch = async function() {
             var response = await originalFetch.apply(this, arguments);
             
-            // Check for Invalid API Key (401)
             var url = typeof arguments[0] === 'string' ? arguments[0] : (arguments[0] && arguments[0].url ? arguments[0].url : '');
             if (response.status === 401 && url.includes('/api/')) {
                 showToast('Invalid API Key provided');
@@ -199,7 +197,6 @@ export function buildBrandingScript() {
         if (!cfg.enabled) return;
         if (!cfg.sponsors || cfg.sponsors.length === 0) return;
         
-        // Build cards HTML for all sponsors
         var cardsHTML = cfg.sponsors.map(function(s) {
           return '<div class="sponsor-card" onclick="window.open(\\'' + s.targetUrl + '\\', \\'_blank\\')">' +
             '<div class="sponsor-card-header">' +
@@ -240,11 +237,8 @@ export function buildBrandingScript() {
         overlay.querySelector('.sponsor-close-btn').addEventListener('click', closeModal);
 
         setTimeout(function() {
-          // 1. Fade in overlay
           anime({ targets: overlay, opacity: [0, 1], duration: 400, easing: 'easeOutQuad', begin: function() { overlay.style.pointerEvents = 'auto'; } });
-          // 2. Elastic pop-in for modal box
           anime({ targets: '.sponsor-modal', scale: [0.85, 1], translateY: [40, 0], opacity: [0, 1], duration: 700, easing: 'easeOutElastic(1, 0.7)' });
-          // 3. Staggered slide-up for cards
           anime({ targets: '.sponsor-card', translateY: [24, 0], opacity: [0, 1], duration: 500, delay: anime.stagger(120, { start: 250 }), easing: 'easeOutExpo' });
         }, cfg.delayMs);
       }

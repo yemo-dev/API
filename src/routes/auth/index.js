@@ -74,7 +74,6 @@ export const keyStatusHandler = (c) => {
     const apiKey = c.req.header('x-api-key') || c.req.query('apikey') || c.req.query('apiKey');
     
     if (!apiKey) {
-        // Return default guest config if no API key provided
         return c.json({
             success: true,
             key: 'Guest',

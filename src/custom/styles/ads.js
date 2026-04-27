@@ -1,7 +1,4 @@
 export const adsCSS = `
-  /* ── Sponsor Ads Modal ── */
-
-  /* Overlay / Backdrop */
   .sponsor-modal-overlay {
     position: fixed;
     top: 0;
@@ -19,7 +16,6 @@ export const adsCSS = `
     pointer-events: none;
   }
 
-  /* Modal Container */
   .sponsor-modal {
     width: 90%;
     max-width: 620px;
@@ -36,7 +32,6 @@ export const adsCSS = `
     transform: scale(0.85) translateY(40px);
   }
 
-  /* Header */
   .sponsor-modal-header {
     display: flex;
     justify-content: space-between;
@@ -54,7 +49,6 @@ export const adsCSS = `
     text-transform: uppercase;
   }
 
-  /* Close Button */
   .sponsor-close-btn {
     display: flex;
     align-items: center;
@@ -75,7 +69,6 @@ export const adsCSS = `
     transform: scale(1.1);
   }
 
-  /* Scrollable Body */
   .sponsor-modal-body {
     padding: 20px;
     overflow-y: auto;
@@ -85,7 +78,6 @@ export const adsCSS = `
     flex: 1;
   }
 
-  /* Sponsor Card */
   .sponsor-card {
     border-radius: 12px;
     overflow: hidden;
@@ -103,7 +95,6 @@ export const adsCSS = `
     transform: scale(1.02);
   }
 
-  /* Card Header (Logo + Info) */
   .sponsor-card-header {
     display: flex;
     align-items: center;
@@ -147,7 +138,6 @@ export const adsCSS = `
     letter-spacing: 0.03em;
   }
 
-  /* Card Body (Banner Image) */
   .sponsor-card-body {
     padding: 0;
     overflow: hidden;
@@ -156,12 +146,10 @@ export const adsCSS = `
     width: 100%;
     display: block;
     object-fit: cover;
-    /* Banner recommended: 1200x400px or 3:1 ratio */
     max-height: 210px;
     transition: transform 0.4s ease;
   }
 
-  /* Footer */
   .sponsor-modal-footer {
     padding: 13px 22px;
     text-align: center;

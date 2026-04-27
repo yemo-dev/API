@@ -3,18 +3,11 @@ import { appendFile, mkdir } from 'node:fs/promises'
 import { join } from 'node:path'
 import { apiKeys, guestConfig, autoBanConfig, banList } from '../configs/apiKeys.js'
 
-// ── In-memory stores ──
-const clients = new Map()      // rate-limit counters  { id -> { count, resetTime } }
-const autoBanCounters = new Map() // auto-ban counters { ip -> { count, resetTime } }
+const clients = new Map()
+const autoBanCounters = new Map()
 
-// ── Log directory ──
 const LOG_DIR = join(process.cwd(), 'logs')
 
-// ── Helpers ──
-
-/**
- * Write one access log line to logs/YYYY-MM-DD.log
- */
 async function writeLog(entry) {
     try {
         await mkdir(LOG_DIR, { recursive: true })
@@ -22,12 +15,9 @@ async function writeLog(entry) {
         const file = join(LOG_DIR, `${date}.log`)
         const line = JSON.stringify(entry) + '\n'
         await appendFile(file, line, 'utf8')
-    } catch (_) { /* never crash the request */ }
+    } catch (_) {}
 }
 
-/**
- * Sync rate-limit state across cluster workers via primary process.
- */
 const syncRateLimit = (data) => {
     return new Promise((resolve) => {
         const handler = (msg) => {
@@ -41,9 +31,6 @@ const syncRateLimit = (data) => {
     })
 }
 
-/**
- * Get or create a counter for a given id within a time window.
- */
 function getCounter(store, id, windowMs, isHead = false) {
     const now = Date.now()
     if (!store.has(id)) {
@@ -65,11 +52,9 @@ export const rateLimiter = () => {
         const path    = c.req.path
         const method  = c.req.method
 
-        // Skip non-API paths
         if (path === '/' || path === '/docs') return await next()
         if (!path.startsWith('/api/')) return await next()
 
-        // ── Resolve client IP ──
         let ip = headers['cf-connecting-ip'] ||
                  headers['x-forwarded-for']?.split(',')[0] ||
                  headers['x-real-ip'] ||
@@ -80,11 +65,9 @@ export const rateLimiter = () => {
 
         const now = Date.now()
 
-        // ── Auto-Ban Check ──
         if (autoBanConfig.enabled) {
             const banEntry = getCounter(autoBanCounters, ip, autoBanConfig.windowMs, method === 'HEAD')
             if (banEntry.count > autoBanConfig.threshold) {
-                // Add to banList if not already there
                 const alreadyBanned = banList.some(b => b === ip || b.ip === ip)
                 if (!alreadyBanned) {
                     banList.push({ ip, reason: autoBanConfig.reason })
@@ -92,7 +75,6 @@ export const rateLimiter = () => {
             }
         }
 
-        // ── IP Ban Check ──
         if (banList.some(b => b === ip || b.ip === ip)) {
             const banInfo = banList.find(b => (typeof b === 'object' ? b.ip === ip : b === ip))
             await writeLog({ ts: new Date().toISOString(), ip, path, method, status: 403, reason: 'banned' })
@@ -106,11 +88,9 @@ export const rateLimiter = () => {
             }, 403)
         }
 
-        // ── API Key Resolution ──
         const apiKey  = headers['x-api-key'] || c.req.query('apikey') || c.req.query('apiKey')
         const keyData = apiKeys.find(k => k.key === apiKey)
 
-        // ── Key Expiry Check ──
         if (keyData?.expiresAt) {
             if (new Date(keyData.expiresAt) < new Date()) {
                 return c.json({
@@ -122,7 +102,6 @@ export const rateLimiter = () => {
             }
         }
 
-        // ── Scope / Permission Check ──
         if (keyData?.scopes && keyData.scopes.length > 0) {
             const allowed = keyData.scopes.some(scope => path.startsWith(scope))
             if (!allowed) {
@@ -135,11 +114,8 @@ export const rateLimiter = () => {
             }
         }
 
-        // ── Determine Rate Limit Config ──
-        // Priority: per-endpoint override > key global > guest config
         let config
         if (keyData) {
-            // Check per-endpoint override
             const endpointKey = Object.keys(keyData.endpointLimits || {})
                 .find(prefix => path.startsWith(prefix))
             if (endpointKey) {
@@ -153,7 +129,6 @@ export const rateLimiter = () => {
 
         const id = keyData ? `key:${apiKey}:${path}` : `ip:${ip}:${path}`
 
-        // ── Unlimited Keys ──
         if (config.limit === 0) {
             c.header('X-RateLimit-Limit', 'UNLIMITED')
             c.header('X-RateLimit-Remaining', 'UNLIMITED')
@@ -162,7 +137,6 @@ export const rateLimiter = () => {
             return
         }
 
-        // ── Cluster-Aware Rate Limit Counter ──
         let clientData
         if (cluster.isWorker) {
             clientData = await syncRateLimit({ id, method, windowMs: config.windowMs })

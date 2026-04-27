@@ -1,6 +1,4 @@
 export const bannerCSS = `
-  /* ── Introduction / Banner Section ── */
-
   .introduction {
     display: flex !important;
     flex-direction: row !important;
@@ -13,7 +11,6 @@ export const bannerCSS = `
     box-sizing: border-box !important;
   }
 
-  /* Banner wrapper enables perspective for 3D hover effect */
   .m-banner-wrapper {
     flex: 1 !important;
     display: flex;
@@ -21,7 +18,6 @@ export const bannerCSS = `
     perspective: 2000px;
   }
 
-  /* Banner image: recommended size 960x540px (16:9) or 480x480px (1:1) */
   .m-intro-banner {
     width: 100%;
     max-width: 480px;
@@ -37,7 +33,6 @@ export const bannerCSS = `
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2) !important;
   }
 
-  /* Mobile responsive */
   @media (max-width: 1000px) {
     .introduction {
       flex-direction: column !important;
