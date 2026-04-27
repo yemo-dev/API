@@ -4,7 +4,7 @@ export const appConfig = {
     port: process.env.PORT || 4000,
     title: 'MiuuAPI Portal',
     description: 'A simple and easy to use API. ⭐️ Star to support our work!',
-    version: '1.0.0',
+    version: '1.2.0',
     contact: {
         name: 'Miuu Support',
         url: 'https://github.com/miuubyte',

@@ -1,14 +1,16 @@
 import { preloaderCSS } from './styles/preloader.js'
 import { bannerCSS } from './styles/banner.js'
 import { adsCSS } from './styles/ads.js'
+import { changelogCSS } from './styles/changelog.js'
 import { scalarConfig } from '../configs/app.js'
 import { adsConfig } from '../configs/ads.js'
+import { changelogConfig } from '../configs/changelog.js'
 const ICONS = {
   discord: '<svg viewBox="0 0 127.14 96.36"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.71,32.65-1.82,56.6.4,80.21a105.73,105.73,0,0,0,32.17,16.15,77.7,77.7,0,0,0,6.89-11.11,68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1,105.25,105.25,0,0,0,32.19-16.14c3.39-29,1.24-52.75-16.9-72.13ZM42.45,65.69C36.18,65.69,31,60,31,53s5.12-12.67,11.45-12.67S54,46,53.86,53,48.74,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5.12-12.67,11.44-12.67S96.14,46,96,53,90.89,65.69,84.69,65.69Z"/></svg>'
 }
 
 export function buildBrandingScript() {
-  const combinedCSS = preloaderCSS + bannerCSS + adsCSS;
+  const combinedCSS = preloaderCSS + bannerCSS + adsCSS + changelogCSS;
   const { footer, clientButton } = scalarConfig.customBranding;
   const btnIcon = ICONS[clientButton.icon] || '';
 
@@ -132,6 +134,38 @@ export function buildBrandingScript() {
         }
         
         var emailBtn = document.querySelector('a[href*="mailto:"]');
+        if (emailBtn && !document.getElementById('status-indicator-btn')) {
+          var statusBtn = document.createElement('div');
+          statusBtn.id = 'status-indicator-btn';
+          statusBtn.className = 'cl-btn mr-2';
+          statusBtn.innerHTML = '<div class="cl-btn-dot checking" id="status-dot"></div><span id="status-text">STATUS: Checking...</span>';
+          statusBtn.onclick = function() { window.dispatchEvent(new CustomEvent('open-changelog')); };
+          emailBtn.parentNode.insertBefore(statusBtn, emailBtn);
+
+          window.fetch('/api/stats').then(function(res) {
+            var dot = document.getElementById('status-dot');
+            var txt = document.getElementById('status-text');
+            if (dot && txt) {
+              dot.classList.remove('checking');
+              if (res.ok) {
+                dot.classList.add('up');
+                txt.innerText = 'STATUS: Online';
+              } else {
+                dot.classList.add('down');
+                txt.innerText = 'STATUS: Offline';
+              }
+            }
+          }).catch(function() {
+            var dot = document.getElementById('status-dot');
+            var txt = document.getElementById('status-text');
+            if (dot && txt) {
+              dot.classList.remove('checking');
+              dot.classList.add('down');
+              txt.innerText = 'STATUS: Offline';
+            }
+          });
+        }
+
         if (emailBtn && !document.getElementById('rate-limit-btn')) {
           var rateLimitBtn = document.createElement('div');
           rateLimitBtn.id = 'rate-limit-btn';
@@ -191,7 +225,6 @@ export function buildBrandingScript() {
             return response;
         };
       }
-
       function initSponsorModal() {
         var cfg = ${JSON.stringify(adsConfig)};
         if (!cfg.enabled) return;
@@ -243,9 +276,62 @@ export function buildBrandingScript() {
         }, cfg.delayMs);
       }
 
+
+      function initChangelogModal() {
+        var cfg = ${JSON.stringify(changelogConfig)};
+        if (!cfg.enabled) return;
+
+        var entriesHTML = cfg.entries.map(function(e) {
+          var itemsHTML = e.changes.map(function(c) {
+            var type = 'change';
+            if (c.startsWith('[+]')) type = 'add';
+            else if (c.startsWith('[-]')) type = 'remove';
+            else if (c.startsWith('[!]')) type = 'fix';
+            return '<li class="cl-change-item ' + type + '">' + c + '</li>';
+          }).join('');
+
+          return '<div class="cl-entry">' +
+            '<div class="cl-entry-header">' +
+              '<span class="cl-version">' + e.version + '</span>' +
+              '<span class="cl-date">' + e.date + '</span>' +
+            '</div>' +
+            '<ul class="cl-changes">' + itemsHTML + '</ul>' +
+          '</div>';
+        }).join('<div class="cl-divider"></div>');
+
+        var overlay = document.createElement('div');
+        overlay.className = 'cl-modal-overlay';
+        overlay.innerHTML = '<div class="cl-modal">' +
+          '<div class="cl-modal-header">' +
+            '<h3 class="cl-modal-title">' + cfg.title + '</h3>' +
+            '<button class="cl-close-btn" aria-label="Close"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>' +
+          '</div>' +
+          '<div class="cl-modal-body">' + entriesHTML + '</div>' +
+        '</div>';
+
+        document.body.appendChild(overlay);
+
+        function openModal() {
+          anime.timeline({ easing: 'easeOutQuad' })
+            .add({ targets: overlay, opacity: [0, 1], duration: 300, begin: function() { overlay.style.pointerEvents = 'auto'; } })
+            .add({ targets: '.cl-modal', scale: [0.88, 1], translateY: [32, 0], opacity: [0, 1], duration: 500, easing: 'easeOutExpo' }, '-=200')
+            .add({ targets: '.cl-entry', translateY: [16, 0], opacity: [0, 1], duration: 400, delay: anime.stagger(100) }, '-=300');
+        }
+
+        function closeModal() {
+          anime.timeline({ easing: 'easeInQuad' })
+            .add({ targets: '.cl-modal', scale: [1, 0.9], opacity: [1, 0], duration: 250 })
+            .add({ targets: overlay, opacity: [1, 0], duration: 200, complete: function() { overlay.style.pointerEvents = 'none'; } }, '-=150');
+        }
+
+        overlay.querySelector('.cl-close-btn').addEventListener('click', closeModal);
+        window.addEventListener('open-changelog', openModal);
+      }
+
       customizeUI();
       initRateLimitBanner();
       initSponsorModal();
+      initChangelogModal();
       var observer = new MutationObserver(customizeUI);
       observer.observe(document.body, { childList: true, subtree: true });
     }
