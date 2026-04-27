@@ -10,11 +10,38 @@ const ICONS = {
 export function buildBrandingScript() {
   const statusCSS = `
     .cl-btn { display: flex; align-items: center; gap: 8px; color: var(--scalar-color-1); font-size: 13px; font-weight: 600; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--scalar-border-color); background: var(--scalar-background-2); cursor: default; }
-    .cl-btn-dot { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 6px #22c55e; }
+    .cl-btn-dot { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 6px #22c55e; flex-shrink: 0; }
     .cl-btn-dot.up { background: #22c55e; box-shadow: 0 0 6px #22c55e; }
-    .cl-btn-dot.down { background: #f87171; box-shadow: 0 0 6px #f87171; }
+    .cl-btn-dot.warn { background: #eab308; box-shadow: 0 0 6px #eab308; }
+    .cl-btn-dot.down { background: #ef4444; box-shadow: 0 0 6px #ef4444; }
     .cl-btn-dot.checking { background: #f59e0b; box-shadow: 0 0 6px #f59e0b; animation: cl-pulse 1s infinite; }
     @keyframes cl-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+    
+    .m-rl-widget {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 999999;
+      background: color-mix(in srgb, var(--scalar-background-1) 80%, transparent);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--scalar-border-color);
+      border-radius: 12px;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+      font-family: var(--scalar-font);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--scalar-color-1);
+      user-select: none;
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .m-rl-widget:hover { transform: scale(1.05); }
+    .m-rl-label { color: var(--scalar-color-3); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .m-rl-val { color: var(--scalar-color-accent); }
   `;
   const combinedCSS = preloaderCSS + bannerCSS + adsCSS + statusCSS;
   const { footer, clientButton } = scalarConfig.customBranding;
@@ -171,15 +198,35 @@ export function buildBrandingScript() {
           });
         }
 
-        if (emailBtn && !document.getElementById('rate-limit-btn')) {
-          var rateLimitBtn = document.createElement('div');
-          rateLimitBtn.id = 'rate-limit-btn';
-          rateLimitBtn.className = 'text-c-1 mr-2 flex min-h-7 min-w-7 items-center rounded-lg border px-2 py-1 group-last:mr-0 xl:border-none no-underline hover:bg-b-2';
-          // Custom Zap/Lightning SVG for Rate Limit
-          rateLimitBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="1em" height="1em" class="size-3 text-current"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg><span class="ml-1 empty:hidden" id="rl-val" style="font-size: 13px; font-weight: 600;">RATE LIMIT: Checking...</span>';
-          emailBtn.parentNode.insertBefore(rateLimitBtn, emailBtn);
-          
-          window.fetch('/api/auth/check', { method: 'HEAD' }).catch(function(){});
+        if (!document.getElementById('m-rl-widget')) {
+          var rlWidget = document.createElement('div');
+          rlWidget.id = 'm-rl-widget';
+          rlWidget.className = 'm-rl-widget';
+          rlWidget.innerHTML = '<div class="cl-btn-dot checking" id="rl-dot"></div><span class="m-rl-label">Rate Limit:</span><span class="m-rl-val"><span id="m-rl-val">--</span>/100</span>';
+          document.body.appendChild(rlWidget);
+
+          async function updateRL() {
+            try {
+              var res = await window.fetch('/api/auth/check?t=' + Date.now());
+              var dot = document.getElementById('rl-dot');
+              if (res.ok) {
+                var data = await res.json();
+                if (data && data.api) {
+                   document.getElementById('m-rl-val').innerText = data.api.remaining;
+                   if (dot) {
+                     dot.className = 'cl-btn-dot ' + (data.api.remaining > 30 ? 'up' : (data.api.remaining > 0 ? 'warn' : 'down'));
+                   }
+                }
+              } else {
+                 if (dot) dot.className = 'cl-btn-dot down';
+              }
+            } catch(e) {
+               var dot = document.getElementById('rl-dot');
+               if (dot) dot.className = 'cl-btn-dot down';
+            }
+          }
+          setInterval(updateRL, 3000);
+          updateRL();
         }
       }
 
