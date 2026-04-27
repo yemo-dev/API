@@ -17,7 +17,6 @@ export const scalarConfig = {
         preferredSecurityScheme: 'ApiKeyAuth'
     },
     theme: 'none',
-    showDeveloperTools: 'never',
     customBranding: {
         footer: {
             text: 'Powered by miuubyte',

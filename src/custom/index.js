@@ -128,8 +128,16 @@ export function buildBrandingScript() {
         var buttons = document.querySelectorAll('button');
         buttons.forEach(function(btn) {
           var txt = btn.innerText || '';
-          if (txt.includes('Ask AI') || txt.includes('Deploy') || txt.includes('Share')) {
+          if (txt.includes('Ask AI') || txt.includes('Deploy') || txt.includes('Share') || txt.includes('Developer Tools')) {
             btn.style.setProperty('display', 'none', 'important');
+          }
+        });
+
+        var allLinks = document.querySelectorAll('a, span');
+        allLinks.forEach(function(el) {
+          var txt = el.innerText || '';
+          if (txt.includes('Developer Tools')) {
+            el.style.setProperty('display', 'none', 'important');
           }
         });
 
