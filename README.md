@@ -31,6 +31,63 @@ Robust security layer providing mandatory header validation, CORS policy enforce
 
 ---
 
+## Sponsor Ads System
+
+MiuuAPI includes a built-in, fully configurable Sponsor Ads modal that appears after the loading animation completes. It is powered by **AnimeJS** for premium entrance and exit animations.
+
+All settings are managed in a single file: **`src/configs/ads.js`**
+
+### Enabling & Disabling
+
+Set `enabled` to `true` or `false` to toggle the entire feature without touching any other code.
+
+```javascript
+enabled: false // ads are hidden
+enabled: true  // ads will show after 'delayMs' milliseconds
+```
+
+### Adding Multiple Sponsors
+
+Simply add more objects to the `sponsors` array:
+
+```javascript
+sponsors: [
+  { name: 'SponsorA', type: 'Hosting Provider', ... },
+  { name: 'SponsorB', type: 'CDN Provider', ... },
+]
+```
+
+Each sponsor card will slide in with a staggered AnimeJS animation.
+
+### Sponsor Type Categories
+
+The `type` field displays a colored badge on the sponsor card. Recommended values:
+
+| Type | Description |
+| :--- | :--- |
+| `Hosting Provider` | Web / cloud hosting services |
+| `API Provider` | Third-party API services |
+| `CDN Provider` | Content delivery network |
+| `Developer Tool` | Libraries, tools, IDEs, etc. |
+| `Security Partner` | VPN, firewall, DDoS protection |
+| `Community Partner` | Discord, forums, communities |
+| `Media Partner` | Streaming / media platforms |
+| `Custom` | Any other category |
+
+### Image Configuration
+
+Both `logoUrl` and `bannerUrl` support **local paths** (files placed in `src/public/assets/`) and **remote URLs**.
+
+| Field | Local Example | Remote Example | Recommended Size |
+| :--- | :--- | :--- | :--- |
+| `logoUrl` | `/assets/sponsor-logo.png` | `https://example.com/logo.png` | Min **72×72px**, square (displayed as 36×36 circle) |
+| `bannerUrl` | `/assets/sponsor-banner.jpg` | `https://example.com/banner.jpg` | **1200×400px** (3:1 ratio), max rendered height 210px |
+
+> [!TIP]
+> For the best visual quality, use **JPEG** or **WebP** for banners and **PNG** for logos.
+
+---
+
 ## Deployment Guide
 
 ### Prerequisites
