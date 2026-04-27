@@ -146,7 +146,8 @@ if (isCluster && cluster.isPrimary) {
             config: { ...config, spec: { url: '/docs' } },
             pageTitle: `${appConfig.title} - Documentation Portal`
         })
-        return c.html(html.replace('</body>', `${buildBrandingScript()}</body>`))
+        const injectedHead = '<link rel="icon" type="image/png" href="/favicon.png"><link rel="shortcut icon" href="/favicon.ico"></head>';
+        return c.html(html.replace('</head>', injectedHead).replace('</body>', `${buildBrandingScript()}</body>`))
     })
 
     app.notFound((c) => {
