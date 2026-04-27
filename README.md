@@ -4,14 +4,6 @@ MiuuAPI is a state-of-the-art API gateway and documentation infrastructure engin
 
 ---
 
-## System Preview
-
-### Main Interface
-#### Dark Mode
-![Dark Mode View](src/public/preview/dark.png)
-#### Light Mode
-![Light Mode View](src/public/preview/light.png)
-
 ---
 
 ## Core Capabilities
