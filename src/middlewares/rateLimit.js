@@ -1,4 +1,5 @@
 import cluster from 'node:cluster'
+import { getConnInfo } from '@hono/node-server/conninfo'
 import { apiKeys, guestConfig, banList } from '../configs/apiKeys.js'
 
 const clients = new Map()
@@ -21,9 +22,16 @@ export const rateLimiter = () => {
         const headers = c.req.header()
         let ip = headers['cf-connecting-ip'] || 
                  headers['x-forwarded-for']?.split(',')[0] || 
-                 headers['x-real-ip'] || 
-                 c.env?.incoming?.socket?.remoteAddress || 
-                 '127.0.0.1'
+                 headers['x-real-ip']
+                 
+        if (!ip) {
+            try {
+                const info = getConnInfo(c)
+                ip = info.remote.address
+            } catch (e) {
+                ip = '127.0.0.1'
+            }
+        }
 
         if (ip === '::1') ip = '127.0.0.1'
         if (ip.startsWith('::ffff:')) ip = ip.replace('::ffff:', '')
