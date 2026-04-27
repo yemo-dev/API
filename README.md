@@ -31,59 +31,66 @@ Robust security layer providing mandatory header validation, CORS policy enforce
 
 ---
 
-## Deployment Guide
+## 🚀 Deployment Guide
 
-### Prerequisites
-* Node.js v20.0.0 or higher
-* npm v10.0.0 or higher
+### 📋 Prerequisites
+Ensure your environment meets the following requirements:
+- **Node.js** `v20.0.0` or higher
+- **npm** `v10.0.0` or higher
 
-### Installation
+### 📦 Installation
+Clone the repository and install the dependencies:
 ```bash
 git clone https://github.com/miuubyte/API.git
 cd API
 npm install
 ```
 
-### Execution Profiles
+### ⚙️ Execution Profiles
 
-**Standard Execution**
+> [!TIP]
+> Use **Cluster Performance Mode** for production environments to utilize all CPU cores and maximize throughput.
+
+**Standard Execution** (Development / Single-Core)
 ```bash
 npm run start
 ```
 
-**Cluster Performance Mode**
+**Cluster Performance Mode** (Production / Multi-Core)
 ```bash
 npm run dev:cluster
 ```
 
 ---
 
-## API Reference
+## 📚 API Reference
 
-### Anime and Media Services
+### 🎬 Anime and Media Services
 Endpoints for comprehensive media metadata retrieval.
 
 | Endpoint | Method | Parameter | Description |
-| :--- | :--- | :--- | :--- |
-| `/api/anime/home` | GET | None | Global featured content and latest updates. |
-| `/api/anime/search` | GET | `q` | Full-text search across the media database. |
-| `/api/anime/detail/{slug}` | GET | `slug` | Comprehensive metadata for a single entry. |
-| `/api/anime/episode/{slug}` | GET | `slug` | Direct streaming assets and mirror availability. |
-| `/api/anime/popular` | GET | None | High-engagement titles based on user traffic. |
+| :--- | :---: | :--- | :--- |
+| `/api/anime/home` | `GET` | *None* | Global featured content and latest updates. |
+| `/api/anime/search` | `GET` | `q` | Full-text search across the media database. |
+| `/api/anime/detail/{slug}` | `GET` | `slug` | Comprehensive metadata for a single entry. |
+| `/api/anime/episode/{slug}` | `GET` | `slug` | Direct streaming assets and mirror availability. |
+| `/api/anime/popular` | `GET` | *None* | High-engagement titles based on user traffic. |
 
-### Infrastructure Monitoring
+### 📊 Infrastructure Monitoring
 System-level diagnostics and real-time health metrics.
 
 | Endpoint | Method | Description |
-| :--- | :--- | :--- |
-| `/api/stats` | GET | Detailed hardware metrics (CPU, RAM, Uptime, Network). |
-| `/api/auth/check` | GET | Authentication token validation and tier status. |
+| :--- | :---: | :--- |
+| `/api/stats` | `GET` | Detailed hardware metrics (CPU, RAM, Uptime, Network). |
+| `/api/auth/check` | `GET` | Authentication token validation and tier status. |
 
 ---
 
-## Integration Example
+## ⚡ Integration Example
 
 ### Standard API Request
+Pass your `x-api-key` in the header or as a query parameter (`?apikey=`) to authenticate.
+
 ```bash
 curl -X GET "http://localhost:4000/api/anime/search?q=query" \
      -H "x-api-key: your_api_token" \
@@ -91,6 +98,8 @@ curl -X GET "http://localhost:4000/api/anime/search?q=query" \
 ```
 
 ### Standard JSON Response
+All responses follow a consistent, predictable JSON schema.
+
 ```json
 {
   "success": true,
@@ -105,4 +114,8 @@ curl -X GET "http://localhost:4000/api/anime/search?q=query" \
 ```
 
 ---
-Developed by MiuuPS
+
+<div align="center">
+  <b>Developed by MiuuPS</b><br>
+  <i>Built with ❤️ for speed, reliability, and developer experience.</i>
+</div>
