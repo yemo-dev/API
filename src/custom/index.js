@@ -174,7 +174,7 @@ export function buildBrandingScript() {
           statusBtn.innerHTML = '<div class="cl-btn-dot checking" id="status-dot"></div><span id="status-text">STATUS: Checking...</span>';
           emailBtn.parentNode.insertBefore(statusBtn, emailBtn);
 
-          window.fetch('/api/stats').then(function(res) {
+          window.fetch('/api/stats', { method: 'HEAD' }).then(function(res) {
             var dot = document.getElementById('status-dot');
             var txt = document.getElementById('status-text');
             if (dot && txt) {
@@ -256,38 +256,6 @@ export function buildBrandingScript() {
           }, 3500);
       }
 
-      function initRateLimitBanner() {
-        var originalFetch = window.fetch;
-        window.fetch = async function() {
-            var response = await originalFetch.apply(this, arguments);
-            
-            // Check for Invalid API Key (401)
-            var url = typeof arguments[0] === 'string' ? arguments[0] : (arguments[0] && arguments[0].url ? arguments[0].url : '');
-            if (response.status === 401 && url.includes('/api/')) {
-                showToast('Invalid API Key provided');
-            }
-
-            var remaining = response.headers.get('X-RateLimit-Remaining');
-            var limit = response.headers.get('X-RateLimit-Limit');
-            if (remaining && limit) {
-                var rlVal = document.getElementById('rl-val');
-                if (rlVal) {
-                    if (limit === 'UNLIMITED') {
-                        rlVal.innerText = 'RATE LIMIT: Unlimited';
-                    } else {
-                        rlVal.innerText = 'RATE LIMIT: ' + remaining;
-                        if (parseInt(remaining) < (parseInt(limit) * 0.2)) {
-                            rlVal.style.color = '#f87171';
-                        } else {
-                            rlVal.style.color = '';
-                        }
-                    }
-                }
-            }
-            return response;
-        };
-      }
-
       function initSponsorModal() {
         var cfg = ${JSON.stringify(adsConfig)};
         if (!cfg.enabled) return;
@@ -344,7 +312,6 @@ export function buildBrandingScript() {
       }
 
       customizeUI();
-      initRateLimitBanner();
       initSponsorModal();
       var observer = new MutationObserver(customizeUI);
       observer.observe(document.body, { childList: true, subtree: true });
