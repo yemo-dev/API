@@ -10,7 +10,12 @@
     "description": "High-performance API gateway and documentation portal for MiuuAPI. Optimized for Node.js 20+ with automatic git cloning and clustering support.",
     "features": null,
     "docker_images": {
-        "Miuu All-in-One": "ghcr.io/miuubyte/nodejs-all-in-one"
+        "Miuu All-in-One (Latest)": "ghcr.io/miuubyte/nodejs-all-in-one:latest",
+        "Miuu All-in-One (Node 25)": "ghcr.io/miuubyte/nodejs-all-in-one:25",
+        "Miuu All-in-One (Node 24)": "ghcr.io/miuubyte/nodejs-all-in-one:24",
+        "Miuu All-in-One (Node 23)": "ghcr.io/miuubyte/nodejs-all-in-one:23",
+        "Miuu All-in-One (Node 22)": "ghcr.io/miuubyte/nodejs-all-in-one:22",
+        "Miuu All-in-One (Node 20)": "ghcr.io/miuubyte/nodejs-all-in-one:20"
     },
     "file_denylist": [],
     "startup": "if [ ! -d \"node_modules\" ]; then npm install; fi; node src/index.js",
