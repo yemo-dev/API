@@ -287,7 +287,7 @@ export function buildBrandingScript() {
                   var p = inputs[i].placeholder || '';
                   var val = inputs[i].value || '';
                   if (p.includes('api-key') || p.includes('api key') || p.includes('QUxMIFlPVVIgQkFTRSBBUkUgQkVMT05HIFRPIFVT') || inputs[i].classList.contains('scalar-password-input')) {
-                    if (val && val.length > 5) {
+                    if (val && val.length >= 3) {
                       apiKey = val;
                       break;
                     }
