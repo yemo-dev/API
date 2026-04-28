@@ -22,21 +22,21 @@ export function buildBrandingScript() {
       bottom: 24px;
       right: 24px;
       z-index: 999999;
-      background: #252423;
-      border: 1px solid #32302e;
+      background: var(--scalar-background-1);
+      border: 1px solid var(--scalar-border-color);
       border-radius: 8px;
       padding: 8px 14px;
       display: flex;
       align-items: center;
       gap: 12px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
       font-family: 'Inter', system-ui, sans-serif;
       transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
-    .m-rl-widget:hover { transform: translateY(-4px) scale(1.02); border-color: #3db3ff; }
+    .m-rl-widget:hover { transform: translateY(-4px) scale(1.02); border-color: var(--scalar-color-accent); }
     
     .m-rl-label { 
-      color: #a5a5a5; 
+      color: var(--scalar-color-3); 
       font-size: 10px; 
       font-weight: 800;
       text-transform: uppercase; 
@@ -44,38 +44,37 @@ export function buildBrandingScript() {
     }
     
     .m-rl-val-box {
-      background: #1a1918;
+      background: var(--scalar-background-2);
       border-radius: 4px;
       padding: 4px 10px;
       display: flex;
       align-items: center;
       justify-content: center;
       min-width: 40px;
-      border: 1px solid #32302e;
+      border: 1px solid var(--scalar-border-color);
       position: relative;
       overflow: hidden;
     }
     
     .m-rl-val { 
-      color: #3db3ff; 
+      color: var(--scalar-color-accent); 
       font-size: 15px;
       font-weight: 700;
       font-family: 'JetBrains Mono', 'Fira Code', monospace;
-      text-shadow: 0 0 15px rgba(61, 179, 255, 0.5);
+      text-shadow: 0 0 15px color-mix(in srgb, var(--scalar-color-accent) 40%, transparent);
     }
     
     .m-rl-sep {
-      color: #3db3ff;
+      color: var(--scalar-color-accent);
       font-size: 16px;
       margin: 0 8px;
-      opacity: 0.8;
+      opacity: 0.6;
       font-weight: 200;
-      text-shadow: 0 0 8px rgba(61, 179, 255, 0.3);
     }
     
     .m-rl-val.unlimited {
       font-size: 20px;
-      background: linear-gradient(135deg, #3db3ff, #ff6b00);
+      background: linear-gradient(135deg, var(--scalar-color-accent), #60a5fa);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       animation: m-pulse-neon 3s infinite alternate cubic-bezier(0.45, 0.05, 0.55, 0.95);
@@ -83,8 +82,8 @@ export function buildBrandingScript() {
     }
 
     @keyframes m-pulse-neon {
-      0% { filter: drop-shadow(0 0 2px rgba(61, 179, 255, 0.4)); opacity: 0.9; transform: scale(0.95); }
-      100% { filter: drop-shadow(0 0 10px rgba(255, 107, 0, 0.6)); opacity: 1; transform: scale(1.1); }
+      0% { filter: drop-shadow(0 0 2px color-mix(in srgb, var(--scalar-color-accent) 40%, transparent)); opacity: 0.9; transform: scale(0.95); }
+      100% { filter: drop-shadow(0 0 10px color-mix(in srgb, var(--scalar-color-accent) 60%, transparent)); opacity: 1; transform: scale(1.1); }
     }
   `;
   const combinedCSS = preloaderCSS + bannerCSS + adsCSS + statusCSS;
