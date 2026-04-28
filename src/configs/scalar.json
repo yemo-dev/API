@@ -1,0 +1,40 @@
+{
+  "theme": "none",
+  "layout": "modern",
+  "hideClientButton": false,
+  "showSidebar": true,
+  "showDeveloperTools": true,
+  "showToolbar": true,
+  "operationTitleSource": "summary",
+  "persistAuth": false,
+  "telemetry": true,
+  "isEditable": false,
+  "isLoading": false,
+  "hideModels": false,
+  "documentDownloadType": "both",
+  "hideTestRequestButton": false,
+  "hideSearch": false,
+  "showOperationId": false,
+  "hideDarkModeToggle": false,
+  "withDefaultFonts": true,
+  "defaultOpenFirstTag": true,
+  "defaultOpenAllTags": false,
+  "expandAllModelSections": false,
+  "expandAllResponses": false,
+  "orderSchemaPropertiesBy": "alpha",
+  "orderRequiredPropertiesFirst": true,
+  "authentication": {
+    "preferredSecurityScheme": "ApiKeyAuth"
+  },
+  "customBranding": {
+    "footer": {
+      "text": "Powered by miuubyte",
+      "url": "https://github.com/miuubyte"
+    },
+    "clientButton": {
+      "text": "Discord",
+      "url": "https://discord.gg/Gj8CUjCtav",
+      "icon": "discord"
+    }
+  }
+}

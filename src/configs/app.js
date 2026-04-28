@@ -1,4 +1,9 @@
 import { z } from '@hono/zod-openapi'
+import fs from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 export const appConfig = {
     port: process.env.PORT || 4000,
@@ -14,29 +19,19 @@ export const appConfig = {
 
 /**
  * Configuration for the Scalar Documentation UI
+ * Loaded dynamically from scalar.json
  */
-export const scalarConfig = {
-    /** Theme of the documentation portal ('none' for custom styling) */
-    theme: 'none',
-    /** Layout style ('modern' or 'classic') */
-    layout: 'classic',
-    /** Default authentication settings */
-    authentication: {
-        preferredSecurityScheme: 'ApiKeyAuth'
-    },
-    /** Custom branding and external community links */
-    customBranding: {
-        footer: {
-            text: 'Powered by miuubyte',
-            url: 'https://github.com/miuubyte'
-        },
-        clientButton: {
-            text: 'Discord',
-            url: 'https://discord.gg/Gj8CUjCtav',
-            icon: 'discord'
-        }
+let loadedScalarConfig = {}
+try {
+    const configPath = path.join(__dirname, 'scalar.json')
+    if (fs.existsSync(configPath)) {
+        loadedScalarConfig = JSON.parse(fs.readFileSync(configPath, 'utf8'))
     }
+} catch (e) {
+    console.error('[Config] Failed to load scalar.json, using defaults')
 }
+
+export const scalarConfig = loadedScalarConfig
 
 export const openApiConfig = {
     openapi: '3.1.0',
