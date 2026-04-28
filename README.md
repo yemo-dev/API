@@ -67,25 +67,59 @@ The portal is strictly optimized for mobile responsiveness:
 
 ---
 
-## Real-Time Portal Configuration
+## Portal Configuration (src/configs/scalar.json)
+
+Manage the visual appearance and behavior of your documentation portal. 
+
+> [!TIP]
+> **Manual Mode**: If you are hosting on a VPS or Public Domain where the interactive "Configure" button is hidden, you can customize everything by directly editing the `src/configs/scalar.json` file in your project directory.
+
+### 1. Core Layout and Theme
+- **`layout`**: Set the navigation style of the portal.
+  - Options: `"modern"` (Recommended: Sleek sidebar style), `"classic"` (Traditional top navigation).
+- **`theme`**: Choose a high-quality color palette for your portal.
+  - Options: `"none"`, `"default"`, `"alternate"`, `"moon"`, `"purple"`, `"solarized"`, `"bluePlanet"`, `"saturn"`, `"kepler"`, `"mars"`, `"deepSpace"`, `"laserwave"`.
+
+### 2. Visual Toggles (true/false)
+- **`showSidebar`**: Show or hide the navigation sidebar.
+- **`showDeveloperTools`**: Enable the interactive configuration panel (Local only).
+- **`showToolbar`**: Display the top search and tools bar.
+- **`hideModels`**: Hide the schema models section from the sidebar.
+- **`hideSearch`**: Remove the search bar from the UI.
+- **`hideDarkModeToggle`**: Disable the theme switcher for users.
+- **`persistAuth`**: Keep authentication keys saved after page refresh.
+- **`withDefaultFonts`**: Use Scalar's premium typography.
+
+### 3. Branding & Customization
+- **`title`**: The name of your API portal displayed in the browser tab and metadata.
+- **`customBranding`**:
+  - **`footer`**: 
+    - `text`: Custom text for the bottom of the portal page.
+    - `url`: Link for the footer text.
+  - **`clientButton`**:
+    - `text`: Text for the header action button (e.g., "Join Discord").
+    - `url`: Destination URL for the button.
+    - `icon`: Icon type (default is `"discord"`).
+
+---
+
+## Administrative Portal (Local Access Only)
 
 MiuuAPI features a sophisticated, self-service administrative panel that allows for real-time adjustments to the portal's layout, theme, and branding without requiring server restarts.
 
-### Desktop Only Support
+### Desktop & Local Only Support
 > [!IMPORTANT]
-> **Admin Configuration tools (Configure & Save) are only available on Desktop environments.**
-> These tools are automatically disabled and hidden on mobile devices and public domains to ensure security and prevent UI conflicts.
+> **Admin Configuration tools (Configure & Save) are only visible when accessing via `localhost` or a direct server IP.**
+> These tools are automatically hidden on public domains to ensure your infrastructure settings remain secure.
 
 ### How to Use
 1. **Access**: Open the portal via `localhost:4000` or your server's `IP:Port` on a desktop browser.
 2. **Configure**: Click the native **Configure** button provided by the Scalar engine.
-3. **Edit**: Adjust the Layout (Classic/Modern), Theme, or other JSON parameters.
-4. **Save**: Click the professional **SAVE TO SCALAR.JSON** button injected at the top of the configuration panel.
-5. **Sync**: The changes are persisted to `src/configs/scalar.json` instantly and reflected globally.
+3. **Edit**: Adjust the Layout, Theme, or other JSON parameters in the real-time editor.
+4. **Save**: Click the professional **SAVE TO SCALAR.JSON** button at the top of the panel.
+5. **Global Sync**: Changes are instantly saved to `src/configs/scalar.json` and applied to all users.
 
-### Security and Rate Limits
-- **IP Protection**: The configuration panel only appears when accessed via a numeric IP or localhost. It is completely removed from the DOM when accessed via a public domain.
-- **Rate Limit Bypass**: Administrative configuration requests are excluded from global rate limiting, ensuring you can make unlimited adjustments during development or maintenance.
+---
 
 ---
 

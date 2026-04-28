@@ -45,6 +45,18 @@ if (cluster.isPrimary) {
     }, 15 * 1000)
 }
 
+const getLocalIP = () => {
+    const interfaces = os.networkInterfaces()
+    for (const name of Object.keys(interfaces)) {
+        for (const iface of interfaces[name]) {
+            if (iface.family === 'IPv4' && !iface.internal) {
+                return iface.address
+            }
+        }
+    }
+    return '127.0.0.1'
+}
+
 if (isCluster && cluster.isPrimary) {
     logger.info(`Primary ${process.pid} is running`)
     logger.info(`Starting ${numCPUs} workers...`)
@@ -102,6 +114,9 @@ if (isCluster && cluster.isPrimary) {
     })
 } else {
     serve({ fetch: app.fetch, port: appConfig.port }, (info) => {
-        logger.ready(`Worker ${process.pid} is running on port ${info.port}`)
+        const localIP = getLocalIP()
+        logger.ready(`Worker ${process.pid} is running`)
+        console.log(`  > Local:   http://localhost:${info.port}`)
+        console.log(`  > Network: http://${localIP}:${info.port}\n`)
     })
 }
