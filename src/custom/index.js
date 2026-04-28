@@ -294,7 +294,29 @@ export function buildBrandingScript() {
               }
             });
 
-            var lastRemaining = null;
+            // Aggressive key scraper for Scalar UI
+            function scrapeScalarKey() {
+              try {
+                // Look for inputs near "x-api-key" or in security sections
+                var inputs = document.querySelectorAll('input');
+                inputs.forEach(function(input) {
+                  var val = input.value.trim();
+                  if (val.length >= 16) { // Most API keys are at least 16 chars
+                    var parentText = input.parentElement.innerText || '';
+                    var label = input.getAttribute('aria-label') || '';
+                    if (label.includes('api-key') || parentText.includes('x-api-key') || parentText.includes('Authentication') || parentText.includes('Value')) {
+                      if (localStorage.getItem('miuu_api_key') !== val) {
+                        localStorage.setItem('miuu_api_key', val);
+                        updateRL();
+                      }
+                    }
+                  }
+                });
+              } catch(e) {}
+            }
+            setInterval(scrapeScalarKey, 2000);
+            document.addEventListener('input', scrapeScalarKey);
+
             async function updateRL() {
               try {
                 var apiKey = localStorage.getItem('miuu_api_key') || '';
@@ -305,15 +327,21 @@ export function buildBrandingScript() {
                   url += '&apikey=' + apiKey;
                 }
 
-                var res = await window.fetch(url, { method: 'HEAD', headers: headers });
-                var remaining = res.headers.get('x-ratelimit-remaining');
-                var limit = res.headers.get('x-ratelimit-limit');
+                // Use GET and parse JSON for better reliability
+                var res = await window.fetch(url, { method: 'GET', headers: headers });
+                var data = await res.json();
                 
                 var container = document.getElementById('m-rl-val-container');
                 var dot = document.getElementById('rl-dot');
 
-                if (container && remaining !== null && limit !== null) {
-                  if (limit.toUpperCase() === 'UNLIMITED' || limit === '0') {
+                if (container && data.success) {
+                  var limit = data.limit;
+                  var remaining = data.remaining;
+                  
+                  // Check if limit is unlimited (0 or string "Unlimited"/"UNLIMITED")
+                  var isUnlimited = (limit === 0 || limit === '0' || (typeof limit === 'string' && limit.toUpperCase() === 'UNLIMITED'));
+
+                  if (isUnlimited) {
                     if (!container.classList.contains('unlimited-box')) {
                       container.innerHTML = '<span id="m-rl-val" class="m-rl-val unlimited">∞</span>';
                       container.classList.add('unlimited-box');
@@ -335,7 +363,7 @@ export function buildBrandingScript() {
                     var curValEl = document.getElementById('m-rl-val');
                     var curLimitEl = document.getElementById('m-rl-limit');
                     
-                    if (curValEl && curValEl.innerText !== remaining) {
+                    if (curValEl && curValEl.innerText != remaining) {
                       curValEl.innerText = remaining;
                       anime({
                         targets: curValEl,
@@ -357,7 +385,7 @@ export function buildBrandingScript() {
                 }
               } catch(e) {}
             }
-            setInterval(updateRL, 10000); // Check every 10s to be less aggressive
+            setInterval(updateRL, 10000);
             updateRL();
           }
         } finally {
