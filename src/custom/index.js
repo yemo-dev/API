@@ -268,7 +268,6 @@ export function buildBrandingScript() {
               var apiKey = localStorage.getItem('miuu_api_key') || '';
               
               if (!apiKey) {
-                // Universal scan of ALL storage
                 var allStorage = { ...localStorage, ...sessionStorage };
                 Object.keys(allStorage).forEach(function(k) {
                   try {
@@ -284,7 +283,6 @@ export function buildBrandingScript() {
                 });
               }
 
-              // Direct DOM peek for the Authorize input
               if (!apiKey) {
                 var inputs = document.querySelectorAll('input');
                 for (var i = 0; i < inputs.length; i++) {
@@ -363,7 +361,6 @@ export function buildBrandingScript() {
         if (!cfg.enabled) return;
         if (!cfg.sponsors || cfg.sponsors.length === 0) return;
         
-        // Build cards HTML for all sponsors
         var cardsHTML = cfg.sponsors.map(function(s) {
           return '<div class="sponsor-card" onclick="window.open(\\'' + s.targetUrl + '\\', \\'_blank\\')">' +
             '<div class="sponsor-card-header">' +
@@ -404,11 +401,8 @@ export function buildBrandingScript() {
         overlay.querySelector('.sponsor-close-btn').addEventListener('click', closeModal);
 
         setTimeout(function() {
-          // 1. Fade in overlay
           anime({ targets: overlay, opacity: [0, 1], duration: 400, easing: 'easeOutQuad', begin: function() { overlay.style.pointerEvents = 'auto'; } });
-          // 2. Elastic pop-in for modal box
           anime({ targets: '.sponsor-modal', scale: [0.85, 1], translateY: [40, 0], opacity: [0, 1], duration: 700, easing: 'easeOutElastic(1, 0.7)' });
-          // 3. Staggered slide-up for cards
           anime({ targets: '.sponsor-card', translateY: [24, 0], opacity: [0, 1], duration: 500, delay: anime.stagger(120, { start: 250 }), easing: 'easeOutExpo' });
         }, cfg.delayMs);
       }

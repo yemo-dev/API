@@ -15,8 +15,8 @@ export const guestConfig = {
 export const autoBanConfig = {
   enabled: true,
   threshold: 2000,
-  windowMs: 5 * 60 * 1000, // Monitor window
-  banDuration: 5 * 60 * 1000 // Ban duration
+  windowMs: 5 * 60 * 1000,
+  banDuration: 5 * 60 * 1000
 }
 
-export const banList = [] // Will store { ip, expires }
+export const banList = []

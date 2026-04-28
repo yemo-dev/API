@@ -76,7 +76,6 @@ export const keyStatusRoute = createRoute({
 export const keyStatusHandler = async (c) => {
     const apiKey = c.req.header('x-api-key') || c.req.query('apikey') || c.req.query('apiKey');
     
-    // Get client info for remaining limit
     const headers = c.req.header()
     let ip = headers['cf-connecting-ip'] || 
              headers['x-forwarded-for']?.split(',')[0] || 
