@@ -22,39 +22,60 @@ export function buildBrandingScript() {
       bottom: 24px;
       right: 24px;
       z-index: 999999;
-      background: color-mix(in srgb, var(--scalar-background-1) 80%, transparent);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid var(--scalar-border-color);
-      border-radius: 12px;
-      padding: 10px 16px;
+      background: #252423;
+      border: 1px solid #32302e;
+      border-radius: 8px;
+      padding: 8px 14px;
       display: flex;
       align-items: center;
-      gap: 10px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-      font-family: var(--scalar-font);
+      gap: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      font-family: 'Inter', system-ui, sans-serif;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .m-rl-widget:hover { transform: translateY(-4px) scale(1.02); border-color: #3db3ff; }
+    
+    .m-rl-label { 
+      color: #a5a5a5; 
+      font-size: 10px; 
+      font-weight: 800;
+      text-transform: uppercase; 
+      letter-spacing: 0.1em; 
+    }
+    
+    .m-rl-val-box {
+      background: #1a1918;
+      border-radius: 4px;
+      padding: 4px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 40px;
+      border: 1px solid #32302e;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .m-rl-val { 
+      color: #3db3ff; 
       font-size: 13px;
       font-weight: 700;
-      color: var(--scalar-color-1);
-      user-select: none;
-      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      text-shadow: 0 0 12px rgba(61, 179, 255, 0.3);
     }
-    .m-rl-widget:hover { transform: scale(1.05); }
-    .m-rl-label { color: var(--scalar-color-3); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
-    .m-rl-val { 
-      color: var(--scalar-color-accent); 
-      font-family: 'Inter', sans-serif;
-      font-feature-settings: 'tnum' on, 'lnum' on;
-      text-shadow: 0 0 8px color-mix(in srgb, var(--scalar-color-accent) 40%, transparent);
-    }
+    
     .m-rl-val.unlimited {
-      font-size: 18px;
-      line-height: 1;
-      background: linear-gradient(135deg, var(--scalar-color-accent), #60a5fa);
+      font-size: 20px;
+      background: linear-gradient(135deg, #3db3ff, #ff6b00);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 0 4px color-mix(in srgb, var(--scalar-color-accent) 50%, transparent));
-      font-weight: 800;
+      animation: m-pulse-neon 3s infinite alternate cubic-bezier(0.45, 0.05, 0.55, 0.95);
+      font-weight: 900;
+    }
+
+    @keyframes m-pulse-neon {
+      0% { filter: drop-shadow(0 0 2px rgba(61, 179, 255, 0.4)); opacity: 0.9; transform: scale(0.95); }
+      100% { filter: drop-shadow(0 0 10px rgba(255, 107, 0, 0.6)); opacity: 1; transform: scale(1.1); }
     }
   `;
   const combinedCSS = preloaderCSS + bannerCSS + adsCSS + statusCSS;
@@ -224,7 +245,7 @@ export function buildBrandingScript() {
           var rlWidget = document.createElement('div');
           rlWidget.id = 'm-rl-widget';
           rlWidget.className = 'm-rl-widget';
-          rlWidget.innerHTML = '<div class="cl-btn-dot checking" id="rl-dot"></div><span class="m-rl-label">Rate Limit:</span><span class="m-rl-val" id="m-rl-val-container"><span id="m-rl-val">--</span>/<span id="m-rl-limit">--</span></span>';
+          rlWidget.innerHTML = '<div class="cl-btn-dot checking" id="rl-dot"></div><span class="m-rl-label">Rate Limit</span><div class="m-rl-val-box" id="m-rl-val-container"><span id="m-rl-val" class="m-rl-val">--</span>/<span id="m-rl-limit" class="m-rl-val">--</span></div>';
           document.body.appendChild(rlWidget);
 
           async function updateRL() {
@@ -280,7 +301,7 @@ export function buildBrandingScript() {
                   if (dot) dot.className = 'cl-btn-dot up';
                 } else if (remaining !== null && limit !== null) {
                   if (!document.getElementById('m-rl-limit')) {
-                    container.innerHTML = '<span id="m-rl-val">--</span>/<span id="m-rl-limit">--</span>';
+                    container.innerHTML = '<span id="m-rl-val" class="m-rl-val">--</span>/<span id="m-rl-limit" class="m-rl-val">--</span>';
                   }
                   var curValEl = document.getElementById('m-rl-val');
                   var curLimitEl = document.getElementById('m-rl-limit');
