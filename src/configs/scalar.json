@@ -1,9 +1,9 @@
 {
   "theme": "none",
-  "layout": "classic",
+  "layout": "modern",
   "hideClientButton": false,
   "showSidebar": true,
-  "showDeveloperTools": true,
+  "showDeveloperTools": false,
   "showToolbar": true,
   "operationTitleSource": "summary",
   "persistAuth": false,
