@@ -14,7 +14,7 @@ export const adsCSS = `
     justify-content: center;
     opacity: 0;
     pointer-events: none;
-    padding: 12px;
+    padding: 0;
     transition: opacity 0.6s cubic-bezier(0.23, 1, 0.32, 1);
   }
 
@@ -33,6 +33,7 @@ export const adsCSS = `
     display: flex;
     flex-direction: column;
     transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    margin: 16px;
   }
 
   .sponsor-modal-header {
@@ -76,10 +77,10 @@ export const adsCSS = `
   }
 
   .sponsor-modal-body {
-    padding: 16px;
+    padding: 12px;
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 12px;
     overflow-y: auto;
     flex: 1;
     scrollbar-width: thin;
@@ -89,7 +90,7 @@ export const adsCSS = `
   .sponsor-card {
     background: var(--scalar-background-1);
     border: 1px solid var(--scalar-border-color);
-    border-radius: 10px;
+    border-radius: 8px;
     overflow: hidden;
     cursor: pointer;
     transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
@@ -100,29 +101,28 @@ export const adsCSS = `
 
   .sponsor-card:hover {
     border-color: #5865F2;
-    transform: translateY(-4px);
-    box-shadow: 0 15px 30px rgba(88, 101, 242, 0.15);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(88, 101, 242, 0.15);
   }
 
   .sponsor-card-header {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 10px 14px;
+    gap: 10px;
+    padding: 8px 12px;
     border-bottom: 1px solid var(--scalar-border-color);
     background: linear-gradient(135deg, var(--scalar-background-2) 0%, var(--scalar-background-1) 100%);
   }
 
   .sponsor-logo {
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     background: #5865F2;
-    border-radius: 8px;
+    border-radius: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    box-shadow: 0 4px 8px rgba(88, 101, 242, 0.2);
     flex-shrink: 0;
   }
 
@@ -136,11 +136,11 @@ export const adsCSS = `
   .sponsor-info {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 1px;
   }
 
   .sponsor-name {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 800;
     color: var(--scalar-color-1);
     margin: 0;
@@ -148,10 +148,10 @@ export const adsCSS = `
   }
 
   .sponsor-type {
-    font-size: 8px;
+    font-size: 7.5px;
     font-weight: 900;
     color: #5865F2;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     font-family: 'JetBrains Mono', monospace;
   }
@@ -176,13 +176,8 @@ export const adsCSS = `
     transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  .sponsor-card:hover .sponsor-banner-image {
-    opacity: 1;
-    transform: scale(1.04);
-  }
-
   .sponsor-modal-footer {
-    padding: 12px;
+    padding: 10px;
     text-align: center;
     background: var(--scalar-background-2);
     border-top: 1px solid var(--scalar-border-color);
@@ -190,54 +185,34 @@ export const adsCSS = `
   }
 
   .sponsor-support-text {
-    font-size: 8.5px;
+    font-size: 8px;
     color: var(--scalar-color-3);
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.15em;
-  }
-
-  .sponsor-card::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 50%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-    transform: skewX(-25deg);
-    transition: 0.75s;
-    pointer-events: none;
-  }
-
-  .sponsor-card:hover::after {
-    left: 150%;
+    letter-spacing: 0.12em;
   }
 
   @media (max-width: 480px) {
     .sponsor-modal {
-      max-width: 92%;
-      max-height: 75vh;
+      margin: 12px;
+      max-height: 85vh;
     }
     .sponsor-modal-body {
-      padding: 12px;
-      gap: 10px;
+      padding: 8px;
+      gap: 8px;
     }
     .sponsor-card-header {
-      padding: 8px 12px;
+      padding: 6px 10px;
     }
     .sponsor-logo {
-      width: 28px;
-      height: 28px;
+      width: 24px;
+      height: 24px;
     }
     .sponsor-name {
-      font-size: 12px;
+      font-size: 11px;
     }
     .sponsor-modal-footer {
-      padding: 10px;
-    }
-    .sponsor-support-text {
-      font-size: 8px;
+      padding: 8px;
     }
   }
 `;

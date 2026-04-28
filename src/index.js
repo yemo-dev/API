@@ -184,7 +184,7 @@ if (isCluster && cluster.isPrimary) {
             const iconPath = path.resolve('src/public/favicon.ico')
             if (fs.existsSync(iconPath)) {
                 const base64 = fs.readFileSync(iconPath).toString('base64')
-                faviconDataUri = `data:image/x-icon;base64,${base64}`
+                faviconDataUri = `data:image/png;base64,${base64}`
             }
         } catch (e) {}
 
@@ -192,7 +192,7 @@ if (isCluster && cluster.isPrimary) {
         html = html.replace('<head>', '<head><meta name="google" content="notranslate"><meta http-equiv="Content-Language" content="en"><meta name="language" content="English">')
         
         const faviconTags = faviconDataUri 
-            ? `<link rel="icon" href="${faviconDataUri}"><link rel="shortcut icon" href="${faviconDataUri}"><link rel="apple-touch-icon" href="${faviconDataUri}">`
+            ? `<link rel="icon" type="image/png" href="${faviconDataUri}"><link rel="shortcut icon" type="image/png" href="${faviconDataUri}"><link rel="apple-touch-icon" href="${faviconDataUri}">`
             : '<link rel="icon" type="image/x-icon" href="/favicon.ico"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/favicon.ico">'
         
         html = html.replace('</head>', `${faviconTags}</head>`)
