@@ -70,7 +70,7 @@ export const rateLimiter = () => {
                         success: false,
                         status: 403,
                         error: 'Forbidden',
-                        message: 'IP anda diblokir otomatis selama 5 menit karena aktivitas mencurigakan.'
+                        message: 'IP anda diblokir otomatis selama 30 menit karena aktivitas mencurigakan.'
                     }, 403)
                 }
             }
