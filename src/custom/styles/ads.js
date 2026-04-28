@@ -124,10 +124,9 @@ export const adsCSS = `
   }
 
   .sponsor-logo img {
-    width: 65%;
-    height: 65%;
+    width: 80%;
+    height: 80%;
     object-fit: contain;
-    filter: brightness(0) invert(1);
   }
 
   .sponsor-info {

@@ -133,7 +133,6 @@ if (isCluster && cluster.isPrimary) {
     app.use('*', rateLimiter())
     app.use('/assets/*', serveStatic({ root: './src/public' }))
     app.use('/favicon.ico', serveStatic({ path: './src/public/favicon.ico' }))
-    app.use('/favicon.png', serveStatic({ path: './src/public/favicon.ico' }))
 
     setupRoutes(app)
 
