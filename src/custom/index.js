@@ -74,16 +74,37 @@ export function buildBrandingScript() {
     
     .m-rl-val.unlimited {
       font-size: 20px;
-      background: linear-gradient(135deg, var(--scalar-color-accent), #60a5fa);
+      background: linear-gradient(90deg, #3db3ff, #ff00ff, #ff6b00, #3db3ff);
+      background-size: 300% 100%;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      animation: m-pulse-neon 3s infinite alternate cubic-bezier(0.45, 0.05, 0.55, 0.95);
+      animation: m-rainbow-text 3s linear infinite, m-pulse-scale 2s ease-in-out infinite alternate;
       font-weight: 900;
+      filter: drop-shadow(0 0 5px rgba(61, 179, 255, 0.5));
     }
 
-    @keyframes m-pulse-neon {
-      0% { filter: drop-shadow(0 0 2px color-mix(in srgb, var(--scalar-color-accent) 40%, transparent)); opacity: 0.9; transform: scale(0.95); }
-      100% { filter: drop-shadow(0 0 10px color-mix(in srgb, var(--scalar-color-accent) 60%, transparent)); opacity: 1; transform: scale(1.1); }
+    .m-rl-val-box.unlimited-box {
+      border: 1px solid transparent;
+      background: linear-gradient(var(--scalar-background-2), var(--scalar-background-2)) padding-box,
+                  linear-gradient(90deg, #3db3ff, #ff00ff, #ff6b00, #3db3ff) border-box;
+      background-size: 300% 100%;
+      animation: m-rainbow-border 3s linear infinite;
+      box-shadow: 0 0 15px color-mix(in srgb, var(--scalar-color-accent) 20%, transparent);
+    }
+
+    @keyframes m-rainbow-text {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 100% 50%; }
+    }
+
+    @keyframes m-rainbow-border {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 100% 50%; }
+    }
+
+    @keyframes m-pulse-scale {
+      0% { transform: scale(0.9); }
+      100% { transform: scale(1.1); }
     }
   `;
   const combinedCSS = preloaderCSS + bannerCSS + adsCSS + statusCSS;
@@ -306,8 +327,10 @@ export function buildBrandingScript() {
               if (container) {
                 if (limit === 'UNLIMITED' || limit === 'Unlimited' || limit === '0') {
                   container.innerHTML = '<span id="m-rl-val" class="m-rl-val unlimited">∞</span>';
+                  container.classList.add('unlimited-box');
                   if (dot) dot.className = 'cl-btn-dot up';
                 } else if (remaining !== null && limit !== null) {
+                  container.classList.remove('unlimited-box');
                   if (!document.getElementById('m-rl-limit')) {
                     container.innerHTML = '<span id="m-rl-val" class="m-rl-val">--</span><span class="m-rl-sep">/</span><span id="m-rl-limit" class="m-rl-val">--</span>';
                   }
