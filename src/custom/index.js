@@ -1,6 +1,7 @@
 import { preloaderCSS } from './styles/preloader.js'
 import { bannerCSS } from './styles/banner.js'
 import { adsCSS } from './styles/ads.js'
+import { logsCSS } from './styles/logs.js'
 import { scalarConfig } from '../configs/app.js'
 import { adsConfig } from '../configs/ads.js'
 const ICONS = {
@@ -43,7 +44,7 @@ export function buildBrandingScript() {
     .m-rl-label { color: var(--scalar-color-3); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
     .m-rl-val { color: var(--scalar-color-accent); }
   `;
-  const combinedCSS = preloaderCSS + bannerCSS + adsCSS + statusCSS;
+  const combinedCSS = preloaderCSS + bannerCSS + adsCSS + statusCSS + logsCSS;
   const { footer, clientButton } = scalarConfig.customBranding;
   const btnIcon = ICONS[clientButton.icon] || '';
 
@@ -69,6 +70,107 @@ export function buildBrandingScript() {
         '<div class="m-loader-text">MiuuAPI</div>' +
       '</div>';
       document.body.appendChild(preloader);
+
+      // Logs Modal
+      var logsModal = document.createElement('div');
+      logsModal.className = 'm-logs-modal';
+      logsModal.innerHTML = '<div class="m-logs-container">' +
+        '<div class="m-logs-header">' +
+          '<div class="m-logs-title">' +
+            '<svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>' +
+            '<span>Server Logs</span>' +
+          '</div>' +
+          '<div class="m-logs-close" style="font-size:24px">&times;</div>' +
+        '</div>' +
+        '<div class="m-logs-body">' +
+          '<div class="m-logs-sidebar"></div>' +
+          '<div class="m-logs-content">' +
+            '<div class="m-logs-empty">Select a log file to view</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+      document.body.appendChild(logsModal);
+
+      var logsBtn = document.createElement('div');
+      logsBtn.className = 'm-logs-btn';
+      logsBtn.innerHTML = '<svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zM7 10h10v2H7zm0-3h10v2H7zm0 6h7v2H7z"/></svg>';
+      document.body.appendChild(logsBtn);
+
+      function loadLogList() {
+        var apiKey = localStorage.getItem('miuu_api_key') || '';
+        fetch('/api/logs', { headers: { 'x-api-key': apiKey } })
+          .then(res => res.json())
+          .then(data => {
+            if (data.success) {
+              var sidebar = logsModal.querySelector('.m-logs-sidebar');
+              sidebar.innerHTML = '';
+              data.logs.forEach(file => {
+                var item = document.createElement('div');
+                item.className = 'm-log-file-item';
+                item.innerText = file;
+                item.onclick = () => loadLogContent(file, item);
+                sidebar.appendChild(item);
+              });
+            }
+          });
+      }
+
+      function loadLogContent(filename, el) {
+        var apiKey = localStorage.getItem('miuu_api_key') || '';
+        var contentArea = logsModal.querySelector('.m-logs-content');
+        contentArea.innerHTML = '<div class="m-logs-loading">Loading...</div>';
+        
+        document.querySelectorAll('.m-log-file-item').forEach(i => i.classList.remove('active'));
+        el.classList.add('active');
+
+        fetch('/api/logs/' + filename, { headers: { 'x-api-key': apiKey } })
+          .then(res => res.json())
+          .then(data => {
+            if (data.success) {
+              contentArea.innerHTML = '<pre class="m-logs-pre"></pre>';
+              var pre = contentArea.querySelector('pre');
+              
+              // Simple highlighting
+              var lines = data.content.split('\\n').reverse();
+              lines.forEach(line => {
+                if (!line.trim()) return;
+                var div = document.createElement('div');
+                div.className = 'm-log-entry';
+                
+                var tsMatch = line.match(/\\[(.*?)\\]/);
+                var levelMatch = line.match(/\\[(INFO|WARN|ERROR)\\]/);
+                
+                var coloredLine = line
+                  .replace(/\\[(.*?)\\]/, '<span class="m-log-ts">[$1]</span>')
+                  .replace(/\\[INFO\\]/, '<span class="m-log-level m-log-level-info">[INFO]</span>')
+                  .replace(/\\[WARN\\]/, '<span class="m-log-level m-log-level-warn">[WARN]</span>')
+                  .replace(/\\[ERROR\\]/, '<span class="m-log-level m-log-level-error">[ERROR]</span>');
+                
+                div.innerHTML = coloredLine;
+                pre.appendChild(div);
+              });
+            } else {
+              contentArea.innerHTML = '<div class="m-logs-empty">Error: ' + data.message + '</div>';
+            }
+          });
+      }
+
+      logsBtn.onclick = function() {
+        var apiKey = localStorage.getItem('miuu_api_key');
+        if (!apiKey) {
+          apiKey = prompt('Enter Premium API Key to view logs:');
+          if (apiKey) localStorage.setItem('miuu_api_key', apiKey);
+        }
+        if (apiKey) {
+          logsModal.style.display = 'flex';
+          loadLogList();
+        }
+      };
+
+      logsModal.querySelector('.m-logs-close').onclick = function() {
+        logsModal.style.display = 'none';
+      };
+
       document.body.style.overflow = 'hidden';
 
       anime.timeline({

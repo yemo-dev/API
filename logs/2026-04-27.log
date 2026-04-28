@@ -1,0 +1,2 @@
+[2026-04-28T01:03:06.058Z] [INFO] HEAD 200 /api/auth/check {"ip":"unknown","apiKey":"Guest","duration":"16.17ms"}
+[2026-04-28T01:04:06.800Z] [INFO] HEAD 200 /api/auth/check {"ip":"unknown","apiKey":"Guest","duration":"14.78ms"}

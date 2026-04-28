@@ -2,6 +2,7 @@ export const apiKeys = [
   {
     name: 'Administrator',
     key: 'a8d9f1c2b3e4a5c6',
+    type: 'Premium',
     limit: 0,
     windowMs: 10 * 60 * 1000
   }
