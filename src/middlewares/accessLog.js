@@ -12,6 +12,18 @@ export const logApiRequest = async (c, next) => {
              headers['x-forwarded-for']?.split(',')[0] || 
              headers['x-real-ip']
     
+    if (!ip) {
+        try {
+            const { getConnInfo } = await import('@hono/node-server/conninfo')
+            const info = getConnInfo(c)
+            ip = info.remote.address
+        } catch (e) {
+            ip = '127.0.0.1'
+        }
+    }
+    if (ip === '::1') ip = '127.0.0.1'
+    if (ip?.startsWith('::ffff:')) ip = ip.replace('::ffff:', '')
+    
     await next()
     const end = performance.now()
     const duration = (end - start).toFixed(2)
