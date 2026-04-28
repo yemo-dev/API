@@ -34,13 +34,6 @@ export const scalarConfig = {
     persistAuth: false,
     /** Enable Scalar telemetry */
     telemetry: true,
-    /** Custom external URLs for Scalar services */
-    externalUrls: {
-        dashboardUrl: 'https://dashboard.scalar.com',
-        registryUrl: 'https://registry.scalar.com',
-        proxyUrl: 'https://proxy.scalar.com',
-        apiBaseUrl: 'https://api.scalar.com'
-    },
     /** Allow editing the OpenAPI document from UI */
     isEditable: false,
     /** Show initial loading state */
