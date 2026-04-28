@@ -1,43 +1,33 @@
 /**
- * Sponsor Ads Configuration
- *
- * enabled   — Toggle the entire ads feature on/off (true | false).
- * delayMs   — Delay in milliseconds before the modal appears after page load (default: 3500).
- * title     — Title text shown in the modal header.
- * sponsors  — Array of sponsor objects. Add as many as you need.
- * footerText — Footer message inside the modal.
- *
- * ── Sponsor Object Fields ──
- * name      — Sponsor's display name.
- * type      — Sponsor category label. Recommended values:
- *               'Hosting Provider'    — Web / cloud hosting services
- *               'API Provider'        — Third-party API services
- *               'CDN Provider'        — Content delivery network
- *               'Developer Tool'      — Libraries, tools, IDEs, etc.
- *               'Security Partner'    — VPN, firewall, DDoS protection
- *               'Community Partner'   — Discord, forums, communities
- *               'Media Partner'       — Streaming, media platforms
- *               'Custom'              — Any other category
- *
- * logoUrl   — Sponsor logo. Supports:
- *               Local path  : '/assets/sponsor-logo.png'  (place in src/public/assets/)
- *               Remote URL  : 'https://example.com/logo.png'
- *               Recommended : Square image, minimum 72x72px (displayed as 36x36 circle)
- *
- * bannerUrl — Sponsor banner image. Supports:
- *               Local path  : '/assets/sponsor-banner.jpg' (place in src/public/assets/)
- *               Remote URL  : 'https://example.com/banner.jpg'
- *               Recommended : 1200x400px (3:1 ratio), max-height rendered is 210px
- *
- * targetUrl — URL to open when user clicks the sponsor card.
- * bgColor   — Background color for the card body (hex or CSS color). Default: '#0d1117'
- * textColor — Text color for the card body. Default: '#ffffff'
+ * Configuration for the Sponsor Ads Modal
+ * This file defines the behavior and content of the sponsorship system.
  */
-
 export const adsConfig = {
+    /**
+     * Set to true to enable the sponsor modal on the dashboard
+     */
     enabled: true,
+
+    /**
+     * Delay before the modal appears (in milliseconds)
+     */
     delayMs: 3500,
+
+    /**
+     * The title displayed at the top of the modal
+     */
     title: 'Sponsored Partners',
+
+    /**
+     * List of sponsors to be displayed
+     * - name: Name of the sponsor
+     * - type: Label (e.g., Core Developer, Premium Sponsor)
+     * - logoUrl: URL to the sponsor's logo (1:1 ratio recommended)
+     * - bannerUrl: URL to the sponsor's banner image (3:1 ratio recommended)
+     * - targetUrl: URL to open when the card is clicked
+     * - bgColor: Optional background color for the card
+     * - textColor: Optional text color for the card
+     */
     sponsors: [
         {
             name: 'miuubyte',
@@ -45,9 +35,22 @@ export const adsConfig = {
             logoUrl: '/favicon.png',
             bannerUrl: '/assets/banner.jpg',
             targetUrl: 'https://github.com/miuubyte',
-            bgColor: '#0d1117',
+            bgColor: '#000000',
+            textColor: '#ffffff'
+        },
+        {
+            name: 'MiuuAPI Community',
+            type: 'Official Sponsor',
+            logoUrl: '/favicon.png',
+            bannerUrl: '/assets/banner.jpg',
+            targetUrl: 'https://github.com/miuubyte/API',
+            bgColor: '#000000',
             textColor: '#ffffff'
         }
     ],
+
+    /**
+     * Text displayed at the bottom of the modal
+     */
     footerText: 'Support our amazing infrastructure partners ❤'
 };
