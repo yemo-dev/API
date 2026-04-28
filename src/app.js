@@ -1,0 +1,117 @@
+import { OpenAPIHono } from '@hono/zod-openapi'
+import { renderApiReference } from '@scalar/client-side-rendering'
+import { cors } from 'hono/cors'
+import { secureHeaders } from 'hono/secure-headers'
+import { serveStatic } from '@hono/node-server/serve-static'
+import fs from 'node:fs'
+import path from 'node:path'
+
+import logger from './utils/logger.js'
+import { appConfig, openApiConfig, scalarConfig } from './configs/app.js'
+import { setupRoutes } from './routes/index.js'
+import { logApiRequest } from './middlewares/accessLog.js'
+import { rateLimiter } from './middlewares/rateLimit.js'
+import { prettyPrint } from './middlewares/pretty.js'
+import { buildBrandingScript } from './custom/index.js'
+
+export const app = new OpenAPIHono()
+
+app.use('*', secureHeaders())
+app.use('*', cors({
+    origin: '*',
+    allowHeaders: ['X-RateLimit-Limit', 'X-RateLimit-Remaining', 'x-api-key', 'Authorization', 'Content-Type'],
+    exposeHeaders: ['X-RateLimit-Limit', 'X-RateLimit-Remaining']
+}))
+app.use('*', logApiRequest)
+app.use('*', prettyPrint)
+app.use('*', rateLimiter())
+app.use('/assets/*', serveStatic({ root: './src/public' }))
+
+app.get('/favicon.ico', (c) => {
+    try {
+        const iconPath = path.resolve('src/public/favicon.ico')
+        if (fs.existsSync(iconPath)) {
+            const icon = fs.readFileSync(iconPath)
+            c.header('Content-Type', 'image/x-icon')
+            c.header('Cache-Control', 'public, max-age=3600')
+            return c.body(icon)
+        }
+    } catch (e) {}
+    return c.notFound()
+})
+
+setupRoutes(app)
+
+app.openAPIRegistry.registerComponent('securitySchemes', 'ApiKeyAuth', {
+    type: 'apiKey',
+    in: 'header',
+    name: 'x-api-key',
+    description: 'Enter your custom API Key to get higher rate limits.'
+})
+
+app.get('/docs', (c) => {
+    const url = new URL(c.req.url)
+    const proto = c.req.header('x-forwarded-proto') || (url.protocol.includes('https') || c.req.header('cf-visitor')?.includes('https') ? 'https' : 'http')
+    const host = c.req.header('x-forwarded-host') || c.req.header('host') || url.host
+    const origin = `${proto}://${host}`
+    const fullSpec = app.getOpenAPIDocument(openApiConfig)
+    return c.json({
+        ...fullSpec,
+        servers: [
+            { url: origin, description: 'Current Server' },
+            ...(fullSpec.servers || []).filter(s => s.url !== origin)
+        ]
+    })
+})
+
+app.get('/', (c) => {
+    const { branding, ...config } = scalarConfig
+    let html = renderApiReference({
+        config: { ...config, spec: { url: '/docs' } },
+        pageTitle: `${appConfig.title} - Documentation Portal`
+    })
+
+    let faviconDataUri = ''
+    try {
+        const iconPath = path.resolve('src/public/favicon.ico')
+        if (fs.existsSync(iconPath)) {
+            const base64 = fs.readFileSync(iconPath).toString('base64')
+            faviconDataUri = `data:image/png;base64,${base64}`
+        }
+    } catch (e) {}
+
+    html = html.replace(/(<html)([^>]*)>/, '$1 lang="en" translate="no"$2>')
+    html = html.replace('<head>', '<head><meta name="google" content="notranslate"><meta http-equiv="Content-Language" content="en"><meta name="language" content="English">')
+    
+    const faviconTags = faviconDataUri 
+        ? `<link rel="icon" type="image/png" href="${faviconDataUri}"><link rel="shortcut icon" type="image/png" href="${faviconDataUri}"><link rel="apple-touch-icon" href="${faviconDataUri}">`
+        : '<link rel="icon" type="image/x-icon" href="/favicon.ico"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/favicon.ico">'
+    
+    html = html.replace('</head>', `${faviconTags}</head>`)
+    html = html.replace('<body>', '<body class="notranslate">')
+    html = html.replace('</body>', `${buildBrandingScript()}</body>`)
+    c.header('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
+    c.header('Pragma', 'no-cache')
+    c.header('Expires', '0')
+    c.header('Content-Language', 'en')
+    return c.html(html)
+})
+
+app.notFound((c) => {
+    return c.json({
+        success: false,
+        status: 404,
+        error: 'Not Found',
+        message: `Route ${c.req.method} ${c.req.path} not found.`
+    }, 404)
+})
+
+app.onError(async (err, c) => {
+    logger.error(`[Error] ${err.message}`)
+    return c.json({
+        success: false,
+        status: 500,
+        error: 'Internal Server Error',
+        message: err.message || 'An unexpected error occurred.'
+    }, 500)
+})

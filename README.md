@@ -2,6 +2,23 @@
 
 MiuuAPI is a high-performance, production-ready API gateway and documentation portal built on a modular Hono architecture. It features a native Node.js clustering engine, real-time security monitoring, and a premium AnimeJS-powered user interface.
 
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fmiuubyte%2FAPI)
+
+---
+
+## Deployment Modes
+
+### 1. VPS / Dedicated (Recommended)
+Best for high-performance and persistent security.
+- **Multicore Sync**: Full utilization of all CPU cores via Node.js clustering.
+- **Persistent Bans**: IP bans are saved to `bans.json` and persist across restarts.
+- **Command**: `npm run start` (standalone) or `npm run dev:cluster` (cluster)
+
+### 2. Vercel / Serverless
+Best for zero-config scaling and low cost.
+- **Architecture**: Runs as an ephemeral serverless function.
+- **Limitations**: `bans.json` is read-only. Auto-bans will only persist in memory for the duration of the function's execution.
+
 ---
 
 ## Key Features
