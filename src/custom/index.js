@@ -432,6 +432,140 @@ export function buildBrandingScript(scalarConfig) {
         }, cfg.delayMs);
       }
 
+      // Admin Settings Logic
+      const adminKey = 'a8d9f1c2b3e4a5c6';
+      let settingsButton = null;
+
+      const createSettingsModal = () => {
+          const modal = document.createElement('div');
+          modal.id = 'miuu-settings-modal';
+          modal.style = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;z-index:10000;backdrop-filter:blur(10px);padding:20px;box-sizing:border-box;';
+          
+          const container = document.createElement('div');
+          container.style = 'background:#1a1a1a;width:100%;max-width:500px;border-radius:16px;padding:28px;border:1px solid #333;color:white;font-family:sans-serif;max-height:90vh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,0.8);';
+          
+          container.innerHTML = \`
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+                  <h2 style="margin:0;font-size:22px;background:linear-gradient(90deg, #00a3ff, #00ff88);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800;">Portal Settings</h2>
+                  <button id="miuu-close-settings" style="background:none;border:none;color:#666;cursor:pointer;font-size:28px;line-height:1;">&times;</button>
+              </div>
+              <div style="margin-bottom:20px;">
+                  <label style="display:block;margin-bottom:8px;color:#888;font-size:12px;text-transform:uppercase;letter-spacing:1px;font-weight:600;">Layout Engine</label>
+                  <select id="miuu-set-layout" style="width:100%;padding:12px;background:#222;border:1px solid #333;color:white;border-radius:8px;font-size:14px;outline:none;transition:border-color 0.3s ease;">
+                      <option value="modern">Modern (Recommended)</option>
+                      <option value="classic">Classic (Compact)</option>
+                  </select>
+              </div>
+              <div style="margin-bottom:20px;">
+                  <label style="display:block;margin-bottom:8px;color:#888;font-size:12px;text-transform:uppercase;letter-spacing:1px;font-weight:600;">Color Theme</label>
+                  <select id="miuu-set-theme" style="width:100%;padding:12px;background:#222;border:1px solid #333;color:white;border-radius:8px;font-size:14px;outline:none;transition:border-color 0.3s ease;">
+                      <option value="none">None (System/Custom)</option>
+                      <option value="alternate">Alternate</option>
+                      <option value="moon">Moon</option>
+                      <option value="purple">Purple</option>
+                      <option value="solarized">Solarized</option>
+                      <option value="bluePlanet">Blue Planet</option>
+                      <option value="saturn">Saturn</option>
+                      <option value="kepler">Kepler</option>
+                      <option value="mars">Mars</option>
+                      <option value="deepSpace">Deep Space</option>
+                  </select>
+              </div>
+              <div style="margin-bottom:20px;">
+                  <label style="display:block;margin-bottom:8px;color:#888;font-size:12px;text-transform:uppercase;letter-spacing:1px;font-weight:600;">Footer Text</label>
+                  <input id="miuu-set-footer-text" type="text" style="width:100%;padding:12px;background:#222;border:1px solid #333;color:white;border-radius:8px;font-size:14px;outline:none;">
+              </div>
+               <div style="margin-bottom:20px;">
+                  <label style="display:block;margin-bottom:8px;color:#888;font-size:12px;text-transform:uppercase;letter-spacing:1px;font-weight:600;">Discord Link</label>
+                  <input id="miuu-set-discord-url" type="text" style="width:100%;padding:12px;background:#222;border:1px solid #333;color:white;border-radius:8px;font-size:14px;outline:none;">
+              </div>
+              <div style="display:flex;gap:12px;margin-top:32px;">
+                  <button id="miuu-save-settings" style="flex:1;padding:14px;background:linear-gradient(135deg, #00a3ff, #0066ff);color:white;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-size:14px;transition:transform 0.2s active;">Save Changes</button>
+              </div>
+          \`;
+          
+          modal.appendChild(container);
+          document.body.appendChild(modal);
+
+          // Pre-fill values
+          const sc = ${JSON.stringify(scalarConfig)};
+          document.getElementById('miuu-set-layout').value = sc.layout || 'modern';
+          document.getElementById('miuu-set-theme').value = sc.theme || 'none';
+          document.getElementById('miuu-set-footer-text').value = sc.customBranding?.footer?.text || 'Powered by miuubyte';
+          document.getElementById('miuu-set-discord-url').value = sc.customBranding?.clientButton?.url || 'https://discord.gg/Gj8CUjCtav';
+
+          document.getElementById('miuu-close-settings').onclick = () => modal.remove();
+          document.getElementById('miuu-save-settings').onclick = async () => {
+              const btn = document.getElementById('miuu-save-settings');
+              btn.textContent = 'Saving...';
+              btn.disabled = true;
+
+              const updatedConfig = {
+                  ...sc,
+                  layout: document.getElementById('miuu-set-layout').value,
+                  theme: document.getElementById('miuu-set-theme').value,
+                  customBranding: {
+                      ...sc.customBranding,
+                      footer: {
+                          ...sc.customBranding?.footer,
+                          text: document.getElementById('miuu-set-footer-text').value
+                      },
+                      clientButton: {
+                          ...sc.customBranding?.clientButton,
+                          url: document.getElementById('miuu-set-discord-url').value
+                      }
+                  }
+              };
+
+              try {
+                  const res = await fetch('/api/admin/config', {
+                      method: 'POST',
+                      headers: { 
+                          'Content-Type': 'application/json',
+                          'x-api-key': adminKey
+                      },
+                      body: JSON.stringify(updatedConfig)
+                  });
+                  if (res.ok) {
+                      location.reload();
+                  } else {
+                      alert('Failed to save configuration');
+                      btn.textContent = 'Save Changes';
+                      btn.disabled = false;
+                  }
+              } catch (e) {
+                  alert('Error: ' + e.message);
+                  btn.textContent = 'Save Changes';
+                  btn.disabled = false;
+              }
+          };
+      };
+
+      const checkAdmin = () => {
+          const authInput = document.querySelector('input[aria-label="Value"], input[type="password"]');
+          const currentVal = authInput ? authInput.value : '';
+          
+          if (currentVal === adminKey) {
+              if (!settingsButton) {
+                  settingsButton = document.createElement('button');
+                  settingsButton.innerHTML = '⚙️ Portal Settings';
+                  settingsButton.style = 'position:fixed;bottom:24px;left:24px;z-index:9999;padding:12px 20px;background:rgba(26,26,26,0.9);color:white;border:1px solid #444;border-radius:12px;cursor:pointer;font-size:13px;font-weight:700;box-shadow:0 8px 30px rgba(0,0,0,0.6);backdrop-filter:blur(10px);transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1);display:flex;align-items:center;gap:8px;';
+                  settingsButton.onmouseover = () => { settingsButton.style.transform = 'translateY(-4px)'; settingsButton.style.borderColor = '#00a3ff'; };
+                  settingsButton.onmouseout = () => { settingsButton.style.transform = 'translateY(0)'; settingsButton.style.borderColor = '#444'; };
+                  settingsButton.onclick = createSettingsModal;
+                  document.body.appendChild(settingsButton);
+              }
+          } else {
+              if (settingsButton) {
+                  settingsButton.remove();
+                  settingsButton = null;
+              }
+          }
+      };
+
+      document.addEventListener('input', (e) => { if (e.target.tagName === 'INPUT') checkAdmin(); });
+      setInterval(checkAdmin, 2000);
+
       customizeUI();
       initSponsorModal();
       var observer = new MutationObserver(customizeUI);
