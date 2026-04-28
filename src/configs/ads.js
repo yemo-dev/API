@@ -35,19 +35,19 @@
  */
 
 export const adsConfig = {
-    enabled: false,
+    enabled: true,
     delayMs: 3500,
-    title: 'Sponsored Ads',
+    title: 'Sponsored Partners',
     sponsors: [
         {
-            name: '',
+            name: 'Miuu Cloud',
             type: 'Hosting Provider',
-            logoUrl: '',
-            bannerUrl: '',
-            targetUrl: '',
+            logoUrl: '/favicon.png',
+            bannerUrl: '/assets/banner.jpg',
+            targetUrl: 'https://github.com/miuubyte',
             bgColor: '#0d1117',
             textColor: '#ffffff'
         }
     ],
-    footerText: 'Support these amazing services ❤'
+    footerText: 'Support our amazing infrastructure partners ❤'
 };
