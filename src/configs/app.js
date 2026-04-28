@@ -13,10 +13,21 @@ export const appConfig = {
 }
 
 export const scalarConfig = {
+    theme: 'none',
+    layout: 'modern',
+    isEditable: false,
+    hideModels: false,
+    hideSearch: false,
+    showOperationId: false,
+    hideDarkModeToggle: false,
+    withDefaultFonts: true,
+    defaultOpenFirstTag: true,
+    defaultOpenAllTags: false,
+    showDeveloperTools: true,
+    showToolbar: true,
     authentication: {
         preferredSecurityScheme: 'ApiKeyAuth'
     },
-    theme: 'none',
     customBranding: {
         footer: {
             text: 'Powered by miuubyte',
