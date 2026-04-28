@@ -171,219 +171,176 @@ export function buildBrandingScript() {
         }
       });
 
+      var isProcessing = false;
       function customizeUI() {
-        var targets = document.querySelectorAll('.scalar-mcp-layer, .scalar-mcp-layer-link, .mcp-logo, .ask-agent-scalar-input-label, [data-v-78f5377c]');
-        for (var i = 0; i < targets.length; i++) targets[i].remove();
+        if (isProcessing) return;
+        isProcessing = true;
+        try {
+          var targets = document.querySelectorAll('.scalar-mcp-layer, .scalar-mcp-layer-link, .mcp-logo, .ask-agent-scalar-input-label, [data-v-78f5377c]');
+          for (var i = 0; i < targets.length; i++) targets[i].remove();
 
-        var buttons = document.querySelectorAll('button');
-        buttons.forEach(function(btn) {
-          var txt = btn.innerText || '';
-          if (txt.includes('Ask AI') || txt.includes('Deploy') || txt.includes('Share') || txt.includes('Developer Tools')) {
-            btn.style.setProperty('display', 'none', 'important');
+          var buttons = document.querySelectorAll('button');
+          buttons.forEach(function(btn) {
+            var txt = btn.innerText || '';
+            if (txt.includes('Ask AI') || txt.includes('Deploy') || txt.includes('Share') || txt.includes('Developer Tools')) {
+              btn.style.setProperty('display', 'none', 'important');
+            }
+          });
+
+          var allLinks = document.querySelectorAll('a, span');
+          allLinks.forEach(function(el) {
+            var txt = el.innerText || '';
+            if (txt.includes('Developer Tools')) {
+              el.style.setProperty('display', 'none', 'important');
+            }
+          });
+
+          var configTitles = document.querySelectorAll('span.text-base.font-medium.text-c-1');
+          configTitles.forEach(function(el) {
+            if (el.innerText === 'Scalar Configuration') {
+              el.innerText = 'Configuration';
+            }
+          });
+
+          var footerLink = document.querySelector('.scalar-footer-link, a[href*="scalar.com"]');
+          if (footerLink && footerLink.innerText !== ${JSON.stringify(footer.text)}) {
+            footerLink.href = ${JSON.stringify(footer.url)};
+            footerLink.innerText = ${JSON.stringify(footer.text)};
           }
-        });
 
-        var allLinks = document.querySelectorAll('a, span');
-        allLinks.forEach(function(el) {
-          var txt = el.innerText || '';
-          if (txt.includes('Developer Tools')) {
-            el.style.setProperty('display', 'none', 'important');
+          var clientButtons = document.querySelectorAll('.open-api-client-button');
+          clientButtons.forEach(function(btn) {
+            if (!btn.classList.contains('m-discord-btn')) {
+              btn.classList.add('m-discord-btn');
+              btn.href = ${JSON.stringify(clientButton.url)};
+              btn.target = '_blank';
+              btn.innerHTML = ${JSON.stringify(btnIcon + ' ' + clientButton.text)};
+            }
+          });
+
+          var introText = Array.from(document.querySelectorAll('span, p')).find(el => el.innerText.includes('A simple and easy to use API') || el.innerText.includes('Star to support our work'));
+          if (introText && !document.querySelector('.m-intro-banner')) {
+            var introSection = introText.closest('section');
+            if (introSection) introSection.classList.add('introduction');
+            var wrapper = document.createElement('div');
+            wrapper.className = 'm-banner-wrapper';
+            wrapper.innerHTML = '<img class="m-intro-banner" src="/assets/banner.jpg" alt="Banner">';
+            introText.parentElement.appendChild(wrapper);
           }
-        });
+          
+          var emailBtn = document.querySelector('a[href*="mailto:"]');
+          if (emailBtn && !document.getElementById('status-indicator-btn')) {
+            var statusBtn = document.createElement('div');
+            statusBtn.id = 'status-indicator-btn';
+            statusBtn.className = 'cl-btn mr-2';
+            statusBtn.innerHTML = '<div class="cl-btn-dot checking" id="status-dot"></div><span id="status-text">STATUS: Checking...</span>';
+            emailBtn.parentNode.insertBefore(statusBtn, emailBtn);
 
-        var configTitles = document.querySelectorAll('span.text-base.font-medium.text-c-1');
-        configTitles.forEach(function(el) {
-          if (el.innerText.includes('Scalar Configuration')) {
-            el.innerText = 'Configuration';
-          }
-        });
-
-        var footerLink = document.querySelector('.scalar-footer-link, a[href*="scalar.com"]');
-        if (footerLink) {
-          footerLink.href = ${JSON.stringify(footer.url)};
-          footerLink.innerText = ${JSON.stringify(footer.text)};
-        }
-
-        var clientButtons = document.querySelectorAll('.open-api-client-button');
-        clientButtons.forEach(function(btn) {
-          if (!btn.classList.contains('m-discord-btn')) {
-            btn.classList.add('m-discord-btn');
-            btn.href = ${JSON.stringify(clientButton.url)};
-            btn.target = '_blank';
-            btn.innerHTML = ${JSON.stringify(btnIcon + ' ' + clientButton.text)};
-          }
-        });
-
-        var introText = Array.from(document.querySelectorAll('span, p')).find(el => el.innerText.includes('A simple and easy to use API') || el.innerText.includes('Star to support our work'));
-        if (introText && !document.querySelector('.m-intro-banner')) {
-          var introSection = introText.closest('section');
-          if (introSection) introSection.classList.add('introduction');
-          var wrapper = document.createElement('div');
-          wrapper.className = 'm-banner-wrapper';
-          wrapper.innerHTML = '<img class="m-intro-banner" src="/assets/banner.jpg" alt="Banner">';
-          introText.parentElement.appendChild(wrapper);
-        }
-        
-        var emailBtn = document.querySelector('a[href*="mailto:"]');
-        if (emailBtn && !document.getElementById('status-indicator-btn')) {
-          var statusBtn = document.createElement('div');
-          statusBtn.id = 'status-indicator-btn';
-          statusBtn.className = 'cl-btn mr-2';
-          statusBtn.innerHTML = '<div class="cl-btn-dot checking" id="status-dot"></div><span id="status-text">STATUS: Checking...</span>';
-          emailBtn.parentNode.insertBefore(statusBtn, emailBtn);
-
-          window.fetch('/api/stats', { method: 'HEAD' }).then(function(res) {
-            var dot = document.getElementById('status-dot');
-            var txt = document.getElementById('status-text');
-            if (dot && txt) {
-              dot.classList.remove('checking');
-              if (res.ok) {
-                dot.classList.add('up');
-                txt.innerText = 'STATUS: Online';
-              } else {
+            window.fetch('/api/stats', { method: 'HEAD' }).then(function(res) {
+              var dot = document.getElementById('status-dot');
+              var txt = document.getElementById('status-text');
+              if (dot && txt) {
+                dot.classList.remove('checking');
+                if (res.ok) {
+                  dot.classList.add('up');
+                  txt.innerText = 'STATUS: Online';
+                } else {
+                  dot.classList.add('down');
+                  txt.innerText = 'STATUS: Offline';
+                }
+              }
+            }).catch(function() {
+              var dot = document.getElementById('status-dot');
+              var txt = document.getElementById('status-text');
+              if (dot && txt) {
+                dot.classList.remove('checking');
                 dot.classList.add('down');
                 txt.innerText = 'STATUS: Offline';
               }
-            }
-          }).catch(function() {
-            var dot = document.getElementById('status-dot');
-            var txt = document.getElementById('status-text');
-            if (dot && txt) {
-              dot.classList.remove('checking');
-              dot.classList.add('down');
-              txt.innerText = 'STATUS: Offline';
-            }
-          });
-        }
-
-        if (!document.getElementById('m-rl-widget')) {
-          var rlWidget = document.createElement('div');
-          rlWidget.id = 'm-rl-widget';
-          rlWidget.className = 'm-rl-widget';
-          rlWidget.innerHTML = '<div class="cl-btn-dot checking" id="rl-dot"></div><span class="m-rl-label">Rate Limit</span><div class="m-rl-val-box" id="m-rl-val-container"><span id="m-rl-val" class="m-rl-val">--</span><span class="m-rl-sep">/</span><span id="m-rl-limit" class="m-rl-val">--</span></div>';
-          document.body.appendChild(rlWidget);
-
-          async function updateRL() {
-            try {
-              var apiKey = localStorage.getItem('miuu_api_key') || '';
-              
-              if (!apiKey) {
-                var allStorage = { ...localStorage, ...sessionStorage };
-                Object.keys(allStorage).forEach(function(k) {
-                  try {
-                    var data = allStorage[k];
-                    if (typeof data !== 'string') return;
-                    if (data.indexOf('a8d9f1c2b3e4a5c6') !== -1) {
-                      apiKey = 'a8d9f1c2b3e4a5c6';
-                    } else if (!apiKey) {
-                      var match = data.match(/[a-f0-9]{16}/);
-                      if (match) apiKey = match[0];
-                    }
-                  } catch(e) {}
-                });
-              }
-
-              if (!apiKey) {
-                var inputs = document.querySelectorAll('input');
-                for (var i = 0; i < inputs.length; i++) {
-                  var v = inputs[i].value || '';
-                  if (v.length === 16 && /[a-f0-9]{16}/.test(v)) {
-                    apiKey = v;
-                    break;
-                  }
-                }
-              }
-
-              var url = '/api/auth/check?t=' + Date.now();
-              var headers = { 'Accept': 'application/json' };
-              if (apiKey) {
-                headers['x-api-key'] = apiKey;
-                url += '&apikey=' + apiKey;
-              }
-
-              var res = await window.fetch(url, { method: 'HEAD', headers: headers });
-              var remaining = res.headers.get('x-ratelimit-remaining');
-              var limit = res.headers.get('x-ratelimit-limit');
-              
-              var container = document.getElementById('m-rl-val-container');
-              var dot = document.getElementById('rl-dot');
-
-              if (container) {
-                if (limit === 'UNLIMITED' || limit === 'Unlimited' || limit === '0') {
-                  container.innerHTML = '<span id="m-rl-val" class="m-rl-val unlimited">∞</span>';
-                  container.classList.add('unlimited-box');
-                  if (dot) dot.className = 'cl-btn-dot up';
-                } else if (remaining !== null && limit !== null) {
-                  container.classList.remove('unlimited-box');
-                  if (!document.getElementById('m-rl-limit')) {
-                    container.innerHTML = '<span id="m-rl-val" class="m-rl-val">--</span><span class="m-rl-sep">/</span><span id="m-rl-limit" class="m-rl-val">--</span>';
-                  }
-                  var curValEl = document.getElementById('m-rl-val');
-                  var curLimitEl = document.getElementById('m-rl-limit');
-                  if (curValEl) curValEl.innerText = remaining;
-                  if (curLimitEl) curLimitEl.innerText = limit;
-                  
-                  var remainingNum = parseInt(remaining, 10);
-                  var limitNum = parseInt(limit, 10);
-                  if (dot && !isNaN(remainingNum) && !isNaN(limitNum)) {
-                    var percentage = (remainingNum / limitNum) * 100;
-                    dot.className = 'cl-btn-dot ' + (percentage > 30 ? 'up' : (percentage > 0 ? 'warn' : 'down'));
-                  }
-                }
-              }
-            } catch(e) {}
+            });
           }
-          setInterval(updateRL, 3000);
-          updateRL();
-        }
-      }
 
-      function showToast(msg) {
-          var toast = document.createElement('div');
-          toast.style.cssText = 'position:fixed;bottom:24px;right:24px;background:var(--scalar-background-1);color:var(--scalar-color-1);border:1px solid #ef4444;padding:12px 20px;border-radius:8px;font-size:14px;font-weight:600;z-index:99999;box-shadow:0 10px 15px -3px rgba(0,0,0,0.2);opacity:0;transform:translateY(20px);transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1);display:flex;align-items:center;gap:12px;font-family:var(--scalar-font);';
-          toast.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg><span>' + msg + '</span>';
-          document.body.appendChild(toast);
-          
-          requestAnimationFrame(function() {
-              toast.style.opacity = '1';
-              toast.style.transform = 'translateY(0)';
-          });
-          
-          setTimeout(function() {
-              toast.style.opacity = '0';
-              toast.style.transform = 'translateY(20px)';
-              setTimeout(function() { toast.remove(); }, 300);
-          }, 3500);
+          if (!document.getElementById('m-rl-widget')) {
+            var rlWidget = document.createElement('div');
+            rlWidget.id = 'm-rl-widget';
+            rlWidget.className = 'm-rl-widget';
+            rlWidget.innerHTML = '<div class="cl-btn-dot checking" id="rl-dot"></div><span class="m-rl-label">Rate Limit</span><div class="m-rl-val-box" id="m-rl-val-container"><span id="m-rl-val" class="m-rl-val">--</span><span class="m-rl-sep">/</span><span id="m-rl-limit" class="m-rl-val">--</span></div>';
+            document.body.appendChild(rlWidget);
+
+            async function updateRL() {
+              try {
+                var apiKey = localStorage.getItem('miuu_api_key') || '';
+                var url = '/api/auth/check?t=' + Date.now();
+                var headers = { 'Accept': 'application/json' };
+                if (apiKey) {
+                  headers['x-api-key'] = apiKey;
+                  url += '&apikey=' + apiKey;
+                }
+
+                var res = await window.fetch(url, { method: 'HEAD', headers: headers });
+                var remaining = res.headers.get('x-ratelimit-remaining');
+                var limit = res.headers.get('x-ratelimit-limit');
+                
+                var container = document.getElementById('m-rl-val-container');
+                var dot = document.getElementById('rl-dot');
+
+                if (container && remaining !== null && limit !== null) {
+                  if (limit === 'UNLIMITED' || limit === 'Unlimited' || limit === '0') {
+                    container.innerHTML = '<span id="m-rl-val" class="m-rl-val unlimited">∞</span>';
+                    container.classList.add('unlimited-box');
+                    if (dot) dot.className = 'cl-btn-dot up';
+                  } else {
+                    container.classList.remove('unlimited-box');
+                    var curValEl = document.getElementById('m-rl-val');
+                    var curLimitEl = document.getElementById('m-rl-limit');
+                    if (curValEl) curValEl.innerText = remaining;
+                    if (curLimitEl) curLimitEl.innerText = limit;
+                    
+                    var remainingNum = parseInt(remaining, 10);
+                    var limitNum = parseInt(limit, 10);
+                    if (dot && !isNaN(remainingNum) && !isNaN(limitNum)) {
+                      var percentage = (remainingNum / limitNum) * 100;
+                      dot.className = 'cl-btn-dot ' + (percentage > 30 ? 'up' : (percentage > 0 ? 'warn' : 'down'));
+                    }
+                  }
+                }
+              } catch(e) {}
+            }
+            setInterval(updateRL, 5000);
+            updateRL();
+          }
+        } finally {
+          isProcessing = false;
+        }
       }
 
       function initSponsorModal() {
         var cfg = ${JSON.stringify(adsConfig)};
-        if (!cfg.enabled) return;
-        if (!cfg.sponsors || cfg.sponsors.length === 0) return;
+        if (!cfg.enabled || !cfg.sponsors || cfg.sponsors.length === 0) return;
         
-        var cardsHTML = cfg.sponsors.map(function(s) {
-          return '<div class="sponsor-card" onclick="window.open(\\'' + s.targetUrl + '\\', \\'_blank\\')">' +
-            '<div class="sponsor-card-header">' +
-              '<div class="sponsor-logo"><img src="' + s.logoUrl + '" alt="' + s.name + '" onerror="this.style.display=\\'none\\'"></div>' +
-              '<div class="sponsor-info">' +
-                '<h4 class="sponsor-name">' + s.name + '</h4>' +
-                '<span class="sponsor-type">' + (s.type || 'Sponsor') + '</span>' +
-              '</div>' +
-            '</div>' +
-            '<div class="sponsor-card-body">' +
-              '<img src="' + s.bannerUrl + '" class="sponsor-banner-image" alt="' + s.name + ' banner">' +
-            '</div>' +
-          '</div>';
-        }).join('');
-
         var overlay = document.createElement('div');
         overlay.className = 'sponsor-modal-overlay';
         overlay.innerHTML = '<div class="sponsor-modal">' +
           '<div class="sponsor-modal-header">' +
             '<h3 class="sponsor-modal-title">' + cfg.title + '</h3>' +
-            '<button class="sponsor-close-btn" aria-label="Close"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>' +
+            '<button class="sponsor-close-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>' +
           '</div>' +
-          '<div class="sponsor-modal-body">' + cardsHTML + '</div>' +
+          '<div class="sponsor-modal-body">' + 
+            cfg.sponsors.map(function(s) {
+              return '<div class="sponsor-card" data-url="' + s.targetUrl + '">' +
+                '<div class="sponsor-card-header">' +
+                  '<div class="sponsor-logo"><img src="' + s.logoUrl + '" alt="' + s.name + '" onerror="this.style.display=\\'none\\'"></div>' +
+                  '<div class="sponsor-info">' +
+                    '<h4 class="sponsor-name">' + s.name + '</h4>' +
+                    '<span class="sponsor-type">' + (s.type || 'Sponsor') + '</span>' +
+                  '</div>' +
+                '</div>' +
+                '<div class="sponsor-card-body">' +
+                  '<img src="' + s.bannerUrl + '" class="sponsor-banner-image" alt="' + s.name + '">' +
+                '</div>' +
+              '</div>';
+            }).join('') + 
+          '</div>' +
           '<div class="sponsor-modal-footer">' +
             '<p class="sponsor-support-text">' + cfg.footerText + '</p>' +
           '</div>' +
@@ -391,14 +348,18 @@ export function buildBrandingScript() {
         
         document.body.appendChild(overlay);
         
-        function closeModal() {
+        document.querySelectorAll('.sponsor-card').forEach(function(card) {
+          card.addEventListener('click', function() {
+            window.open(this.getAttribute('data-url'), '_blank');
+          });
+        });
+
+        overlay.querySelector('.sponsor-close-btn').addEventListener('click', function() {
           anime.timeline({ easing: 'easeInQuad' })
             .add({ targets: '.sponsor-card', translateY: [0, 16], opacity: [1, 0], duration: 200, delay: anime.stagger(50) })
             .add({ targets: '.sponsor-modal', scale: [1, 0.9], opacity: [1, 0], duration: 280 }, '-=100')
             .add({ targets: overlay, opacity: [1, 0], duration: 250, complete: function() { overlay.remove(); } }, '-=200');
-        }
-
-        overlay.querySelector('.sponsor-close-btn').addEventListener('click', closeModal);
+        });
 
         setTimeout(function() {
           anime({ targets: overlay, opacity: [0, 1], duration: 400, easing: 'easeOutQuad', begin: function() { overlay.style.pointerEvents = 'auto'; } });

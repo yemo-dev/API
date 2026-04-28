@@ -14,13 +14,12 @@ export const adsCSS = `
     justify-content: center;
     opacity: 0;
     pointer-events: none;
-    padding: 0;
     transition: opacity 0.6s cubic-bezier(0.23, 1, 0.32, 1);
   }
 
   .sponsor-modal {
-    width: 100%;
-    max-width: 440px;
+    width: 90%;
+    max-width: 420px;
     max-height: 80vh;
     background: var(--scalar-background-1);
     border: 1px solid var(--scalar-border-color);
@@ -33,21 +32,20 @@ export const adsCSS = `
     display: flex;
     flex-direction: column;
     transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-    margin: 16px;
   }
 
   .sponsor-modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 16px;
+    padding: 10px 14px;
     background: var(--scalar-background-2);
     border-bottom: 1px solid var(--scalar-border-color);
     flex-shrink: 0;
   }
 
   .sponsor-modal-title {
-    font-size: 9px;
+    font-size: 8.5px;
     font-weight: 800;
     color: var(--scalar-color-1);
     margin: 0;
@@ -60,8 +58,8 @@ export const adsCSS = `
     background: transparent;
     border: 1px solid var(--scalar-border-color);
     color: var(--scalar-color-3);
-    width: 24px;
-    height: 24px;
+    width: 22px;
+    height: 22px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -77,10 +75,10 @@ export const adsCSS = `
   }
 
   .sponsor-modal-body {
-    padding: 12px;
+    padding: 8px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 8px;
     overflow-y: auto;
     flex: 1;
     scrollbar-width: thin;
@@ -97,6 +95,7 @@ export const adsCSS = `
     position: relative;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
     flex-shrink: 0;
+    -webkit-tap-highlight-color: transparent;
   }
 
   .sponsor-card:hover {
@@ -115,8 +114,8 @@ export const adsCSS = `
   }
 
   .sponsor-logo {
-    width: 28px;
-    height: 28px;
+    width: 26px;
+    height: 26px;
     background: #5865F2;
     border-radius: 6px;
     display: flex;
@@ -124,6 +123,7 @@ export const adsCSS = `
     justify-content: center;
     overflow: hidden;
     flex-shrink: 0;
+    pointer-events: none;
   }
 
   .sponsor-logo img {
@@ -137,10 +137,11 @@ export const adsCSS = `
     display: flex;
     flex-direction: column;
     gap: 1px;
+    pointer-events: none;
   }
 
   .sponsor-name {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 800;
     color: var(--scalar-color-1);
     margin: 0;
@@ -148,7 +149,7 @@ export const adsCSS = `
   }
 
   .sponsor-type {
-    font-size: 7.5px;
+    font-size: 7px;
     font-weight: 900;
     color: #5865F2;
     letter-spacing: 0.08em;
@@ -165,6 +166,7 @@ export const adsCSS = `
     display: flex;
     align-items: center;
     justify-content: center;
+    pointer-events: none;
   }
 
   .sponsor-banner-image {
@@ -176,8 +178,13 @@ export const adsCSS = `
     transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
+  .sponsor-card:hover .sponsor-banner-image {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+
   .sponsor-modal-footer {
-    padding: 10px;
+    padding: 8px;
     text-align: center;
     background: var(--scalar-background-2);
     border-top: 1px solid var(--scalar-border-color);
@@ -185,7 +192,7 @@ export const adsCSS = `
   }
 
   .sponsor-support-text {
-    font-size: 8px;
+    font-size: 7.5px;
     color: var(--scalar-color-3);
     font-weight: 700;
     text-transform: uppercase;
@@ -194,25 +201,28 @@ export const adsCSS = `
 
   @media (max-width: 480px) {
     .sponsor-modal {
-      margin: 12px;
-      max-height: 85vh;
+      width: 94%;
+      margin: 0;
     }
     .sponsor-modal-body {
-      padding: 8px;
-      gap: 8px;
+      padding: 6px;
+      gap: 6px;
     }
     .sponsor-card-header {
       padding: 6px 10px;
     }
     .sponsor-logo {
-      width: 24px;
-      height: 24px;
+      width: 22px;
+      height: 22px;
     }
     .sponsor-name {
-      font-size: 11px;
+      font-size: 10.5px;
     }
     .sponsor-modal-footer {
-      padding: 8px;
+      padding: 6px;
+    }
+    .sponsor-support-text {
+      font-size: 7px;
     }
   }
 `;
