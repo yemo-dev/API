@@ -61,14 +61,15 @@ export function buildBrandingScript() {
       font-size: 13px;
       font-weight: 700;
       font-family: 'JetBrains Mono', 'Fira Code', monospace;
-      text-shadow: 0 0 12px rgba(61, 179, 255, 0.3);
+      text-shadow: 0 0 12px rgba(61, 179, 255, 0.4);
     }
     
     .m-rl-sep {
-      color: #4a4846;
-      font-size: 11px;
-      margin: 0 3px;
-      opacity: 0.8;
+      color: #ffffff;
+      font-size: 12px;
+      margin: 0 4px;
+      opacity: 0.4;
+      font-weight: 300;
     }
     
     .m-rl-val.unlimited {
