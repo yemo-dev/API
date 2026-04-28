@@ -64,6 +64,13 @@ export function buildBrandingScript() {
       text-shadow: 0 0 12px rgba(61, 179, 255, 0.3);
     }
     
+    .m-rl-sep {
+      color: #4a4846;
+      font-size: 11px;
+      margin: 0 3px;
+      opacity: 0.8;
+    }
+    
     .m-rl-val.unlimited {
       font-size: 20px;
       background: linear-gradient(135deg, #3db3ff, #ff6b00);
@@ -245,7 +252,7 @@ export function buildBrandingScript() {
           var rlWidget = document.createElement('div');
           rlWidget.id = 'm-rl-widget';
           rlWidget.className = 'm-rl-widget';
-          rlWidget.innerHTML = '<div class="cl-btn-dot checking" id="rl-dot"></div><span class="m-rl-label">Rate Limit</span><div class="m-rl-val-box" id="m-rl-val-container"><span id="m-rl-val" class="m-rl-val">--</span>/<span id="m-rl-limit" class="m-rl-val">--</span></div>';
+          rlWidget.innerHTML = '<div class="cl-btn-dot checking" id="rl-dot"></div><span class="m-rl-label">Rate Limit</span><div class="m-rl-val-box" id="m-rl-val-container"><span id="m-rl-val" class="m-rl-val">--</span><span class="m-rl-sep">/</span><span id="m-rl-limit" class="m-rl-val">--</span></div>';
           document.body.appendChild(rlWidget);
 
           async function updateRL() {
@@ -301,7 +308,7 @@ export function buildBrandingScript() {
                   if (dot) dot.className = 'cl-btn-dot up';
                 } else if (remaining !== null && limit !== null) {
                   if (!document.getElementById('m-rl-limit')) {
-                    container.innerHTML = '<span id="m-rl-val" class="m-rl-val">--</span>/<span id="m-rl-limit" class="m-rl-val">--</span>';
+                    container.innerHTML = '<span id="m-rl-val" class="m-rl-val">--</span><span class="m-rl-sep">/</span><span id="m-rl-limit" class="m-rl-val">--</span>';
                   }
                   var curValEl = document.getElementById('m-rl-val');
                   var curLimitEl = document.getElementById('m-rl-limit');
