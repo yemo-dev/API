@@ -111,33 +111,21 @@ npm install
 
 ### Execution Profiles
 
-> [!TIP]
-> Use **Cluster Performance Mode** for production environments to utilize all CPU cores and maximize throughput.
-
-**Standard Execution** (Development / Single-Core)
+**Standard Execution**
 ```bash
 npm run start
 ```
 
-**Cluster Performance Mode** (Production / Multi-Core)
+**Development Mode** (with Auto-Reload)
 ```bash
-npm run dev:cluster
+npm run dev
 ```
 
 ---
 
+
+
 ## API Reference
-
-### Anime and Media Services
-Endpoints for comprehensive media metadata retrieval.
-
-| Endpoint | Method | Parameter | Description |
-| :--- | :---: | :--- | :--- |
-| `/api/anime/home` | `GET` | *None* | Global featured content and latest updates. |
-| `/api/anime/search` | `GET` | `q` | Full-text search across the media database. |
-| `/api/anime/detail/{slug}` | `GET` | `slug` | Comprehensive metadata for a single entry. |
-| `/api/anime/episode/{slug}` | `GET` | `slug` | Direct streaming assets and mirror availability. |
-| `/api/anime/popular` | `GET` | *None* | High-engagement titles based on user traffic. |
 
 ### Infrastructure Monitoring
 System-level diagnostics and real-time health metrics.
@@ -155,7 +143,7 @@ System-level diagnostics and real-time health metrics.
 Pass your `x-api-key` in the header or as a query parameter (`?apikey=`) to authenticate.
 
 ```bash
-curl -X GET "http://localhost:4000/api/anime/search?q=query" \
+curl -X GET "http://localhost:4000/api/stats" \
      -H "x-api-key: your_api_token" \
      -H "Content-Type: application/json"
 ```
