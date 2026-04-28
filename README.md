@@ -50,18 +50,29 @@ enabled: false // ads are hidden
 enabled: true  // ads will show after 'delayMs' milliseconds
 ```
 
-### Adding Multiple Sponsors
+### Multi-Sponsor Responsive Grid
 
-Simply add more objects to the `sponsors` array:
+The system automatically adjusts its layout based on the number of sponsors:
+- **1 Sponsor**: Featured full-width card.
+- **2-4 Sponsors**: Responsive 2-column grid on desktop, single-column list on mobile.
+- **Max Capacity**: Optimized for up to 4 sponsors to maintain premium aesthetics.
 
-```javascript
-sponsors: [
-  { name: 'SponsorA', type: 'Hosting Provider', ... },
-  { name: 'SponsorB', type: 'CDN Provider', ... },
-]
-```
+### Interactive Animations (AnimeJS)
 
-Each sponsor card will slide in with a staggered AnimeJS animation.
+- **Entrance**: Staggered slide-in and scale animation for cards and logos.
+- **Hover Effects**: 
+    - Banner: Subtle scale (`1.05`) and opacity transition.
+    - Logo: Interactive scale and rotate (`8deg`) effect.
+    - Shine: CSS-powered light sweep across the card.
+
+### Asset Configuration
+
+| Field | Description | Format |
+| :--- | :--- | :--- |
+| `logoUrl` | Square icon, displayed in blue circle | SVG (Recommended), PNG |
+| `bannerUrl` | 1200×400 banner | SVG (Recommended), WebP, JPG |
+| `targetUrl` | Destination link | HTTPS URL |
+
 
 ### Sponsor Type Categories
 

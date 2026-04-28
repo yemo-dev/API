@@ -19,8 +19,8 @@ export const adsCSS = `
 
   .sponsor-modal {
     width: 90%;
-    max-width: 420px;
-    max-height: 80vh;
+    max-width: 480px;
+    max-height: 85vh;
     background: var(--scalar-background-1);
     border: 1px solid var(--scalar-border-color);
     border-radius: 12px;
@@ -75,14 +75,23 @@ export const adsCSS = `
   }
 
   .sponsor-modal-body {
-    padding: 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+    padding: 10px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
     overflow-y: auto;
     flex: 1;
     scrollbar-width: thin;
     scrollbar-color: var(--scalar-border-color) transparent;
+  }
+
+  @media (min-width: 640px) {
+    .sponsor-modal {
+      max-width: 600px;
+    }
+    .sponsor-modal-body:has(.sponsor-card:nth-child(2)) {
+      grid-template-columns: 1fr 1fr;
+    }
   }
 
   .sponsor-card {
@@ -94,14 +103,15 @@ export const adsCSS = `
     transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     position: relative;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
     -webkit-tap-highlight-color: transparent;
   }
 
   .sponsor-card:hover {
     border-color: #5865F2;
-    transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(88, 101, 242, 0.15);
+    transform: translateY(-3px);
+    box-shadow: 0 15px 30px rgba(88, 101, 242, 0.15);
   }
 
   .sponsor-card-header {
@@ -123,7 +133,12 @@ export const adsCSS = `
     justify-content: center;
     overflow: hidden;
     flex-shrink: 0;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     pointer-events: none;
+  }
+
+  .sponsor-card:hover .sponsor-logo {
+    transform: scale(1.15) rotate(8deg);
   }
 
   .sponsor-logo img {
@@ -146,6 +161,9 @@ export const adsCSS = `
     color: var(--scalar-color-1);
     margin: 0;
     line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .sponsor-type {
@@ -163,9 +181,6 @@ export const adsCSS = `
     overflow: hidden;
     background: #000;
     position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     pointer-events: none;
   }
 
@@ -180,7 +195,7 @@ export const adsCSS = `
 
   .sponsor-card:hover .sponsor-banner-image {
     opacity: 1;
-    transform: scale(1.04);
+    transform: scale(1.05);
   }
 
   .sponsor-modal-footer {
@@ -205,8 +220,8 @@ export const adsCSS = `
       margin: 0;
     }
     .sponsor-modal-body {
-      padding: 6px;
-      gap: 6px;
+      padding: 8px;
+      gap: 8px;
     }
     .sponsor-card-header {
       padding: 6px 10px;
@@ -216,13 +231,10 @@ export const adsCSS = `
       height: 22px;
     }
     .sponsor-name {
-      font-size: 10.5px;
+      font-size: 10px;
     }
     .sponsor-modal-footer {
       padding: 6px;
-    }
-    .sponsor-support-text {
-      font-size: 7px;
     }
   }
 `;
