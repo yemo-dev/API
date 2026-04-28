@@ -1,0 +1,59 @@
+{
+    "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY ANTIGRAVITY FOR MIUUAPI",
+    "meta": {
+        "version": "PTDL_v1",
+        "update_url": null
+    },
+    "exported_at": "2026-04-28T06:18:00Z",
+    "name": "MiuuAPI Node.js",
+    "author": "miuubyte@gmail.com",
+    "description": "High-performance API gateway and documentation portal for MiuuAPI. Optimized for Node.js 20+ with automatic git cloning and clustering support.",
+    "features": null,
+    "docker_images": {
+        "Node.js 20": "ghcr.io/pterodactyl/yolks:nodejs_20"
+    },
+    "file_denylist": [],
+    "startup": "if [ ! -d \"node_modules\" ]; then npm install; fi; node src/index.js",
+    "config": {
+        "files": "{}",
+        "startup": "{\"done\": \"ready Worker\"}",
+        "logs": "{}",
+        "stop": "^C"
+    },
+    "scripts": {
+        "installation": {
+            "script": "#!/bin/bash\n# MiuuAPI Installation Script\n\napt update\napt install -y git curl jq\n\ncd /mnt/server\n\nif [ -z \"$(ls -A /mnt/server)\" ]; then\n    echo -e \"\\e[32mCloning MiuuAPI repository...\\e[0m\"\n    git clone ${GIT_ADDRESS} .\n    \n    if [ ! -z \"${GIT_BRANCH}\" ]; then\n        git checkout ${GIT_BRANCH}\n    fi\nelse\n    echo -e \"\\e[33mDirectory not empty. Skipping clone. Updating if possible...\\e[0m\"\n    if [ -d \".git\" ]; then\n        git pull\n    fi\nfi\n\necho -e \"\\e[32mInstalling dependencies...\\e[0m\"\nnpm install --production\n\necho -e \"\\e[32mInstallation completed successfully!\\e[0m\"",
+            "container": "debian:buster-slim",
+            "entrypoint": "bash"
+        }
+    },
+    "variables": [
+        {
+            "name": "Git Repository",
+            "description": "The URL of the MiuuAPI repository to clone.",
+            "env_variable": "GIT_ADDRESS",
+            "default_value": "https://github.com/miuubyte/API.git",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string"
+        },
+        {
+            "name": "Git Branch",
+            "description": "The branch to checkout.",
+            "env_variable": "GIT_BRANCH",
+            "default_value": "main",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string"
+        },
+        {
+            "name": "Server Port",
+            "description": "The port the API will listen on.",
+            "env_variable": "SERVER_PORT",
+            "default_value": "4000",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|numeric"
+        }
+    ]
+}
