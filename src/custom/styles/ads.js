@@ -138,13 +138,33 @@ export const adsCSS = `
   }
   .sponsor-type {
     display: inline-block;
-    font-size: 11px;
-    font-weight: 500;
+    font-size: 9px;
+    font-weight: 800;
     color: var(--scalar-color-accent);
-    background: color-mix(in srgb, var(--scalar-color-accent) 15%, transparent);
-    padding: 1px 7px;
-    border-radius: 20px;
-    letter-spacing: 0.03em;
+    border: 1px solid var(--scalar-color-accent);
+    padding: 2px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    background: color-mix(in srgb, var(--scalar-color-accent) 8%, transparent);
+    box-shadow: 0 0 12px color-mix(in srgb, var(--scalar-color-accent) 25%, transparent);
+    position: relative;
+    overflow: hidden;
+  }
+  .sponsor-type::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    animation: sponsor-shimmer 3s infinite;
+  }
+  @keyframes sponsor-shimmer {
+    0% { left: -100%; }
+    20%, 100% { left: 100%; }
   }
 
   /* Card Body (Banner Image) */
