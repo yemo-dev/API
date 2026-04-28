@@ -99,12 +99,12 @@ export const keyStatusHandler = async (c) => {
 
         return c.json({
             success: true,
-            key: 'Guest',
-            type: 'Default',
+            key: 'GUEST_MODE',
+            type: 'Free Tier',
             limit: guestConfig.limit,
             remaining: remaining,
-            description: 'Default guest rate limit',
-            owner: 'Guest User'
+            description: 'Standard access for guest users',
+            owner: 'Public Guest'
         }, 200)
     }
 
@@ -125,8 +125,10 @@ export const keyStatusHandler = async (c) => {
     return c.json({
         success: true,
         key: apiKey,
-        ...keyInfo,
+        type: 'MiuuAPI Member',
         limit: keyInfo.limit === 0 ? 'Unlimited' : keyInfo.limit,
-        remaining: remaining
+        remaining: remaining,
+        description: 'Unlimited Premium Access',
+        owner: keyInfo.name || 'API Partner'
     }, 200)
 }

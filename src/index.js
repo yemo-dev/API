@@ -18,6 +18,7 @@ import { logApiRequest } from './middlewares/accessLog.js'
 import { rateLimiter } from './middlewares/rateLimit.js'
 import { prettyPrint } from './middlewares/pretty.js'
 import { buildBrandingScript } from './custom/index.js'
+import { banManager } from './utils/banManager.js'
 
 const port = appConfig.port
 
@@ -44,13 +45,15 @@ const killPort = () => {
     } catch (e) { }
 }
 
-import { banManager } from './utils/banManager.js'
-
 const numCPUs = os.cpus().length
 const isCluster = process.argv.includes('--cluster')
 
 if (cluster.isPrimary) {
     killPort()
+    
+    setInterval(() => {
+        banManager.cleanup()
+    }, 15 * 1000)
 }
 
 if (isCluster && cluster.isPrimary) {
@@ -102,8 +105,7 @@ if (isCluster && cluster.isPrimary) {
         for (const [id, data] of masterClients.entries()) {
             if (now > data.resetTime) masterClients.delete(id)
         }
-        banManager.cleanup()
-    }, 30 * 1000)
+    }, 60 * 1000)
 
     cluster.on('exit', (worker) => {
         logger.warn(`Worker ${worker.process.pid} died. Restarting...`)
