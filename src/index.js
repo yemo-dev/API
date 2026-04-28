@@ -54,6 +54,13 @@ if (isCluster && cluster.isPrimary) {
     logger.info(`Starting ${numCPUs} workers...`)
 
     const masterClients = new Map()
+    const masterBanList = []
+
+    const broadcastBanList = () => {
+        Object.values(cluster.workers).forEach(w => {
+            if (w) w.send({ type: 'BAN_LIST_SYNC', data: masterBanList })
+        })
+    }
 
     for (let i = 0; i < numCPUs; i++) {
         const worker = cluster.fork()
@@ -85,6 +92,12 @@ if (isCluster && cluster.isPrimary) {
                     type: 'RATE_LIMIT_SYNC_RES',
                     data: { id, ...clientData }
                 })
+            } else if (msg.type === 'BAN_IP') {
+                const { ip, reason, expires } = msg.data
+                if (!masterBanList.find(b => b.ip === ip)) {
+                    masterBanList.push({ ip, reason, expires })
+                    broadcastBanList()
+                }
             }
         })
     }
@@ -94,7 +107,13 @@ if (isCluster && cluster.isPrimary) {
         for (const [id, data] of masterClients.entries()) {
             if (now > data.resetTime) masterClients.delete(id)
         }
-    }, 10 * 60 * 1000)
+        for (let i = masterBanList.length - 1; i >= 0; i--) {
+            if (now > masterBanList[i].expires) {
+                masterBanList.splice(i, 1)
+                broadcastBanList()
+            }
+        }
+    }, 60 * 1000)
 
     cluster.on('exit', (worker) => {
         logger.warn(`Worker ${worker.process.pid} died. Restarting...`)

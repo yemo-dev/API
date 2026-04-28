@@ -5,6 +5,15 @@ import { apiKeys, guestConfig, banList, autoBanConfig } from '../configs/apiKeys
 const clients = new Map()
 const ipMonitor = new Map()
 
+if (cluster.isWorker) {
+    process.on('message', (msg) => {
+        if (msg.type === 'BAN_LIST_SYNC') {
+            banList.length = 0
+            banList.push(...msg.data)
+        }
+    })
+}
+
 const syncRateLimit = (data) => {
     return new Promise((resolve) => {
         const handler = (msg) => {
@@ -61,11 +70,16 @@ export const rateLimiter = () => {
             } else {
                 monitor.count++
                 if (monitor.count > autoBanConfig.threshold) {
-                    banList.push({ 
+                    const banData = { 
                         ip, 
                         reason: 'Auto-ban: DDoS Protection', 
                         expires: now + autoBanConfig.banDuration 
-                    })
+                    }
+                    if (cluster.isWorker) {
+                        process.send({ type: 'BAN_IP', data: banData })
+                    } else {
+                        banList.push(banData)
+                    }
                     return c.json({
                         success: false,
                         status: 403,
