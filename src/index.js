@@ -58,10 +58,23 @@ if (isCluster && cluster.isPrimary) {
     const masterClients = new Map()
     const masterAutoBanList = []
 
+    const syncAutoBanListToFile = () => {
+        try {
+            const filePath = path.resolve('src/configs/apiKeys.js')
+            let content = fs.readFileSync(filePath, 'utf8')
+            const listString = JSON.stringify(masterAutoBanList, null, 4)
+            content = content.replace(/export const autoBanList = \[([\s\S]*?)\]/, `export const autoBanList = ${listString}`)
+            fs.writeFileSync(filePath, content, 'utf8')
+        } catch (e) {
+            logger.error(`Failed to sync autoBanList to file: ${e.message}`)
+        }
+    }
+
     const broadcastBanList = () => {
         Object.values(cluster.workers).forEach(w => {
             if (w) w.send({ type: 'BAN_LIST_SYNC', data: masterAutoBanList })
         })
+        syncAutoBanListToFile()
     }
 
     for (let i = 0; i < numCPUs; i++) {
@@ -106,16 +119,23 @@ if (isCluster && cluster.isPrimary) {
 
     setInterval(() => {
         const now = Date.now()
+        let changed = false
+
         for (const [id, data] of masterClients.entries()) {
             if (now > data.resetTime) masterClients.delete(id)
         }
+        
         for (let i = masterAutoBanList.length - 1; i >= 0; i--) {
             if (now > masterAutoBanList[i].expires) {
                 masterAutoBanList.splice(i, 1)
-                broadcastBanList()
+                changed = true
             }
         }
-    }, 60 * 1000)
+
+        if (changed) {
+            broadcastBanList()
+        }
+    }, 30 * 1000)
 
     cluster.on('exit', (worker) => {
         logger.warn(`Worker ${worker.process.pid} died. Restarting...`)
