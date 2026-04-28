@@ -1333,3 +1333,8 @@ Restarting 'src/index.js'
 [2m[18.41.37][0m [34mΓùÅ[0m [36m[ENDPOINT][0m [1mHEAD[0m [32m200[0m [90m/api/auth/check[0m [2m1.37ms[0m [2m[Guest][0m
 [2m[18.41.40][0m [34mΓùÅ[0m [36m[ENDPOINT][0m [1mHEAD[0m [32m200[0m [90m/api/auth/check[0m [2m1.00ms[0m [2m[Guest][0m
 [2m[18.41.43][0m [34mΓùÅ[0m [36m[ENDPOINT][0m [1mHEAD[0m [32m200[0m [90m/api/auth/check[0m [2m1.08ms[0m [2m[Guest][0m
+[2m[18.41.46][0m [34mΓùÅ[0m [36m[ENDPOINT][0m [1mHEAD[0m [32m200[0m [90m/api/auth/check[0m [2m1.69ms[0m [2m[Guest][0m
+[2m[18.41.49][0m [34mΓùÅ[0m [36m[ENDPOINT][0m [1mHEAD[0m [32m200[0m [90m/api/auth/check[0m [2m1.33ms[0m [2m[Guest][0m
+[2m[18.41.52][0m [34mΓùÅ[0m [36m[ENDPOINT][0m [1mHEAD[0m [32m200[0m [90m/api/auth/check[0m [2m1.16ms[0m [2m[Guest][0m
+[2m[18.41.55][0m [34mΓùÅ[0m [36m[ENDPOINT][0m [1mHEAD[0m [32m200[0m [90m/api/auth/check[0m [2m1.25ms[0m [2m[Guest][0m
+[2m[18.42.06][0m [34mΓùÅ[0m [36m[ENDPOINT][0m [1mHEAD[0m [32m200[0m [90m/api/auth/check[0m [2m1.40ms[0m [2m[Guest][0m
