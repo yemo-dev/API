@@ -4,8 +4,6 @@ MiuuAPI is a state-of-the-art API gateway and documentation infrastructure engin
 
 ---
 
----
-
 ## Core Capabilities
 
 ### High Availability Clustering
