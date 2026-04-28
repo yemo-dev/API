@@ -14,19 +14,19 @@ export const adsCSS = `
     justify-content: center;
     opacity: 0;
     pointer-events: none;
-    padding: 16px;
+    padding: 12px;
     transition: opacity 0.6s cubic-bezier(0.23, 1, 0.32, 1);
   }
 
   .sponsor-modal {
     width: 100%;
-    max-width: 480px;
-    max-height: 85vh;
+    max-width: 440px;
+    max-height: 80vh;
     background: var(--scalar-background-1);
     border: 1px solid var(--scalar-border-color);
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 50px 100px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.3);
     font-family: var(--scalar-font);
     opacity: 0;
     transform: scale(0.95) translateY(40px);
@@ -39,18 +39,18 @@ export const adsCSS = `
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 14px 18px;
+    padding: 12px 16px;
     background: var(--scalar-background-2);
     border-bottom: 1px solid var(--scalar-border-color);
     flex-shrink: 0;
   }
 
   .sponsor-modal-title {
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 800;
     color: var(--scalar-color-1);
     margin: 0;
-    letter-spacing: 0.2em;
+    letter-spacing: 0.25em;
     text-transform: uppercase;
     font-family: 'JetBrains Mono', monospace;
   }
@@ -59,8 +59,8 @@ export const adsCSS = `
     background: transparent;
     border: 1px solid var(--scalar-border-color);
     color: var(--scalar-color-3);
-    width: 26px;
-    height: 26px;
+    width: 24px;
+    height: 24px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -76,12 +76,14 @@ export const adsCSS = `
   }
 
   .sponsor-modal-body {
-    padding: 18px;
+    padding: 16px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 14px;
     overflow-y: auto;
     flex: 1;
+    scrollbar-width: thin;
+    scrollbar-color: var(--scalar-border-color) transparent;
   }
 
   .sponsor-card {
@@ -92,41 +94,41 @@ export const adsCSS = `
     cursor: pointer;
     transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     position: relative;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
     flex-shrink: 0;
   }
 
   .sponsor-card:hover {
     border-color: #5865F2;
     transform: translateY(-4px);
-    box-shadow: 0 20px 40px rgba(88, 101, 242, 0.15);
+    box-shadow: 0 15px 30px rgba(88, 101, 242, 0.15);
   }
 
   .sponsor-card-header {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 12px 16px;
+    padding: 10px 14px;
     border-bottom: 1px solid var(--scalar-border-color);
     background: linear-gradient(135deg, var(--scalar-background-2) 0%, var(--scalar-background-1) 100%);
   }
 
   .sponsor-logo {
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
     background: #5865F2;
     border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    box-shadow: 0 4px 10px rgba(88, 101, 242, 0.3);
+    box-shadow: 0 4px 8px rgba(88, 101, 242, 0.2);
     flex-shrink: 0;
   }
 
   .sponsor-logo img {
-    width: 70%;
-    height: 70%;
+    width: 75%;
+    height: 75%;
     object-fit: contain;
     filter: brightness(0) invert(1);
   }
@@ -138,10 +140,11 @@ export const adsCSS = `
   }
 
   .sponsor-name {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 800;
     color: var(--scalar-color-1);
     margin: 0;
+    line-height: 1.2;
   }
 
   .sponsor-type {
@@ -155,10 +158,13 @@ export const adsCSS = `
 
   .sponsor-card-body {
     width: 100%;
-    aspect-ratio: 3 / 1;
+    aspect-ratio: 1200 / 400;
     overflow: hidden;
     background: #000;
     position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .sponsor-banner-image {
@@ -166,17 +172,17 @@ export const adsCSS = `
     height: 100%;
     display: block;
     object-fit: cover;
-    opacity: 0.8;
+    opacity: 0.85;
     transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .sponsor-card:hover .sponsor-banner-image {
     opacity: 1;
-    transform: scale(1.05);
+    transform: scale(1.04);
   }
 
   .sponsor-modal-footer {
-    padding: 14px;
+    padding: 12px;
     text-align: center;
     background: var(--scalar-background-2);
     border-top: 1px solid var(--scalar-border-color);
@@ -184,11 +190,11 @@ export const adsCSS = `
   }
 
   .sponsor-support-text {
-    font-size: 9px;
+    font-size: 8.5px;
     color: var(--scalar-color-3);
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.15em;
   }
 
   .sponsor-card::after {
@@ -209,22 +215,29 @@ export const adsCSS = `
   }
 
   @media (max-width: 480px) {
+    .sponsor-modal {
+      max-width: 92%;
+      max-height: 75vh;
+    }
     .sponsor-modal-body {
-      padding: 14px;
-      gap: 12px;
+      padding: 12px;
+      gap: 10px;
     }
     .sponsor-card-header {
-      padding: 10px 14px;
+      padding: 8px 12px;
     }
     .sponsor-logo {
-      width: 32px;
-      height: 32px;
+      width: 28px;
+      height: 28px;
     }
     .sponsor-name {
-      font-size: 13px;
+      font-size: 12px;
     }
     .sponsor-modal-footer {
-      padding: 12px;
+      padding: 10px;
+    }
+    .sponsor-support-text {
+      font-size: 8px;
     }
   }
 `;
