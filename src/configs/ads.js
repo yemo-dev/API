@@ -16,7 +16,7 @@ export const adsConfig = {
     /**
      * The title displayed at the top of the modal
      */
-    title: 'Featured Partner',
+    title: 'Sponsor',
 
     /**
      * List of sponsors to be displayed
